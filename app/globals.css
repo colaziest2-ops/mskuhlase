@@ -1,34 +1,37 @@
 @import "tailwindcss";
 
-/* Fonts (Space Grotesk / Inter / JetBrains Mono) are loaded via <link> tags in
-   app/layout.tsx for better performance and to avoid CSS @import ordering. */
+/* Fonts (IBM Plex Mono / Archivo) are loaded via <link> tags in app/layout.tsx
+   for better performance and to avoid CSS @import ordering. */
 
 /* ============================================================================
-   DESIGN SYSTEM — "Cybernetic Precision"
-   Tailwind v4 tokens. Everything (color, type, easing) is declared here so the
-   whole site derives from one source of truth. Utilities like `bg-void`,
-   `text-cyan`, `font-display` are generated automatically from these names.
+   DESIGN SYSTEM — "Signal Room"
+   Grounded in the visual language of a network operations desk: carbon
+   chassis, phosphor amber status text, hairline schematic panels. No glow,
+   no glassmorphism-by-default — structure reads as instrumentation, not
+   decoration. Token names are kept generic (cyan/emerald/violet) so every
+   component can reference them, but the values below define the real
+   palette: warm carbon, signal amber, CRT green, slate violet.
    ========================================================================== */
 @theme {
   /* -- Surfaces ---------------------------------------------------------- */
-  --color-void: #0a0a0f;          /* page background */
-  --color-panel: #101019;         /* raised glass panels */
-  --color-hairline: #1e1e2e;      /* borders / dividers */
+  --color-void: #0c0b09;           /* page background — warm carbon, not blue-black */
+  --color-panel: #16140f;          /* raised panels */
+  --color-hairline: #2e2a1f;       /* borders / dividers */
 
-  /* -- Telemetry neon accents ------------------------------------------- */
-  --color-cyan: #22d3ee;          /* real-time / primary */
-  --color-emerald: #34d399;       /* operational / success */
-  --color-violet: #a78bfa;        /* AI / edge intelligence */
+  /* -- Signal accents (semantic names kept; values are the real palette) -- */
+  --color-cyan: #f2a93b;           /* SIGNAL AMBER — primary, replaces neon cyan */
+  --color-emerald: #6fae8f;        /* CRT GREEN — operational / secondary */
+  --color-violet: #948bc4;         /* SLATE VIOLET — tertiary */
 
   /* -- Text -------------------------------------------------------------- */
-  --color-ink: #e6e6f0;           /* primary text */
-  --color-muted: #8b8ba0;         /* secondary text */
-  --color-faint: #4a4a5e;         /* tertiary / labels */
+  --color-ink: #ece7da;            /* primary text — warm off-white */
+  --color-muted: #a39a86;          /* secondary text */
+  --color-faint: #5c5546;          /* tertiary / labels */
 
   /* -- Type ------------------------------------------------------------- */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 
   /* -- Motion ----------------------------------------------------------- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -43,7 +46,6 @@
 }
 
 html {
-  /* Lenis handles smooth scroll in JS; keep native fallback off to avoid fight */
   scroll-behavior: auto;
 }
 
@@ -54,15 +56,14 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
-  /* subtle scanline + grid atmosphere so empty space still reads "system" */
+  /* fine grain + a single faint schematic grid — instrument-panel texture,
+     not a decorative gradient bloom */
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.06), transparent 45%),
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 100% 100%, 48px 48px, 48px 48px;
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 56px 56px, 56px 56px;
 }
 
-/* Hide the OS cursor only on devices with a real pointer (custom cursor takes over) */
 @media (hover: hover) and (pointer: fine) {
   * {
     cursor: none;
@@ -70,11 +71,10 @@ body {
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.25);
+  background: rgba(242, 169, 59, 0.25);
   color: #fff;
 }
 
-/* Thin, on-brand scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -91,10 +91,39 @@ body {
 
 /* ---- Reusable primitives ------------------------------------------------ */
 @utility glass {
-  background: color-mix(in srgb, var(--color-panel) 55%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: color-mix(in srgb, var(--color-panel) 70%, transparent);
   border: 1px solid var(--color-hairline);
+}
+
+/* Corner-bracket panel — viewfinder / rack-unit reticle marks instead of a
+   blurred glass card. This is the recurring structural device: it reads as
+   "this is instrumentation" rather than decoration. */
+@utility bracket-panel {
+  position: relative;
+  background: color-mix(in srgb, var(--color-panel) 70%, transparent);
+  border: 1px solid var(--color-hairline);
+}
+.bracket-panel::before,
+.bracket-panel::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--color-cyan);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.bracket-panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.bracket-panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
 }
 
 .eyebrow {
@@ -105,20 +134,42 @@ body {
   color: var(--color-faint);
 }
 
+/* Restrained emphasis: a thin animated underline rather than a text-shadow
+   glow. Reads as "marked" / annotated, not lit up. */
+.signal-mark,
 .neon-cyan {
   color: var(--color-cyan);
-  text-shadow: 0 0 18px color-mix(in srgb, var(--color-cyan) 55%, transparent);
+  position: relative;
+  display: inline-block;
+}
+.signal-mark::after,
+.neon-cyan::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.06em;
+  height: 3px;
+  background: var(--color-cyan);
+  transform-origin: left;
+  animation: signal-underline 0.6s var(--ease-out-expo) forwards;
+}
+@keyframes signal-underline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
-/* Pulsing operational status dot */
 .status-dot {
   position: relative;
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 9999px;
   background: var(--color-emerald);
-  box-shadow: 0 0 10px var(--color-emerald);
 }
 .status-dot::after {
   content: "";
@@ -136,7 +187,6 @@ body {
   }
 }
 
-/* Accessibility: honour the user's reduced-motion preference everywhere */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -148,7 +198,6 @@ body {
   }
 }
 
-/* Keyboard focus is always visible (never removed by the custom cursor) */
 :focus-visible {
   outline: 2px solid var(--color-cyan);
   outline-offset: 2px;

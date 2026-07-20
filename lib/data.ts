@@ -1,13 +1,12 @@
 /**
  * Single source of truth for all portfolio content.
- * Pulled from Masakhane Kuhlase's CV + the project brief so every section
- * renders from one place — edit here, not in the components.
+ * Pulled from Masakhane Kuhlase's CV. Edit here, not in the components.
  */
 
 export const profile = {
   name: "Masakhane Kuhlase",
-  role: "Technical Engineer",
-  subrole: "Security Systems Specialist · AxxonSoft",
+  role: "App & Web Developer",
+  subrole: "Networking & Security Systems Engineer · AxxonSoft",
   location: "Durban, South Africa",
   timezone: "Africa/Johannesburg", // GMT+2
   email: "mskuhlase1011@icloud.com",
@@ -17,10 +16,10 @@ export const profile = {
     linkedin: "https://www.linkedin.com/", // <- replace with your LinkedIn URL
   },
   summary:
-    "Technical Engineer specialising in real-time security management platforms. I support, troubleshoot and extend AxxonSoft systems (Axxon One, PSIM, Axxon Intellect), configure advanced video analytics, and build custom web tooling that turns raw telemetry into decisions.",
+    "I'm an App & Web Developer with a networking and security-systems engineering background. At AxxonSoft I build the custom web tooling that sits on top of live surveillance infrastructure, which means every interface I ship has to hold up against real network conditions — not just look good on a fast connection.",
 };
 
-/** 2027 skill clusters — feeds the interactive Skill Matrix radar. */
+/** Skill clusters — feeds the interactive Skill Matrix radar. */
 export interface SkillCluster {
   id: string;
   title: string;
@@ -32,39 +31,32 @@ export interface SkillCluster {
 
 export const skillClusters: SkillCluster[] = [
   {
-    id: "realtime",
-    title: "Real-Time Systems & Analytics",
+    id: "appdev",
+    title: "App & Web Development",
     accent: "cyan",
-    level: 92,
-    skills: ["Axxon One / PSIM", "Video Analytics (LPR)", "API Integration", "PowerShell Automation"],
+    level: 85,
+    skills: ["Custom Web Development", "HTML5", "Client Reporting UIs", "Responsive Layout"],
   },
   {
-    id: "fullstack",
-    title: "Full-Stack Architecture",
+    id: "backend",
+    title: "Backend & Languages",
     accent: "violet",
-    level: 80,
-    skills: ["Java", "C++", "Python", "PHP", "C#", "HTML5"],
+    level: 82,
+    skills: ["Java", "C++", "Python", "PHP", "C#", "PowerShell Automation"],
   },
   {
-    id: "infra",
-    title: "Cloud & Edge Infrastructure",
+    id: "network",
+    title: "Networking & Infrastructure",
     accent: "emerald",
-    level: 78,
-    skills: ["Microsoft Azure", "Windows / Linux", "Networking", "Cisco Technologies"],
-  },
-  {
-    id: "frontend",
-    title: "Interactive Frontend",
-    accent: "cyan",
-    level: 74,
-    skills: ["Custom Web Dev", "Client Reporting UI", "Responsive Layout", "Data Visualisation"],
+    level: 88,
+    skills: ["Cisco Technologies", "Network Configuration", "Troubleshooting", "Windows / Linux", "Microsoft Azure"],
   },
   {
     id: "data",
-    title: "Database & Performance",
-    accent: "violet",
+    title: "Data & Security Systems",
+    accent: "cyan",
     level: 84,
-    skills: ["SQL", "PostgreSQL", "Complex Aggregates", "Encrypted Delivery"],
+    skills: ["SQL", "PostgreSQL", "Axxon One / PSIM", "Video Analytics (LPR)", "Encrypted Delivery"],
   },
 ];
 
@@ -87,7 +79,7 @@ export const projects: Project[] = [
     name: "NSK Innovations",
     category: "Corporate & Modern Tech Platform",
     focus:
-      "Kinetic UI system with a component-driven Next.js architecture and layout optimisations that hold zero cumulative layout shift across breakpoints.",
+      "Component-driven Next.js build with layout optimisations that hold zero cumulative layout shift across breakpoints.",
     url: "https://nskinnovations.vercel.app/",
     stack: ["Next.js", "React", "Framer Motion", "Tailwind"],
     accent: "cyan",
@@ -99,7 +91,7 @@ export const projects: Project[] = [
     name: "Ruz Group",
     category: "Enterprise Agricultural Technology",
     focus:
-      "Structured modular frontend with high-contrast branding and seamless route transitions across a multi-division product catalogue.",
+      "Modular frontend with high-contrast branding and seamless route transitions across a multi-division product catalogue.",
     url: "https://ruzgroup.vercel.app/",
     stack: ["Next.js", "TypeScript", "Tailwind"],
     accent: "emerald",
@@ -111,7 +103,7 @@ export const projects: Project[] = [
     name: "Wrench on Wheels",
     category: "On-Demand Service & Logistics App",
     focus:
-      "Dynamic user flows with real-time booking interactions and a mobile-first performance budget for on-the-move mechanics.",
+      "Real-time booking flows on a mobile-first performance budget for mechanics working on the move.",
     url: "https://wrench-on-wheels.vercel.app/",
     stack: ["React", "State Machines", "Tailwind"],
     accent: "violet",
@@ -123,7 +115,7 @@ export const projects: Project[] = [
     name: "Monate Cakes",
     category: "Interactive E-Commerce / Showcase",
     focus:
-      "Client-side rendered product presentation with fluid asset loading and a visual-first browsing experience.",
+      "Client-side rendered product presentation with fluid asset loading for a visual-first browsing experience.",
     url: "https://monate-cakes.github.io/",
     stack: ["JavaScript", "GitHub Pages", "CSS3"],
     accent: "cyan",
@@ -135,7 +127,7 @@ export const projects: Project[] = [
     name: "Oxygas",
     category: "Industrial Web Infrastructure",
     focus:
-      "Secure server hosting on IIS/SolidCP with an SSL rewrite security pipeline hardening every request path.",
+      "Secure server hosting on IIS/SolidCP with an SSL rewrite pipeline hardening every request path — the networking side of the build.",
     url: "https://www.oxygas.co.za/Index.html",
     stack: ["IIS", "SolidCP", "SSL Pipeline"],
     accent: "emerald",
@@ -157,7 +149,7 @@ export const projects: Project[] = [
 ];
 
 export const stats = [
-  { value: 99.99, suffix: "%", label: "System Node Uptime", decimals: 2 },
-  { value: 6, suffix: "+", label: "Deployed Enterprise Platforms", decimals: 0 },
-  { value: 100, prefix: "<", suffix: "ms", label: "Edge Telemetry Latency", decimals: 0 },
+  { value: 99.99, suffix: "%", label: "Network Uptime Supported", decimals: 2 },
+  { value: 6, suffix: "+", label: "Deployed Web Platforms", decimals: 0 },
+  { value: 100, prefix: "<", suffix: "ms", label: "Edge Analytics Latency", decimals: 0 },
 ];

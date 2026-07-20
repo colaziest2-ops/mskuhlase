@@ -49,9 +49,10 @@ export default function Terminal() {
           { type: "out", text: "AVAILABLE COMMANDS" },
           { type: "out", text: "  help      — list commands" },
           { type: "out", text: "  axxon     — engineering background at AxxonSoft" },
-          { type: "out", text: "  skills    — 2027 tech stack" },
+          { type: "out", text: "  network   — networking & infrastructure background" },
+          { type: "out", text: "  skills    — full stack breakdown" },
           { type: "out", text: "  projects  — launch links to deployed apps" },
-          { type: "out", text: "  ping      — latency across distributed nodes" },
+          { type: "out", text: "  ping      — latency across the network" },
           { type: "out", text: "  clear     — clear the screen" },
         ]);
         break;
@@ -65,6 +66,18 @@ export default function Terminal() {
           { type: "out", text: "Spar) via analytics + API + PowerShell with" },
           { type: "out", text: "encrypted delivery. Deployed Axxon One affinities," },
           { type: "out", text: "integrations & clusters for a mining operation." },
+        ]);
+        break;
+
+      case "network":
+        push([
+          { type: "out", text: "NETWORKING & INFRASTRUCTURE BACKGROUND" },
+          { type: "out", text: "Cisco networking, network configuration and" },
+          { type: "out", text: "troubleshooting, Windows/Linux administration," },
+          { type: "out", text: "and Microsoft Azure (AZ-900 complete; AZ-204," },
+          { type: "out", text: "AI-900, AI-102, DP-900, DP-100 in progress)." },
+          { type: "out", text: "This is the layer beneath every app I ship —" },
+          { type: "out", text: "I design for the network it actually runs on." },
         ]);
         break;
 

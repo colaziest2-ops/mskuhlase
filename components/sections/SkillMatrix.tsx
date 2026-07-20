@@ -14,9 +14,9 @@ import { motion } from "framer-motion";
 import { skillClusters } from "@/lib/data";
 
 const accentHex: Record<string, string> = {
-  cyan: "#22d3ee",
-  emerald: "#34d399",
-  violet: "#a78bfa",
+  cyan: "#f2a93b",
+  emerald: "#6fae8f",
+  violet: "#948bc4",
 };
 
 // Radar geometry helpers -----------------------------------------------------
@@ -49,9 +49,9 @@ export default function SkillMatrix() {
       <header className="mb-16 max-w-2xl">
         <p className="eyebrow mb-3">02 — Capability Map</p>
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-          Architectural philosophy,
+          Four disciplines,
           <br />
-          <span className="neon-cyan">measured in clusters.</span>
+          <span className="neon-cyan">one working stack.</span>
         </h2>
       </header>
 

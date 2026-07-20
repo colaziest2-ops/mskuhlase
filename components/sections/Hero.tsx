@@ -22,7 +22,7 @@ const NodeBackground = dynamic(() => import("@/components/canvas/NodeBackground"
   ssr: false,
 });
 
-const HEADLINE = ["Engineered for", "Real-Time Systems.", "Scaled for the Web."];
+const HEADLINE = ["Full-Stack Developer,", "Grounded in Networks."];
 
 export default function Hero() {
   const rootRef = useRef<HTMLElement>(null);
@@ -51,15 +51,15 @@ export default function Hero() {
     >
       <NodeBackground />
 
-      {/* Live telemetry badge */}
+      {/* Status badge — concrete, not decorative */}
       <div className="hero-badge glass mb-10 flex items-center gap-3 rounded-full px-5 py-2">
         <span className="status-dot" />
         <span className="font-mono text-[0.7rem] tracking-[0.2em] text-muted">
-          ALL NODES OPERATIONAL
+          NETWORK STATUS: ONLINE
         </span>
         <span className="h-3 w-px bg-hairline" />
         <span className="font-mono text-[0.7rem] tracking-[0.2em] text-cyan">
-          2027 SYSTEM ARCHITECTURE
+          DURBAN, SOUTH AFRICA
         </span>
       </div>
 
@@ -75,8 +75,9 @@ export default function Hero() {
       </h1>
 
       <p className="hero-sub mt-8 max-w-xl text-center text-base leading-relaxed text-muted sm:text-lg">
-        {profile.role} at AxxonSoft — building real-time distributed video
-        systems, edge analytics, and the web tooling that makes them legible.
+        {profile.role} at AxxonSoft with a background in network engineering
+        and security systems — I build the app and web layer, and I
+        understand the infrastructure it has to run on.
       </p>
 
       <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">

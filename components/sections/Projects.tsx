@@ -14,9 +14,9 @@ import { ArrowUpRight, ExternalLink, Gauge, Timer, X } from "lucide-react";
 import { projects, type Project } from "@/lib/data";
 
 const accentHex: Record<string, string> = {
-  cyan: "#22d3ee",
-  emerald: "#34d399",
-  violet: "#a78bfa",
+  cyan: "#f2a93b",
+  emerald: "#6fae8f",
+  violet: "#948bc4",
 };
 
 // Build a unique, stable list of filter categories.
