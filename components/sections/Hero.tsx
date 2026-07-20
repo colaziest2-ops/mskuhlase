@@ -3,29 +3,64 @@
 /**
  * Hero
  * ----
- * Full-viewport opener: the 3D node network sits behind a GSAP-driven kinetic
- * headline reveal, a live "all nodes operational" telemetry badge, and a
- * magnetic CTA. This is the thesis of the page — the distributed-systems world
- * stated visually before a word is read.
+ * Full-viewport opener: the 3D network topology sits behind a GSAP kinetic
+ * headline reveal, a rotating status badge (part real, part just for fun —
+ * that's on purpose, it's the first "human, not corporate" signal on the
+ * page), a live Durban clock, and a magnetic CTA.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { ArrowDown } from "lucide-react";
 import MagneticButton from "@/components/ui/MagneticButton";
-import { profile } from "@/lib/data";
+import { profile, statusMessages } from "@/lib/data";
 
-// The 3D canvas is client-only and heavy — load it lazily so it never blocks
-// first paint or the server render.
 const NodeBackground = dynamic(() => import("@/components/canvas/NodeBackground"), {
   ssr: false,
 });
 
 const HEADLINE = ["Full-Stack Developer,", "Grounded in Networks."];
 
+/** Rotates through statusMessages every few seconds — real status mixed with
+ * a bit of personality, so the badge doesn't read like a corporate uptime
+ * widget nobody actually wrote. */
+function useRotatingStatus(intervalMs = 3400) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % statusMessages.length);
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return statusMessages[index];
+}
+
+/** Live clock, Durban time — small proof the site is actually alive. */
+function useLiveClock() {
+  const [time, setTime] = useState("--:--:--");
+  useEffect(() => {
+    const tick = () => {
+      setTime(
+        new Intl.DateTimeFormat("en-GB", {
+          timeZone: profile.timezone,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date())
+      );
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+}
+
 export default function Hero() {
   const rootRef = useRef<HTMLElement>(null);
+  const status = useRotatingStatus();
+  const time = useLiveClock();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -51,19 +86,25 @@ export default function Hero() {
     >
       <NodeBackground />
 
-      {/* Status badge — concrete, not decorative */}
+      {/* Status badge — rotates between a genuine status and a bit of tone.
+          Fades the text on each swap rather than snapping, so it doesn't
+          look like a bug. */}
       <div className="hero-badge glass mb-10 flex items-center gap-3 rounded-full px-5 py-2">
         <span className="status-dot" />
-        <span className="font-mono text-[0.7rem] tracking-[0.2em] text-muted">
-          NETWORK STATUS: ONLINE
+        <span
+          key={status}
+          className="font-mono text-[0.7rem] tracking-[0.2em] text-muted"
+          style={{ animation: "fade-in 0.4s ease-out" }}
+        >
+          {status}
         </span>
         <span className="h-3 w-px bg-hairline" />
         <span className="font-mono text-[0.7rem] tracking-[0.2em] text-cyan">
-          DURBAN, SOUTH AFRICA
+          {time} SAST
         </span>
       </div>
 
-      {/* Kinetic headline — each line clips its span for the reveal */}
+      {/* Kinetic headline */}
       <h1 className="text-center font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
         {HEADLINE.map((line, i) => (
           <span key={i} className="hero-line block overflow-hidden py-1">
@@ -75,9 +116,7 @@ export default function Hero() {
       </h1>
 
       <p className="hero-sub mt-8 max-w-xl text-center text-base leading-relaxed text-muted sm:text-lg">
-        {profile.role} at AxxonSoft with a background in network engineering
-        and security systems — I build the app and web layer, and I
-        understand the infrastructure it has to run on.
+        {profile.summary}
       </p>
 
       <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -89,7 +128,6 @@ export default function Hero() {
         </MagneticButton>
       </div>
 
-      {/* Scroll cue */}
       <a
         href="#skills"
         className="hero-scroll absolute bottom-8 flex flex-col items-center gap-2 text-faint transition-colors hover:text-cyan"

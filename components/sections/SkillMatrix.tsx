@@ -169,6 +169,9 @@ export default function SkillMatrix() {
                   }}
                 >
                   <div className="overflow-hidden">
+                    <p className="pt-3 text-sm leading-relaxed text-muted">
+                      {c.story}
+                    </p>
                     <div className="flex flex-wrap gap-2 pt-3">
                       {c.skills.map((s) => (
                         <span

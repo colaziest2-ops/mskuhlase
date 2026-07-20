@@ -164,6 +164,16 @@ function Drawer({ project, onClose }: { project: Project; onClose: () => void })
             <p className="text-sm leading-relaxed text-muted">{project.focus}</p>
           </div>
 
+          <div>
+            <p className="eyebrow mb-2">The Real Challenge</p>
+            <p className="text-sm leading-relaxed text-muted">{project.challenge}</p>
+          </div>
+
+          <div>
+            <p className="eyebrow mb-2">What It Taught Me</p>
+            <p className="text-sm leading-relaxed text-muted">{project.lesson}</p>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="glass rounded-xl p-4">
               <Gauge className="mb-2 h-4 w-4 text-emerald" />

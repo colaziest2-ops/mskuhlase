@@ -81,14 +81,12 @@ export default function Contact() {
         <div>
           <p className="eyebrow mb-3">05 — Contact</p>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
-            Let&apos;s architect
+            Got something
             <br />
-            <span className="neon-cyan">something resilient.</span>
+            <span className="neon-cyan">worth building?</span>
           </h2>
-          <p className="mt-6 max-w-md text-muted">
-            Open to real-time systems, VMS integration, and full-stack builds.
-            Fastest reply is by email.
-          </p>
+          <p className="mt-6 max-w-md text-muted">{profile.availability}</p>
+          <p className="mt-3 max-w-md text-sm text-faint">{profile.collabStyle}</p>
 
           {/* Live operational clock */}
           <div className="glass mt-10 inline-flex items-center gap-4 rounded-xl px-5 py-4">

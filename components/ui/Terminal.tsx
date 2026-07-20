@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { profile, projects, skillClusters } from "@/lib/data";
+import { profile, projects, skillClusters, jokes, durbanFacts } from "@/lib/data";
 
 interface Line {
   type: "in" | "out" | "sys";
@@ -48,11 +48,14 @@ export default function Terminal() {
         push([
           { type: "out", text: "AVAILABLE COMMANDS" },
           { type: "out", text: "  help      — list commands" },
+          { type: "out", text: "  whoami    — quick bio" },
           { type: "out", text: "  axxon     — engineering background at AxxonSoft" },
           { type: "out", text: "  network   — networking & infrastructure background" },
           { type: "out", text: "  skills    — full stack breakdown" },
           { type: "out", text: "  projects  — launch links to deployed apps" },
           { type: "out", text: "  ping      — latency across the network" },
+          { type: "out", text: "  joke      — one dev joke, no refunds" },
+          { type: "out", text: "  durban    — a fact about the city I work from" },
           { type: "out", text: "  clear     — clear the screen" },
         ]);
         break;
@@ -67,6 +70,28 @@ export default function Terminal() {
           { type: "out", text: "encrypted delivery. Deployed Axxon One affinities," },
           { type: "out", text: "integrations & clusters for a mining operation." },
         ]);
+        break;
+
+      case "whoami":
+        push([
+          { type: "out", text: `${profile.name}` },
+          { type: "out", text: `${profile.role} — ${profile.subrole}` },
+          { type: "out", text: `Based in ${profile.location}. Studied networking.` },
+          { type: "out", text: "Ended up shipping web apps anyway. It happens." },
+        ]);
+        break;
+
+      case "joke":
+        push([{ type: "out", text: jokes[Math.floor(Math.random() * jokes.length)] }]);
+        break;
+
+      case "durban":
+        push([{ type: "out", text: durbanFacts[Math.floor(Math.random() * durbanFacts.length)] }]);
+        break;
+
+      case "sudo":
+      case "sudo make me a sandwich":
+        push([{ type: "out", text: "Nice try. You're not root here — I am." }]);
         break;
 
       case "network":
