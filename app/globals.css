@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* Fonts (Space Grotesk / Inter / JetBrains Mono) are loaded via <link> tags in
+   app/layout.tsx for better performance and to avoid CSS @import ordering. */
+
+/* ============================================================================
+   DESIGN SYSTEM — "Cybernetic Precision"
+   Tailwind v4 tokens. Everything (color, type, easing) is declared here so the
+   whole site derives from one source of truth. Utilities like `bg-void`,
+   `text-cyan`, `font-display` are generated automatically from these names.
+   ========================================================================== */
+@theme {
+  /* -- Surfaces ---------------------------------------------------------- */
+  --color-void: #0a0a0f;          /* page background */
+  --color-panel: #101019;         /* raised glass panels */
+  --color-hairline: #1e1e2e;      /* borders / dividers */
+
+  /* -- Telemetry neon accents ------------------------------------------- */
+  --color-cyan: #22d3ee;          /* real-time / primary */
+  --color-emerald: #34d399;       /* operational / success */
+  --color-violet: #a78bfa;        /* AI / edge intelligence */
+
+  /* -- Text -------------------------------------------------------------- */
+  --color-ink: #e6e6f0;           /* primary text */
+  --color-muted: #8b8ba0;         /* secondary text */
+  --color-faint: #4a4a5e;         /* tertiary / labels */
+
+  /* -- Type ------------------------------------------------------------- */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* -- Motion ----------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Lenis handles smooth scroll in JS; keep native fallback off to avoid fight */
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  /* subtle scanline + grid atmosphere so empty space still reads "system" */
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.06), transparent 45%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+}
+
+/* Hide the OS cursor only on devices with a real pointer (custom cursor takes over) */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none;
+  }
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+  color: #fff;
+}
+
+/* Thin, on-brand scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyan);
+}
+
+/* ---- Reusable primitives ------------------------------------------------ */
+@utility glass {
+  background: color-mix(in srgb, var(--color-panel) 55%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--color-hairline);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+.neon-cyan {
+  color: var(--color-cyan);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--color-cyan) 55%, transparent);
+}
+
+/* Pulsing operational status dot */
+.status-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-emerald);
+  box-shadow: 0 0 10px var(--color-emerald);
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-emerald);
+  animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* Accessibility: honour the user's reduced-motion preference everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Keyboard focus is always visible (never removed by the custom cursor) */
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
