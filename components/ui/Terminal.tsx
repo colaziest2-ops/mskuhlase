@@ -98,11 +98,28 @@ export default function Terminal() {
 
   const push = (newLines: Line[]) => setLines((prev) => [...prev, ...newLines]);
 
-  /** Sends unrecognised input to Gemini and streams the reply into a single
-   * growing output line, the same pattern ChatWidget uses for Groq. */
+  /** Sends unrecognised input to Gemini. Shows an animated "thinking" cue
+   * while waiting (this endpoint doesn't stream tokens — see route.ts — so
+   * the animation is what tells the visitor something's actually happening,
+   * not that the terminal has frozen). If the server had to fall back to a
+   * different model (the requested one was overloaded), that's noted too. */
   async function askGemini(prompt: string) {
     setBusy(true);
-    push([{ type: "out", text: "…" }]);
+    push([{ type: "out", text: "thinking" }]);
+
+    // Animate the placeholder line: thinking / thinking. / thinking.. / ...
+    let dots = 0;
+    const anim = setInterval(() => {
+      dots = (dots + 1) % 4;
+      setLines((prev) => {
+        const copy = [...prev];
+        const last = copy[copy.length - 1];
+        if (last && last.text.startsWith("thinking")) {
+          copy[copy.length - 1] = { type: "out", text: "thinking" + ".".repeat(dots) };
+        }
+        return copy;
+      });
+    }, 400);
 
     try {
       const res = await fetch("/api/gemini", {
@@ -111,29 +128,37 @@ export default function Terminal() {
         body: JSON.stringify({ prompt, model }),
       });
 
-      if (!res.ok || !res.body) throw new Error("Gemini request failed");
+      clearInterval(anim);
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let acc = "";
-
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value: chunk } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(chunk, { stream: true });
-        setLines((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = { type: "out", text: acc || "…" };
-          return copy;
-        });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Gemini request failed");
       }
-    } catch {
+
+      const text = await res.text();
+      const modelUsed = res.headers.get("X-Model-Used");
+      const modelRequested = res.headers.get("X-Model-Requested");
+
+      const note =
+        modelUsed && modelRequested && modelUsed !== modelRequested
+          ? `\n(${modelRequested} was overloaded — answered via ${modelUsed} instead)`
+          : "";
+
+      setLines((prev) => {
+        const copy = [...prev];
+        copy[copy.length - 1] = { type: "out", text: (text || "…") + note };
+        return copy;
+      });
+    } catch (err) {
+      clearInterval(anim);
       setLines((prev) => {
         const copy = [...prev];
         copy[copy.length - 1] = {
           type: "out",
-          text: "Gemini didn't respond — try again in a moment.",
+          text:
+            err instanceof Error && err.message
+              ? err.message
+              : "Gemini didn't respond — try again in a moment.",
         };
         return copy;
       });
