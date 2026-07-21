@@ -13,7 +13,7 @@ export const profile = {
   subrole: "Full-Stack Development · VMS Operations",
   location: "Durban, South Africa", // [FILL] confirm — carried over, update if wrong
   timezone: "Africa/Johannesburg", // GMT+2
-  email: "[FILL: your real email]",
+  email: "mskuhlase1011@icloud.com",
   phone: "[FILL: your real phone]",
   socials: {
     github: "https://github.com/", // <- replace with your GitHub URL
@@ -35,10 +35,9 @@ export const profile = {
       text: "Split between client web builds and large-scale VMS work across mine sites.",
     },
   ],
-  collabStyle:
-    "[FILL: e.g. \"I like a clear brief and short check-ins over long email threads — I'll flag risk early rather than at the deadline.\"]",
+  collabStyle: "",
   availability:
-    "[FILL: e.g. \"Open to full-stack web work and systems/VMS engineering roles. Based in Durban, comfortable working remote.\"]",
+    "Got a question about the site, need something that isn't listed here, or want a copy of my CV? Just ask — happy to provide anything that isn't already on the page.",
 };
 
 export const statusMessages = [
@@ -186,3 +185,18 @@ export const pingJokes = [
   "Packet returned. Slightly judgmental about the request, but it returned.",
   "Latency's fine. It's the load-shedding schedule that's the real unpredictable variable here.",
 ];
+
+/**
+ * Gemini models confirmed available on the deployed key (pulled directly
+ * from https://generativelanguage.googleapis.com/v1beta/models). Shared
+ * between the client Terminal (model switcher UI) and the server
+ * /api/gemini route (validation allow-list) so they can never drift apart.
+ */
+export const ALLOWED_GEMINI_MODELS = [
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-2.5-pro",
+] as const;
+export type GeminiModel = (typeof ALLOWED_GEMINI_MODELS)[number];
+export const DEFAULT_GEMINI_MODEL: GeminiModel = "gemini-2.5-flash";

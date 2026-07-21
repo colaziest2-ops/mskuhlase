@@ -6,13 +6,14 @@
  * Magnetic contact form with floating labels + real-time validation feedback,
  * a live South Africa (GMT+2) operational clock, and kinetic social links.
  *
- * The form has no backend here — on submit it composes a mailto: so it works
- * out of the box. Swap `handleSubmit` for your API route when ready.
+ * Submitting now actually sends an email (via /api/contact -> Resend) rather
+ * than just opening the visitor's own mail app — that only worked if they
+ * had one configured, which many mobile browsers don't guarantee.
  */
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, MapPin } from "lucide-react";
+import { Github, Linkedin, Mail, MapPin, Check, X as XIcon } from "lucide-react";
 import { profile } from "@/lib/data";
 
 function useSATime() {
@@ -40,6 +41,8 @@ interface Field {
   touched: boolean;
 }
 
+type SendState = "idle" | "sending" | "sent" | "error";
+
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Contact() {
@@ -47,6 +50,8 @@ export default function Contact() {
   const [name, setName] = useState<Field>({ value: "", touched: false });
   const [email, setEmail] = useState<Field>({ value: "", touched: false });
   const [message, setMessage] = useState<Field>({ value: "", touched: false });
+  const [sendState, setSendState] = useState<SendState>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const nameErr = name.touched && name.value.trim().length < 2;
   const emailErr = email.touched && !emailRe.test(email.value);
@@ -56,16 +61,41 @@ export default function Contact() {
     emailRe.test(email.value) &&
     message.value.trim().length >= 10;
 
-  const handleSubmit = () => {
-    if (!valid) {
+  const handleSubmit = async () => {
+    if (!valid || sendState === "sending") {
       setName((f) => ({ ...f, touched: true }));
       setEmail((f) => ({ ...f, touched: true }));
       setMessage((f) => ({ ...f, touched: true }));
       return;
     }
-    const subject = encodeURIComponent(`Portfolio enquiry from ${name.value}`);
-    const body = encodeURIComponent(`${message.value}\n\n— ${name.value} (${email.value})`);
-    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+
+    setSendState("sending");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.value,
+          email: email.value,
+          message: message.value,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Something went wrong.");
+      }
+
+      setSendState("sent");
+      setName({ value: "", touched: false });
+      setEmail({ value: "", touched: false });
+      setMessage({ value: "", touched: false });
+    } catch (err) {
+      setSendState("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
+    }
   };
 
   const socials = [
@@ -86,10 +116,19 @@ export default function Contact() {
             <span className="neon-cyan">worth building?</span>
           </h2>
           <p className="mt-6 max-w-md text-muted">{profile.availability}</p>
-          <p className="mt-3 max-w-md text-sm text-faint">{profile.collabStyle}</p>
+
+          {/* Visible, clickable email */}
+          <a
+            href={`mailto:${profile.email}`}
+            data-cursor="hover"
+            className="mt-4 inline-flex items-center gap-2 font-mono text-sm text-cyan transition-colors hover:text-emerald"
+          >
+            <Mail className="h-4 w-4" />
+            {profile.email}
+          </a>
 
           {/* Live operational clock */}
-          <div className="glass mt-10 inline-flex items-center gap-4 rounded-xl px-5 py-4">
+          <div className="glass mt-8 inline-flex items-center gap-4 rounded-xl px-5 py-4">
             <span className="status-dot" />
             <div>
               <p className="font-mono text-lg text-cyan">{time}</p>
@@ -150,11 +189,23 @@ export default function Contact() {
 
           <button
             onClick={handleSubmit}
+            disabled={sendState === "sending"}
             data-cursor="hover"
             className="mt-4 w-full rounded-full bg-cyan px-6 py-3.5 text-sm font-medium text-void transition-colors hover:bg-emerald disabled:opacity-40"
           >
-            Send message
+            {sendState === "sending" ? "Sending…" : "Send message"}
           </button>
+
+          {sendState === "sent" && (
+            <p className="mt-3 flex items-center gap-2 font-mono text-xs text-emerald">
+              <Check className="h-4 w-4" /> Sent — I'll reply as soon as I can.
+            </p>
+          )}
+          {sendState === "error" && (
+            <p className="mt-3 flex items-center gap-2 font-mono text-xs text-[#ff5f57]">
+              <XIcon className="h-4 w-4" /> {errorMsg || "Something went wrong — try again, or email me directly."}
+            </p>
+          )}
         </div>
       </div>
     </section>

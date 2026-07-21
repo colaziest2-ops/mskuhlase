@@ -8,15 +8,11 @@
  * line by line, the same way /api/chat streams into the ChatWidget.
  */
 
-import { profile } from "@/lib/data";
+import { profile, ALLOWED_GEMINI_MODELS, DEFAULT_GEMINI_MODEL, type GeminiModel } from "@/lib/data";
 
 export const runtime = "nodejs";
 
 const MAX_PROMPT_CHARS = 2000;
-
-// Model name as of this writing — Google renames/retires these periodically.
-// Check https://ai.google.dev/gemini-api/docs/models if this ever 404s.
-const GEMINI_MODEL = "gemini-2.0-flash";
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -27,7 +23,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { prompt?: string };
+  let body: { prompt?: string; model?: string };
   try {
     body = await req.json();
   } catch {
@@ -45,13 +41,22 @@ export async function POST(req: Request) {
     });
   }
 
+  // Only ever use a model from the allow-list above — falls back to the
+  // default rather than erroring, so a stale client never hard-fails.
+  const requestedModel = body.model;
+  const model: GeminiModel = ALLOWED_GEMINI_MODELS.includes(
+    requestedModel as GeminiModel
+  )
+    ? (requestedModel as GeminiModel)
+    : DEFAULT_GEMINI_MODEL;
+
   // Short system-style context so terminal answers stay on-brand for a
   // portfolio shell rather than reading like a generic chatbot.
   const context = `You are a terminal assistant embedded in ${profile.name}'s developer portfolio. Someone has typed a command the terminal didn't recognise, so it's being routed to you. Answer helpfully and concisely — a few short lines, plain text only (no markdown headers, minimal formatting since this renders in a monospace terminal). If asked about ${profile.name} specifically and you don't know, say so plainly rather than guessing.\n\nUser input: ${prompt}`;
 
   try {
     const upstream = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,7 +71,12 @@ export async function POST(req: Request) {
       const errText = await upstream.text().catch(() => "");
       console.error("Gemini API error:", upstream.status, errText);
       return new Response(
-        JSON.stringify({ error: "Gemini request failed." }),
+        JSON.stringify({
+          error: "Gemini request failed.",
+          status: upstream.status,
+          detail: errText.slice(0, 500),
+          modelUsed: model,
+        }),
         { status: 502, headers: { "Content-Type": "application/json" } }
       );
     }

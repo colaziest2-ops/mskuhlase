@@ -23,6 +23,8 @@ import {
   durbanFacts,
   pingFlavourFacts,
   pingJokes,
+  ALLOWED_GEMINI_MODELS,
+  type GeminiModel,
 } from "@/lib/data";
 
 interface Line {
@@ -84,6 +86,7 @@ export default function Terminal() {
   const [history, setHistory] = useState<string[]>([]);
   const [hIndex, setHIndex] = useState(-1);
   const [busy, setBusy] = useState(false);
+  const [model, setModel] = useState<GeminiModel>("gemini-2.5-flash");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -103,7 +106,7 @@ export default function Terminal() {
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, model }),
       });
 
       if (!res.ok || !res.body) throw new Error("Gemini request failed");
