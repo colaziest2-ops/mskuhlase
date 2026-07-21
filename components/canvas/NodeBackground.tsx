@@ -15,7 +15,7 @@
  *  - Falls back gracefully: if WebGL is unavailable, React renders nothing.
  */
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
@@ -129,6 +129,29 @@ function Topology() {
 }
 
 export default function NodeBackground() {
+  // Touch devices don't get pointer-parallax anyway, and the R3F canvas is
+  // the single heaviest thing on the page — skip it entirely on touch/coarse
+  // pointers and fall back to a cheap static radial glow instead.
+  const [canRender3D, setCanRender3D] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
+    setCanRender3D(!mq.matches);
+  }, []);
+
+  if (!canRender3D) {
+    return (
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 30%, rgba(242,169,59,0.08), transparent 60%)",
+        }}
+      />
+    );
+  }
+
   return (
     <div
       aria-hidden

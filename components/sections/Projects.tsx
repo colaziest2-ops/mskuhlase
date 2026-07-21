@@ -120,21 +120,47 @@ function Drawer({ project, onClose }: { project: Project; onClose: () => void })
         transition={{ type: "spring", stiffness: 260, damping: 28 }}
         className="glass relative z-10 m-4 grid max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl lg:grid-cols-[1.2fr_1fr]"
       >
-        {/* Live preview */}
-        <div className="relative min-h-[240px] border-b border-hairline bg-void lg:border-b-0 lg:border-r">
-          <iframe
-            src={project.url}
-            title={`${project.name} live preview`}
-            className="h-full min-h-[240px] w-full"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-          />
-          <span
-            className="absolute left-3 top-3 rounded-full px-3 py-1 font-mono text-[0.6rem] tracking-widest text-void"
-            style={{ background: accentHex[project.accent] }}
-          >
-            ● LIVE PREVIEW
-          </span>
+        {/* Live preview — iframes are heavy and often blocked on mobile
+            browsers, so below md we skip the embed entirely and just link
+            out. If there's no public URL at all, show a plain fallback. */}
+        <div className="relative min-h-[160px] border-b border-hairline bg-void lg:min-h-[240px] lg:border-b-0 lg:border-r">
+          {project.url ? (
+            <>
+              <iframe
+                src={project.url}
+                title={`${project.name} live preview`}
+                className="hidden h-full min-h-[240px] w-full md:block"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              />
+              {/* Mobile fallback: no iframe, just a clear link out */}
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor="hover"
+                className="flex min-h-[160px] flex-col items-center justify-center gap-2 p-6 text-center md:hidden"
+              >
+                <ExternalLink className="h-6 w-6 text-cyan" />
+                <span className="font-mono text-xs text-muted">
+                  Preview embeds don&apos;t play nicely with mobile browsers —
+                  tap to open the live site instead.
+                </span>
+              </a>
+              <span
+                className="absolute left-3 top-3 rounded-full px-3 py-1 font-mono text-[0.6rem] tracking-widest text-void"
+                style={{ background: accentHex[project.accent] }}
+              >
+                ● LIVE PREVIEW
+              </span>
+            </>
+          ) : (
+            <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 p-6 text-center lg:min-h-[240px]">
+              <span className="font-mono text-xs text-faint">
+                No public link yet — internal / proprietary build.
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Detail */}
@@ -174,26 +200,28 @@ function Drawer({ project, onClose }: { project: Project; onClose: () => void })
             <p className="text-sm leading-relaxed text-muted">{project.lesson}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="glass rounded-xl p-4">
-              <Gauge className="mb-2 h-4 w-4 text-emerald" />
-              <p className="font-display text-2xl font-bold text-emerald">
-                {project.lighthouse}
-              </p>
-              <p className="font-mono text-[0.6rem] tracking-widest text-faint">
-                LIGHTHOUSE
-              </p>
+          {typeof project.lighthouse === "number" && typeof project.loadMs === "number" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="glass rounded-xl p-4">
+                <Gauge className="mb-2 h-4 w-4 text-emerald" />
+                <p className="font-display text-2xl font-bold text-emerald">
+                  {project.lighthouse}
+                </p>
+                <p className="font-mono text-[0.6rem] tracking-widest text-faint">
+                  LIGHTHOUSE
+                </p>
+              </div>
+              <div className="glass rounded-xl p-4">
+                <Timer className="mb-2 h-4 w-4 text-cyan" />
+                <p className="font-display text-2xl font-bold text-cyan">
+                  {project.loadMs}ms
+                </p>
+                <p className="font-mono text-[0.6rem] tracking-widest text-faint">
+                  LOAD TIME
+                </p>
+              </div>
             </div>
-            <div className="glass rounded-xl p-4">
-              <Timer className="mb-2 h-4 w-4 text-cyan" />
-              <p className="font-display text-2xl font-bold text-cyan">
-                {project.loadMs}ms
-              </p>
-              <p className="font-mono text-[0.6rem] tracking-widest text-faint">
-                LOAD TIME
-              </p>
-            </div>
-          </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             {project.stack.map((s) => (
@@ -206,15 +234,17 @@ function Drawer({ project, onClose }: { project: Project; onClose: () => void })
             ))}
           </div>
 
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor="hover"
-            className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-void transition-colors hover:bg-emerald"
-          >
-            Visit live site <ExternalLink className="h-4 w-4" />
-          </a>
+          {project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor="hover"
+              className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-void transition-colors hover:bg-emerald"
+            >
+              Visit live site <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
         </div>
       </motion.div>
     </motion.div>

@@ -1,60 +1,52 @@
 /**
  * Single source of truth for all portfolio content.
- * Pulled from Masakhane Kuhlase's CV. Edit here, not in the components.
  *
- * ⚠️ PLACEHOLDER FIELDS: anywhere you see [FILL: ...] below is a spot where
- * I (the AI) deliberately did NOT invent a number, metric, or personal story —
- * because I don't know if it's true, and fabricated stats on a real portfolio
- * are a bad idea. Swap those for your own real specifics before shipping.
+ * ⚠️ PLACEHOLDER FIELDS: [FILL: ...] marks anything I didn't invent — a
+ * specific date, employer name, metric, or live URL I wasn't given. Replace
+ * those with your real details before shipping. Everything else here comes
+ * directly from what you specified.
  */
 
 export const profile = {
-  name: "Masakhane Kuhlase",
-  role: "Full-Stack Developer",
-  subrole: "with a Networking & Security Systems background · AxxonSoft",
-  location: "Durban, South Africa",
+  name: "Siyabonga Kuhlase",
+  role: "Software Engineer & Technical Operations",
+  subrole: "Full-Stack Development · VMS Operations · Algorithmic Trading Systems",
+  location: "Durban, South Africa", // [FILL] confirm — carried over, update if wrong
   timezone: "Africa/Johannesburg", // GMT+2
-  email: "mskuhlase1011@icloud.com",
-  phone: "068 237 2341",
+  email: "[FILL: your real email]",
+  phone: "[FILL: your real phone]",
   socials: {
     github: "https://github.com/", // <- replace with your GitHub URL
     linkedin: "https://www.linkedin.com/", // <- replace with your LinkedIn URL
   },
   summary:
-    "I studied networking, ended up debugging surveillance software for a living, and somehow that turned me into a full-stack developer. I build apps and web platforms — React, Next.js, the usual suspects — but I still think in packets and uptime. Most developers guess at what happens when a request leaves the browser. I've actually configured the router it goes through.",
-  /**
-   * Short "journey" beats for an About/timeline block. All pulled straight
-   * from your CV — nothing invented here.
-   */
+    "I build web apps and I keep systems running — two things that don't usually sit in the same job description, but here we are. Day to day that's Next.js and React for clients who need a real interface, SQL Server and server-node work for video management systems running across mine sites, and — on the side — MQL5 algorithm design for automated trading on MetaTrader 5. Different problems, same instinct: understand the system before you touch it.",
   journey: [
     {
-      year: "Studied",
-      text: "NQF Level 5 IT qualification, Durban — the networking fundamentals that everything else sits on top of.",
+      year: "[FILL: year]",
+      text: "[FILL: e.g. \"Started in technical operations — VMS deployment, SQL-backed event protocols, the unglamorous server-room work that keeps a system honest.\"]",
     },
     {
-      year: "Dec 2022 – Dec 2023",
-      text: "Software Engineer at Turnkey IT — cut my teeth across the full software development lifecycle: building, debugging, maintaining.",
+      year: "[FILL: year]",
+      text: "[FILL: e.g. \"Moved into full-stack development — Next.js, React, Tailwind — while keeping one foot in operations.\"]",
     },
     {
-      year: "Current",
-      text: "Technical Engineer at AxxonSoft — supporting Axxon One, PSIM and Axxon Intellect, building the custom web reporting layer on top, and automating the boring-but-critical stuff with PowerShell and API integrations.",
+      year: "Ongoing",
+      text: "Split between client web builds, large-scale VMS work across mine sites, and building/documenting an algorithmic trading system on the side.",
     },
   ],
-  /** [FILL] — one or two true collaboration-style lines, in your own words. */
   collabStyle:
-    "[FILL: e.g. \"I like short calls over long email threads, and I'll always tell you early if a deadline looks shaky rather than at the deadline.\"]",
-  /** [FILL] — real current availability. Keep this one honest and current. */
+    "[FILL: e.g. \"I like a clear brief and short check-ins over long email threads — I'll flag risk early rather than at the deadline.\"]",
   availability:
-    "[FILL: e.g. \"Open to freelance web/app work and full-stack roles with a networking or security angle. Based in Durban, happy to work remote across time zones.\"]",
+    "[FILL: e.g. \"Open to full-stack web work and systems/VMS engineering roles. Based in Durban, comfortable working remote.\"]",
 };
 
-/** Playful, rotating status lines for the hero badge — tone, not fact. */
 export const statusMessages = [
-  "NETWORK STATUS: ONLINE",
+  "SYSTEM STATUS: ONLINE",
   "COFFEE STATUS: REQUIRED",
   "LOAD SHEDDING: NOT TODAY (SO FAR)",
   "BUILD STATUS: PASSING (LOCALLY, ANYWAY)",
-  "MOOD: CAUTIOUSLY OPTIMISTIC",
+  "MARKET STATUS: WATCHING V75",
 ];
 
 /** Skill clusters — feeds the interactive Skill Matrix radar. */
@@ -65,46 +57,45 @@ export interface SkillCluster {
   /** 0–100 self-rated proficiency; drives the radar geometry */
   level: number;
   skills: string[];
-  /** A short, human sentence — the "why", not just the "what". */
   story: string;
 }
 
 export const skillClusters: SkillCluster[] = [
   {
-    id: "appdev",
-    title: "App & Web Development",
+    id: "frontend",
+    title: "Frontend & App Development",
     accent: "cyan",
-    level: 85,
-    skills: ["Custom Web Development", "HTML5", "Client Reporting UIs", "Responsive Layout"],
+    level: 86,
+    skills: ["Next.js", "React", "Tailwind CSS", "Framer Motion", "HTML5"],
     story:
-      "This is what I get hired for these days. I build the dashboards and reporting tools clients actually open every morning — which means they need to be fast and boring in the best way, not clever for the sake of it.",
+      "This is the part clients actually see. Next.js and React for the structure, Tailwind for speed, Framer Motion for the interactions that make an app feel considered instead of just functional.",
   },
   {
     id: "backend",
-    title: "Backend & Languages",
+    title: "Backend & Databases",
     accent: "violet",
-    level: 82,
-    skills: ["Java", "C++", "Python", "PHP", "C#", "PowerShell Automation"],
+    level: 80,
+    skills: ["Microsoft SQL Server", "SQL", "PHP", "C#"],
     story:
-      "Jack of a few trades. PowerShell is the one I reach for most — I built an automated daily report that used to be manual, [FILL: e.g. saved roughly X hours a week], and now nobody has to remember to run it.",
+      "Most of my database work isn't for a web app — it's event-protocol data from video management systems. That means schema decisions matter more than usual: this data gets queried under pressure, not browsed at leisure.",
   },
   {
-    id: "network",
-    title: "Networking & Infrastructure",
+    id: "vms-ops",
+    title: "Systems & VMS Operations",
     accent: "emerald",
     level: 88,
-    skills: ["Cisco Technologies", "Network Configuration", "Troubleshooting", "Windows / Linux", "Microsoft Azure"],
+    skills: ["Video Management Systems", "Server Node Restoration", "Networking", "Multi-Site Deployment"],
     story:
-      "This is where I started, and it still shapes how I build. When I deployed Axxon One clusters for a mining client, half the job was network topology, not software. Most devs never have to think about that layer. I don't have a choice.",
+      "Large-scale VMS rollouts across mine sites taught me that software is only as good as the server room it runs in. I've restored nodes on-site more times than I've shipped a clean deploy from a laptop.",
   },
   {
-    id: "data",
-    title: "Data & Security Systems",
-    accent: "cyan",
-    level: 84,
-    skills: ["SQL", "PostgreSQL", "Axxon One / PSIM", "Video Analytics (LPR)", "Encrypted Delivery"],
+    id: "trading",
+    title: "Algorithmic Trading Systems",
+    accent: "violet",
+    level: 75,
+    skills: ["MQL5", "MetaTrader 5", "Multi-Timeframe Analysis", "Smart Money Concepts"],
     story:
-      "Security systems don't forgive sloppy data handling — the retail crime reports I built pull from live analytics and go out encrypted, because they contain exactly the kind of information you don't want leaking.",
+      "The side project that won't stay a side project. Building and documenting a Smart Money Concepts Expert Advisor for the Volatility 75 index — mostly block-detection logic across multiple timeframes.",
   },
 ];
 
@@ -118,123 +109,103 @@ export interface Project {
   challenge: string;
   /** [FILL] — what you'd do differently, or what it taught you. */
   lesson: string;
+  /** Empty string = no public link yet. Projects.tsx handles this gracefully. */
   url: string;
   stack: string[];
   accent: "cyan" | "emerald" | "violet";
-  lighthouse: number;
-  loadMs: number;
+  /** Optional — only include real, measured numbers. Leave undefined otherwise. */
+  lighthouse?: number;
+  loadMs?: number;
 }
 
 export const projects: Project[] = [
   {
-    id: "nsk",
-    name: "NSK Innovations",
-    category: "Corporate & Modern Tech Platform",
+    id: "teez-flexx",
+    name: "Teez-Flexx Mobiles",
+    category: "E-Commerce & Service Booking",
     focus:
-      "A component-driven Next.js build for a modern tech platform — kinetic UI, layout that doesn't jump around while it loads.",
+      "An e-commerce platform with a custom repair-booking system built in — calendar integrations, fluid UI animations, and a storefront that doesn't feel bolted together.",
     challenge:
-      "[FILL: e.g. \"The brand wanted motion everywhere, but every animation library I tried tanked mobile performance until I rebuilt the transitions with CSS instead of JS.\"]",
-    lesson:
-      "[FILL: e.g. \"Learned to profile on an actual mid-range Android before calling anything 'done'.\"]",
-    url: "https://nskinnovations.vercel.app/",
-    stack: ["Next.js", "React", "Framer Motion", "Tailwind"],
-    accent: "cyan",
-    lighthouse: 98,
-    loadMs: 620,
-  },
-  {
-    id: "ruz",
-    name: "Ruz Group",
-    category: "Enterprise Agricultural Technology",
-    focus:
-      "A modular frontend for a multi-division agricultural business — one brand, several very different product lines under it.",
-    challenge:
-      "[FILL: e.g. \"Each division wanted its own visual identity while staying recognisably 'Ruz'. Solved it with a shared component library and per-division theme tokens.\"]",
+      "[FILL: e.g. \"Booking and checkout needed to share state without feeling like two different apps — solved with a shared context layer across both flows.\"]",
     lesson: "[FILL]",
-    url: "https://ruzgroup.vercel.app/",
-    stack: ["Next.js", "TypeScript", "Tailwind"],
-    accent: "emerald",
-    lighthouse: 97,
-    loadMs: 540,
+    url: "", // [FILL: add live URL when available]
+    stack: ["Next.js", "React", "Framer Motion", "Tailwind CSS"],
+    accent: "cyan",
   },
   {
-    id: "wow",
+    id: "ruz-bio",
+    name: "Ruz Bio",
+    category: "Corporate & AgriTech Digital Presence",
+    focus:
+      "A company profile and digital footprint built entirely around modern agricultural technology and sustainable farming — the brand had to read as credible to both investors and farmers.",
+    challenge: "[FILL]",
+    lesson: "[FILL]",
+    url: "", // [FILL: add live URL when available]
+    stack: ["Next.js", "Tailwind CSS", "Framer Motion"],
+    accent: "emerald",
+  },
+  {
+    id: "wrench-on-wheels",
     name: "Wrench on Wheels",
-    category: "On-Demand Service & Logistics App",
+    category: "Mobile Service Business Framework",
     focus:
-      "A mobile-first booking app for on-demand mechanics — built for people standing next to a broken-down car, not sitting at a desk.",
+      "Web presence and business framework for a remote mobile vehicle cleaning and detailing service, with dynamic pricing rules that adjust to vehicle type and condition rather than one flat rate.",
     challenge:
-      "[FILL: e.g. \"Booking flows kept failing on patchy 3G during testing — added optimistic UI so the app never looks stuck even when the network is.\"]",
+      "[FILL: e.g. \"Pricing had too many variables for a static table — built a small rules engine instead of hardcoding every vehicle/condition combination.\"]",
     lesson: "[FILL]",
-    url: "https://wrench-on-wheels.vercel.app/",
-    stack: ["React", "State Machines", "Tailwind"],
+    url: "", // [FILL: add live URL when available]
+    stack: ["React", "Tailwind CSS", "Pricing Rules Engine"],
     accent: "violet",
-    lighthouse: 96,
-    loadMs: 710,
   },
   {
-    id: "monate",
-    name: "Monate Cakes",
-    category: "Interactive E-Commerce / Showcase",
+    id: "v75-ea",
+    name: "MT5 Trading Architecture — V75 Smart Money EA",
+    category: "Algorithmic Trading System",
     focus:
-      "A visual-first product showcase — the kind of site where the photography has to do most of the talking.",
-    challenge: "[FILL]",
-    lesson: "[FILL]",
-    url: "https://monate-cakes.github.io/",
-    stack: ["JavaScript", "GitHub Pages", "CSS3"],
-    accent: "cyan",
-    lighthouse: 94,
-    loadMs: 480,
-  },
-  {
-    id: "oxygas",
-    name: "Oxygas",
-    category: "Industrial Web Infrastructure",
-    focus:
-      "Secure server hosting and an SSL rewrite pipeline for an industrial client — this one's more infrastructure than interface.",
+      "Documentation and logic design for a Smart Money Concepts Expert Advisor trading the Volatility 75 index — multi-timeframe analysis feeding block-detection logic into entry decisions.",
     challenge:
-      "[FILL: e.g. \"Inherited an IIS setup with an expired cert chain and a redirect loop nobody could trace — fixed it by rebuilding the SolidCP rewrite rules from scratch.\"]",
+      "[FILL: e.g. \"Block detection kept producing false positives on lower timeframes — added a higher-timeframe confirmation filter before any entry logic fires.\"]",
     lesson: "[FILL]",
-    url: "https://www.oxygas.co.za/Index.html",
-    stack: ["IIS", "SolidCP", "SSL Pipeline"],
-    accent: "emerald",
-    lighthouse: 90,
-    loadMs: 830,
-  },
-  {
-    id: "myaluza",
-    name: "Myaluza Civils",
-    category: "Civil Engineering Corporate Hub",
-    focus:
-      "An enterprise site with managed domains and hosting set up for uptime, not just looks.",
-    challenge: "[FILL]",
-    lesson: "[FILL]",
-    url: "https://myaluzacivils.com/",
-    stack: ["Web Hosting", "Domain Mgmt", "HTML5"],
+    url: "", // proprietary/personal system — likely no public link
+    stack: ["MQL5", "MetaTrader 5", "Algorithmic Trading"],
     accent: "violet",
-    lighthouse: 92,
-    loadMs: 760,
   },
 ];
 
+/**
+ * These three are intentionally conservative. The first is a literal count of
+ * the list above; the other two are placeholders — swap in your real numbers.
+ */
 export const stats = [
-  { value: 99.99, suffix: "%", label: "Network Uptime Supported", decimals: 2 },
-  { value: 6, suffix: "+", label: "Deployed Web Platforms", decimals: 0 },
-  { value: 100, prefix: "<", suffix: "ms", label: "Edge Analytics Latency", decimals: 0 },
+  { value: projects.length, suffix: "+", label: "Projects Shipped", decimals: 0 },
+  { value: 3, suffix: "+", label: "Mine Sites Serviced (VMS)", decimals: 0 }, // [FILL] your real count
+  { value: 100, prefix: "<", suffix: "ms", label: "Edge System Latency", decimals: 0 }, // [FILL] your real number
 ];
 
-/** A few true-ish, low-stakes lines for the terminal's `joke` command. */
+/** Terminal `joke` command pool. */
 export const jokes = [
   "There are only 10 types of people: those who understand binary, and those who don't.",
-  "I told my router a joke about UDP. Not sure if it got it.",
+  "I told my Expert Advisor a joke about drawdown. It didn't laugh. Neither did my account.",
   "99 little bugs in the code, 99 little bugs — take one down, patch it around, 127 little bugs in the code.",
-  "The best time to plant a static IP was 20 years ago. The second best time is now.",
+  "The best time to backtest a strategy was before you went live. The second best time is now.",
 ];
 
-/** Durban-flavoured trivia for the terminal's `durban` command — generic,
- * not personal claims, safe as color commentary. */
+/** Terminal `durban` command pool — color commentary, not personal claims. */
 export const durbanFacts = [
-  "Durban has the busiest port in Africa — which is a good analogy for what a load balancer does, if you squint.",
+  "Durban has the busiest port in Africa — a decent analogy for what a load balancer does, if you squint.",
   "The Golden Mile is right there and I still spend more time looking at a terminal than the ocean. Priorities.",
   "Durban's humidity has personally taken down more of my hardware than any DDoS attempt ever has.",
+];
+
+/** Terminal `ping` command pool — technical, fun-fact, and joke flavours, so
+ * pinging three times in a row doesn't look like the same canned response. */
+export const pingFlavourFacts = [
+  "Average intercontinental fibre round-trip is ~150ms. Most of my UI updates faster than that.",
+  "Ping originally meant nothing — Mike Muuss named it after sonar, then reverse-engineered the acronym later.",
+  "Somewhere, a Expert Advisor is checking a candle close right now. This ping is faster than that decision.",
+];
+export const pingJokes = [
+  "Pinged the CTO. No response. Typical.",
+  "Packet returned. Slightly judgmental about the request, but it returned.",
+  "Latency's fine. It's the load-shedding schedule that's the real unpredictable variable here.",
 ];

@@ -22,7 +22,7 @@ export default function Page() {
             data-cursor="hover"
             className="font-display text-sm font-bold tracking-tight"
           >
-            MK<span className="text-cyan">.</span>
+            SK<span className="text-cyan">.</span>
           </a>
           <div className="hidden gap-8 font-mono text-[0.7rem] tracking-widest text-muted sm:flex">
             {[

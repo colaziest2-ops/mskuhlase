@@ -3,16 +3,18 @@ import "./globals.css";
 import { profile } from "@/lib/data";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
+import MobileNav from "@/components/ui/MobileNav";
 
 export const metadata: Metadata = {
   title: `${profile.name} — ${profile.role}`,
   description: profile.summary,
   keywords: [
-    "Technical Engineer",
-    "AxxonSoft",
-    "Video Management Software",
-    "Real-Time Systems",
-    "Security Systems",
+    "Software Engineer",
+    "Full-Stack Developer",
+    "Next.js",
+    "React",
+    "Video Management Systems",
+    "Algorithmic Trading",
     profile.name,
   ],
   authors: [{ name: profile.name }],
@@ -44,11 +46,13 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>
+      <body className="pb-16 md:pb-0">
         {/* Lenis momentum scroll wraps the whole tree */}
         <SmoothScroll>{children}</SmoothScroll>
         {/* Velocity-aware custom cursor (auto-disabled on touch devices) */}
         <CustomCursor />
+        {/* Fixed bottom nav — mobile/touch only */}
+        <MobileNav />
       </body>
     </html>
   );

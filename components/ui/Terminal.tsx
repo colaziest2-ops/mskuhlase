@@ -3,13 +3,23 @@
 /**
  * Terminal
  * --------
- * A functional, keyboard-driven command line. Commands operate on the real CV
- * data. Supports: help, axxon, skills, projects, ping, clear. Arrow-up recalls
- * history. Fully accessible: it's a labelled input feeding an aria-live log.
+ * A functional, keyboard-driven command line. Several commands pull from a
+ * randomized response pool so the shell doesn't feel like a static script —
+ * ping three times in a row and you'll get three different flavours (a real
+ * simulated trace, a fun fact, or a dry joke). Arrow-up recalls history.
+ * Fully accessible: labelled input feeding an aria-live log.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { profile, projects, skillClusters, jokes, durbanFacts } from "@/lib/data";
+import {
+  profile,
+  projects,
+  skillClusters,
+  jokes,
+  durbanFacts,
+  pingFlavourFacts,
+  pingJokes,
+} from "@/lib/data";
 
 interface Line {
   type: "in" | "out" | "sys";
@@ -17,8 +27,37 @@ interface Line {
 }
 
 const BANNER: Line[] = [
-  { type: "sys", text: `${profile.name} — interactive shell v2027.1` },
+  { type: "sys", text: `${profile.name} — interactive shell` },
   { type: "sys", text: 'Type "help" to list commands.' },
+];
+
+/** Pick a random element — used everywhere below to vary responses. */
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const skillsIntros = [
+  "Alright, here's the stack:",
+  "Full breakdown, no padding:",
+  "Let's see what's actually under the hood:",
+];
+const projectsIntros = [
+  "Here's what's shipped (and what's still internal):",
+  "The receipts:",
+  "Live and not-so-live, in order:",
+];
+const whoamiVariants = [
+  [
+    `${profile.name}`,
+    `${profile.role}`,
+    `Based in ${profile.location}.`,
+    "Web apps by day, VMS server rooms by necessity, trading algorithms by obsession.",
+  ],
+  [
+    `${profile.name} — ${profile.subrole}`,
+    "Ask me about Next.js or SQL Server event protocols.",
+    "Both answers will be equally enthusiastic.",
+  ],
 ];
 
 export default function Terminal() {
@@ -49,44 +88,47 @@ export default function Terminal() {
           { type: "out", text: "AVAILABLE COMMANDS" },
           { type: "out", text: "  help      — list commands" },
           { type: "out", text: "  whoami    — quick bio" },
-          { type: "out", text: "  axxon     — engineering background at AxxonSoft" },
-          { type: "out", text: "  network   — networking & infrastructure background" },
           { type: "out", text: "  skills    — full stack breakdown" },
-          { type: "out", text: "  projects  — launch links to deployed apps" },
-          { type: "out", text: "  ping      — latency across the network" },
+          { type: "out", text: "  projects  — shipped work" },
+          { type: "out", text: "  vms       — video management system background" },
+          { type: "out", text: "  trading   — algorithmic trading systems background" },
+          { type: "out", text: "  ping      — latency check (results vary)" },
           { type: "out", text: "  joke      — one dev joke, no refunds" },
           { type: "out", text: "  durban    — a fact about the city I work from" },
           { type: "out", text: "  clear     — clear the screen" },
         ]);
         break;
 
-      case "axxon":
+      case "whoami":
+        push(pick(whoamiVariants).map((text) => ({ type: "out" as const, text })));
+        break;
+
+      case "vms":
         push([
-          { type: "out", text: `${profile.role} @ AxxonSoft — ${profile.location}` },
-          { type: "out", text: "Support & optimisation for Axxon One, PSIM, Axxon" },
-          { type: "out", text: "Intellect and AxxonNet. Built an automated daily" },
-          { type: "out", text: "criminal-intel report for retail (Cash Crusaders," },
-          { type: "out", text: "Spar) via analytics + API + PowerShell with" },
-          { type: "out", text: "encrypted delivery. Deployed Axxon One affinities," },
-          { type: "out", text: "integrations & clusters for a mining operation." },
+          { type: "out", text: "VIDEO MANAGEMENT SYSTEM OPERATIONS" },
+          { type: "out", text: "Large-scale VMS deployment across multiple mine" },
+          { type: "out", text: "sites. SQL Server-backed event protocol management" },
+          { type: "out", text: "on the software side; server node restoration on" },
+          { type: "out", text: "the hardware side, when the problem isn't code." },
         ]);
         break;
 
-      case "whoami":
+      case "trading":
         push([
-          { type: "out", text: `${profile.name}` },
-          { type: "out", text: `${profile.role} — ${profile.subrole}` },
-          { type: "out", text: `Based in ${profile.location}. Studied networking.` },
-          { type: "out", text: "Ended up shipping web apps anyway. It happens." },
+          { type: "out", text: "MT5 / ALGORITHMIC TRADING ARCHITECTURE" },
+          { type: "out", text: "V75 Smart Money Concepts Expert Advisor, built" },
+          { type: "out", text: "and documented in MQL5. Multi-timeframe analysis" },
+          { type: "out", text: "feeds block-detection logic into entry decisions —" },
+          { type: "out", text: "the same 'confirm before you act' instinct as VMS." },
         ]);
         break;
 
       case "joke":
-        push([{ type: "out", text: jokes[Math.floor(Math.random() * jokes.length)] }]);
+        push([{ type: "out", text: pick(jokes) }]);
         break;
 
       case "durban":
-        push([{ type: "out", text: durbanFacts[Math.floor(Math.random() * durbanFacts.length)] }]);
+        push([{ type: "out", text: pick(durbanFacts) }]);
         break;
 
       case "sudo":
@@ -94,47 +136,46 @@ export default function Terminal() {
         push([{ type: "out", text: "Nice try. You're not root here — I am." }]);
         break;
 
-      case "network":
-        push([
-          { type: "out", text: "NETWORKING & INFRASTRUCTURE BACKGROUND" },
-          { type: "out", text: "Cisco networking, network configuration and" },
-          { type: "out", text: "troubleshooting, Windows/Linux administration," },
-          { type: "out", text: "and Microsoft Azure (AZ-900 complete; AZ-204," },
-          { type: "out", text: "AI-900, AI-102, DP-900, DP-100 in progress)." },
-          { type: "out", text: "This is the layer beneath every app I ship —" },
-          { type: "out", text: "I design for the network it actually runs on." },
-        ]);
-        break;
-
       case "skills":
-        push(
-          skillClusters.map((c) => ({
+        push([
+          { type: "out", text: pick(skillsIntros) },
+          ...skillClusters.map((c) => ({
             type: "out" as const,
             text: `  [${String(c.level).padStart(3)}%] ${c.title}: ${c.skills.join(", ")}`,
-          }))
-        );
+          })),
+        ]);
         break;
 
       case "projects":
         push([
-          { type: "out", text: "DEPLOYED PLATFORMS" },
+          { type: "out", text: pick(projectsIntros) },
           ...projects.map((p) => ({
             type: "out" as const,
-            text: `  → ${p.name.padEnd(20)} ${p.url}`,
+            text: `  → ${p.name.padEnd(28)} ${p.url || "(internal / no public link)"}`,
           })),
         ]);
         break;
 
       case "ping": {
-        const nodes = ["node-jhb-01", "node-dbn-02", "node-cpt-03", "edge-analytics"];
-        push([{ type: "out", text: "PING distributed mesh ..." }]);
-        for (const n of nodes) {
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((r) => setTimeout(r, 260));
-          const ms = (Math.random() * 40 + 8).toFixed(1);
-          push([{ type: "out", text: `  reply from ${n.padEnd(16)} time=${ms}ms  ✓` }]);
+        // Three response flavours picked at random, so pinging repeatedly
+        // doesn't produce the same canned output every time.
+        const flavour = pick(["trace", "fact", "joke"] as const);
+
+        if (flavour === "trace") {
+          const nodes = ["node-dbn-01", "node-jhb-02", "edge-vms-03", "trading-vm"];
+          push([{ type: "out", text: "PING local network ..." }]);
+          for (const n of nodes) {
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise((r) => setTimeout(r, 240));
+            const ms = (Math.random() * 40 + 8).toFixed(1);
+            push([{ type: "out", text: `  reply from ${n.padEnd(16)} time=${ms}ms  ✓` }]);
+          }
+          push([{ type: "out", text: "4/4 reachable — network healthy." }]);
+        } else if (flavour === "fact") {
+          push([{ type: "out", text: pick(pingFlavourFacts) }]);
+        } else {
+          push([{ type: "out", text: pick(pingJokes) }]);
         }
-        push([{ type: "out", text: "4/4 nodes reachable — mesh healthy." }]);
         break;
       }
 
@@ -194,7 +235,7 @@ export default function Terminal() {
           <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
           <span className="h-3 w-3 rounded-full bg-[#28c840]" />
           <span className="ml-3 font-mono text-xs text-faint">
-            masakhane@axxon: ~/portfolio
+            masakhane@portfolio:~$
           </span>
         </div>
 

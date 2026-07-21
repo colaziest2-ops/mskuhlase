@@ -62,7 +62,7 @@ export default function SkillMatrix() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex justify-center"
+          className="hidden justify-center md:flex"
         >
           <svg
             viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -144,6 +144,15 @@ export default function SkillMatrix() {
                 transition={{ delay: i * 0.08, duration: 0.5 }}
                 onMouseEnter={() => setActive(c.id)}
                 onMouseLeave={() => setActive(null)}
+                onClick={() => setActive(on ? null : c.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActive(on ? null : c.id);
+                  }
+                }}
                 data-cursor="hover"
                 className="glass rounded-xl p-4 transition-colors"
                 style={{
