@@ -3,11 +3,15 @@
 /**
  * Terminal
  * --------
- * A functional, keyboard-driven command line. Several commands pull from a
- * randomized response pool so the shell doesn't feel like a static script —
- * ping three times in a row and you'll get three different flavours (a real
- * simulated trace, a fun fact, or a dry joke). Arrow-up recalls history.
- * Fully accessible: labelled input feeding an aria-live log.
+ * A functional, keyboard-driven command line. Known commands (help, whoami,
+ * skills, projects, vms, ping, joke, durban, sudo, clear) resolve instantly
+ * and locally — no API cost. Anything else gets routed to Gemini via
+ * /api/gemini and streamed back into the terminal, so the shell can actually
+ * answer free-form questions instead of just "command not found".
+ *
+ * Mobile notes: input font-size is 16px (text-base) to stop iOS Safari from
+ * auto-zooming on focus; output pane height and padding shrink on small
+ * screens; the title bar wraps instead of overflowing on narrow viewports.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -28,8 +32,22 @@ interface Line {
 
 const BANNER: Line[] = [
   { type: "sys", text: `${profile.name} — interactive shell` },
-  { type: "sys", text: 'Type "help" to list commands.' },
+  { type: "sys", text: 'Type "help" — or ask anything else, it goes to Gemini.' },
 ];
+
+const KNOWN_COMMANDS = new Set([
+  "help",
+  "whoami",
+  "skills",
+  "projects",
+  "vms",
+  "ping",
+  "joke",
+  "durban",
+  "sudo",
+  "sudo make me a sandwich",
+  "clear",
+]);
 
 /** Pick a random element — used everywhere below to vary responses. */
 function pick<T>(arr: T[]): T {
@@ -51,7 +69,7 @@ const whoamiVariants = [
     `${profile.name}`,
     `${profile.role}`,
     `Based in ${profile.location}.`,
-    "Web apps by day, VMS server rooms by necessity, trading algorithms by obsession.",
+    "Web apps by day, VMS server rooms by necessity.",
   ],
   [
     `${profile.name} — ${profile.subrole}`,
@@ -65,6 +83,7 @@ export default function Terminal() {
   const [value, setValue] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [hIndex, setHIndex] = useState(-1);
+  const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -74,6 +93,50 @@ export default function Terminal() {
 
   const push = (newLines: Line[]) => setLines((prev) => [...prev, ...newLines]);
 
+  /** Sends unrecognised input to Gemini and streams the reply into a single
+   * growing output line, the same pattern ChatWidget uses for Groq. */
+  async function askGemini(prompt: string) {
+    setBusy(true);
+    push([{ type: "out", text: "…" }]);
+
+    try {
+      const res = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!res.ok || !res.body) throw new Error("Gemini request failed");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value: chunk } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(chunk, { stream: true });
+        setLines((prev) => {
+          const copy = [...prev];
+          copy[copy.length - 1] = { type: "out", text: acc || "…" };
+          return copy;
+        });
+      }
+    } catch {
+      setLines((prev) => {
+        const copy = [...prev];
+        copy[copy.length - 1] = {
+          type: "out",
+          text: "Gemini didn't respond — try again in a moment.",
+        };
+        return copy;
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function run(raw: string) {
     const cmd = raw.trim().toLowerCase();
     push([{ type: "in", text: raw }]);
@@ -81,6 +144,11 @@ export default function Terminal() {
 
     setHistory((h) => [...h, raw]);
     setHIndex(-1);
+
+    if (!KNOWN_COMMANDS.has(cmd)) {
+      await askGemini(raw);
+      return;
+    }
 
     switch (cmd) {
       case "help":
@@ -91,11 +159,11 @@ export default function Terminal() {
           { type: "out", text: "  skills    — full stack breakdown" },
           { type: "out", text: "  projects  — shipped work" },
           { type: "out", text: "  vms       — video management system background" },
-          { type: "out", text: "  trading   — algorithmic trading systems background" },
           { type: "out", text: "  ping      — latency check (results vary)" },
           { type: "out", text: "  joke      — one dev joke, no refunds" },
           { type: "out", text: "  durban    — a fact about the city I work from" },
           { type: "out", text: "  clear     — clear the screen" },
+          { type: "out", text: "  (anything else) — ask Gemini directly" },
         ]);
         break;
 
@@ -110,16 +178,6 @@ export default function Terminal() {
           { type: "out", text: "sites. SQL Server-backed event protocol management" },
           { type: "out", text: "on the software side; server node restoration on" },
           { type: "out", text: "the hardware side, when the problem isn't code." },
-        ]);
-        break;
-
-      case "trading":
-        push([
-          { type: "out", text: "MT5 / ALGORITHMIC TRADING ARCHITECTURE" },
-          { type: "out", text: "V75 Smart Money Concepts Expert Advisor, built" },
-          { type: "out", text: "and documented in MQL5. Multi-timeframe analysis" },
-          { type: "out", text: "feeds block-detection logic into entry decisions —" },
-          { type: "out", text: "the same 'confirm before you act' instinct as VMS." },
         ]);
         break;
 
@@ -157,12 +215,10 @@ export default function Terminal() {
         break;
 
       case "ping": {
-        // Three response flavours picked at random, so pinging repeatedly
-        // doesn't produce the same canned output every time.
         const flavour = pick(["trace", "fact", "joke"] as const);
 
         if (flavour === "trace") {
-          const nodes = ["node-dbn-01", "node-jhb-02", "edge-vms-03", "trading-vm"];
+          const nodes = ["node-dbn-01", "node-jhb-02", "edge-vms-03"];
           push([{ type: "out", text: "PING local network ..." }]);
           for (const n of nodes) {
             // eslint-disable-next-line no-await-in-loop
@@ -170,7 +226,7 @@ export default function Terminal() {
             const ms = (Math.random() * 40 + 8).toFixed(1);
             push([{ type: "out", text: `  reply from ${n.padEnd(16)} time=${ms}ms  ✓` }]);
           }
-          push([{ type: "out", text: "4/4 reachable — network healthy." }]);
+          push([{ type: "out", text: "3/3 reachable — network healthy." }]);
         } else if (flavour === "fact") {
           push([{ type: "out", text: pick(pingFlavourFacts) }]);
         } else {
@@ -182,14 +238,12 @@ export default function Terminal() {
       case "clear":
         setLines(BANNER);
         break;
-
-      default:
-        push([{ type: "out", text: `command not found: ${cmd}. Try "help".` }]);
     }
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      if (busy) return;
       run(value);
       setValue("");
     } else if (e.key === "ArrowUp") {
@@ -216,25 +270,25 @@ export default function Terminal() {
     t === "in" ? "text-cyan" : t === "sys" ? "text-violet" : "text-muted";
 
   return (
-    <section id="terminal" className="relative mx-auto max-w-4xl px-6 py-28">
-      <header className="mb-10 max-w-2xl">
+    <section id="terminal" className="relative mx-auto max-w-4xl px-4 py-20 sm:px-6 sm:py-28">
+      <header className="mb-8 max-w-2xl sm:mb-10">
         <p className="eyebrow mb-3">04 — Playground</p>
-        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
+        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-5xl">
           Talk to the <span className="neon-cyan">shell.</span>
         </h2>
       </header>
 
       <div
-        className="glass overflow-hidden rounded-2xl"
+        className="glass-solid overflow-hidden rounded-2xl"
         onClick={() => inputRef.current?.focus()}
         data-cursor="hover"
       >
-        {/* title bar */}
-        <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
+        {/* title bar — wraps rather than overflowing on narrow screens */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-hairline px-3 py-2.5 sm:px-4 sm:py-3">
           <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
           <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
           <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-          <span className="ml-3 font-mono text-xs text-faint">
+          <span className="ml-1 truncate font-mono text-[0.65rem] text-faint sm:ml-3 sm:text-xs">
             masakhane@portfolio:~$
           </span>
         </div>
@@ -243,16 +297,18 @@ export default function Terminal() {
         <div
           ref={scrollRef}
           aria-live="polite"
-          className="h-80 overflow-y-auto p-4 font-mono text-[0.8rem] leading-relaxed"
+          className="h-64 overflow-y-auto overflow-x-hidden p-3 font-mono text-[0.78rem] leading-relaxed sm:h-80 sm:p-4 sm:text-[0.8rem]"
         >
           {lines.map((l, i) => (
-            <div key={i} className={color(l.type)}>
+            <div key={i} className={`${color(l.type)} break-words`}>
               {l.type === "in" ? <span className="text-emerald">$ </span> : null}
               <span className="whitespace-pre-wrap">{l.text}</span>
             </div>
           ))}
 
-          {/* input line */}
+          {/* input line — text-base (16px) prevents iOS Safari's auto-zoom
+              on focus; shrinks back down to match on larger screens where
+              zoom isn't a concern. */}
           <div className="flex items-center text-ink">
             <span className="text-emerald">$&nbsp;</span>
             <input
@@ -262,8 +318,10 @@ export default function Terminal() {
               onKeyDown={onKeyDown}
               aria-label="Terminal command input"
               autoComplete="off"
+              autoCapitalize="off"
               spellCheck={false}
-              className="flex-1 border-none bg-transparent font-mono text-[0.8rem] text-ink outline-none"
+              disabled={busy}
+              className="flex-1 border-none bg-transparent text-base font-mono text-ink outline-none disabled:opacity-60 sm:text-[0.8rem]"
             />
           </div>
         </div>

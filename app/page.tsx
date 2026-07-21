@@ -4,6 +4,7 @@ import Projects from "@/components/sections/Projects";
 import Stats from "@/components/sections/Stats";
 import Terminal from "@/components/ui/Terminal";
 import Contact from "@/components/sections/Contact";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { profile } from "@/lib/data";
 
 /**
@@ -24,22 +25,25 @@ export default function Page() {
           >
             SK<span className="text-cyan">.</span>
           </a>
-          <div className="hidden gap-8 font-mono text-[0.7rem] tracking-widest text-muted sm:flex">
-            {[
-              ["Skills", "#skills"],
-              ["Work", "#projects"],
-              ["Shell", "#terminal"],
-              ["Contact", "#contact"],
-            ].map(([label, href]) => (
-              <a
-                key={href}
-                href={href}
-                data-cursor="hover"
-                className="transition-colors hover:text-cyan"
-              >
-                {label.toUpperCase()}
-              </a>
-            ))}
+          <div className="flex items-center gap-4">
+            <div className="hidden gap-8 font-mono text-[0.7rem] tracking-widest text-muted sm:flex">
+              {[
+                ["Skills", "#skills"],
+                ["Work", "#projects"],
+                ["Shell", "#terminal"],
+                ["Contact", "#contact"],
+              ].map(([label, href]) => (
+                <a
+                  key={href}
+                  href={href}
+                  data-cursor="hover"
+                  className="flex items-center transition-colors hover:text-cyan"
+                >
+                  {label.toUpperCase()}
+                </a>
+              ))}
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </nav>

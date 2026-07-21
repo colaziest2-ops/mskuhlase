@@ -49,7 +49,7 @@ export default function SkillMatrix() {
       <header className="mb-16 max-w-2xl">
         <p className="eyebrow mb-3">02 — Capability Map</p>
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-          Four disciplines,
+          {skillClusters.length === 4 ? "Four" : skillClusters.length === 3 ? "Three" : skillClusters.length} disciplines,
           <br />
           <span className="neon-cyan">one working stack.</span>
         </h2>

@@ -10,7 +10,7 @@
 export const profile = {
   name: "Siyabonga Kuhlase",
   role: "Software Engineer & Technical Operations",
-  subrole: "Full-Stack Development · VMS Operations · Algorithmic Trading Systems",
+  subrole: "Full-Stack Development · VMS Operations",
   location: "Durban, South Africa", // [FILL] confirm — carried over, update if wrong
   timezone: "Africa/Johannesburg", // GMT+2
   email: "[FILL: your real email]",
@@ -20,7 +20,7 @@ export const profile = {
     linkedin: "https://www.linkedin.com/", // <- replace with your LinkedIn URL
   },
   summary:
-    "I build web apps and I keep systems running — two things that don't usually sit in the same job description, but here we are. Day to day that's Next.js and React for clients who need a real interface, SQL Server and server-node work for video management systems running across mine sites, and — on the side — MQL5 algorithm design for automated trading on MetaTrader 5. Different problems, same instinct: understand the system before you touch it.",
+    "I build web apps and I keep systems running — two things that don't usually sit in the same job description, but here we are. Day to day that's Next.js and React for clients who need a real interface, and SQL Server and server-node work for video management systems running across mine sites. Different problems, same instinct: understand the system before you touch it.",
   journey: [
     {
       year: "[FILL: year]",
@@ -32,7 +32,7 @@ export const profile = {
     },
     {
       year: "Ongoing",
-      text: "Split between client web builds, large-scale VMS work across mine sites, and building/documenting an algorithmic trading system on the side.",
+      text: "Split between client web builds and large-scale VMS work across mine sites.",
     },
   ],
   collabStyle:
@@ -46,7 +46,6 @@ export const statusMessages = [
   "COFFEE STATUS: REQUIRED",
   "LOAD SHEDDING: NOT TODAY (SO FAR)",
   "BUILD STATUS: PASSING (LOCALLY, ANYWAY)",
-  "MARKET STATUS: WATCHING V75",
 ];
 
 /** Skill clusters — feeds the interactive Skill Matrix radar. */
@@ -87,15 +86,6 @@ export const skillClusters: SkillCluster[] = [
     skills: ["Video Management Systems", "Server Node Restoration", "Networking", "Multi-Site Deployment"],
     story:
       "Large-scale VMS rollouts across mine sites taught me that software is only as good as the server room it runs in. I've restored nodes on-site more times than I've shipped a clean deploy from a laptop.",
-  },
-  {
-    id: "trading",
-    title: "Algorithmic Trading Systems",
-    accent: "violet",
-    level: 75,
-    skills: ["MQL5", "MetaTrader 5", "Multi-Timeframe Analysis", "Smart Money Concepts"],
-    story:
-      "The side project that won't stay a side project. Building and documenting a Smart Money Concepts Expert Advisor for the Volatility 75 index — mostly block-detection logic across multiple timeframes.",
   },
 ];
 
@@ -157,24 +147,11 @@ export const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "Pricing Rules Engine"],
     accent: "violet",
   },
-  {
-    id: "v75-ea",
-    name: "MT5 Trading Architecture — V75 Smart Money EA",
-    category: "Algorithmic Trading System",
-    focus:
-      "Documentation and logic design for a Smart Money Concepts Expert Advisor trading the Volatility 75 index — multi-timeframe analysis feeding block-detection logic into entry decisions.",
-    challenge:
-      "[FILL: e.g. \"Block detection kept producing false positives on lower timeframes — added a higher-timeframe confirmation filter before any entry logic fires.\"]",
-    lesson: "[FILL]",
-    url: "", // proprietary/personal system — likely no public link
-    stack: ["MQL5", "MetaTrader 5", "Algorithmic Trading"],
-    accent: "violet",
-  },
 ];
 
 /**
- * These three are intentionally conservative. The first is a literal count of
- * the list above; the other two are placeholders — swap in your real numbers.
+ * These are intentionally conservative. The first is a literal count of the
+ * list above; the second is a placeholder — swap in your real number.
  */
 export const stats = [
   { value: projects.length, suffix: "+", label: "Projects Shipped", decimals: 0 },
@@ -185,9 +162,9 @@ export const stats = [
 /** Terminal `joke` command pool. */
 export const jokes = [
   "There are only 10 types of people: those who understand binary, and those who don't.",
-  "I told my Expert Advisor a joke about drawdown. It didn't laugh. Neither did my account.",
+  "I asked the compiler for closure. It gave me a stack trace instead.",
   "99 little bugs in the code, 99 little bugs — take one down, patch it around, 127 little bugs in the code.",
-  "The best time to backtest a strategy was before you went live. The second best time is now.",
+  "The best time to write a test was before you shipped. The second best time is now.",
 ];
 
 /** Terminal `durban` command pool — color commentary, not personal claims. */
@@ -202,7 +179,7 @@ export const durbanFacts = [
 export const pingFlavourFacts = [
   "Average intercontinental fibre round-trip is ~150ms. Most of my UI updates faster than that.",
   "Ping originally meant nothing — Mike Muuss named it after sonar, then reverse-engineered the acronym later.",
-  "Somewhere, a Expert Advisor is checking a candle close right now. This ping is faster than that decision.",
+  "Somewhere a server node is booting back up right now. This ping is faster than that, at least.",
 ];
 export const pingJokes = [
   "Pinged the CTO. No response. Typical.",

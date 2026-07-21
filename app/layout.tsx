@@ -15,7 +15,6 @@ export const metadata: Metadata = {
     "Next.js",
     "React",
     "Video Management Systems",
-    "Algorithmic Trading",
     profile.name,
   ],
   authors: [{ name: profile.name }],
@@ -38,13 +37,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
+        />
+        {/* Runs before paint so a saved "light" preference doesn't flash dark
+            first — ThemeToggle.tsx reads/writes the same localStorage key. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}`,
+          }}
         />
       </head>
       <body className="pb-16 md:pb-0">

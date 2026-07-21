@@ -37,6 +37,37 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Plain custom properties (not Tailwind color tokens) that also need to flip
+   between themes. Kept outside @theme since they don't generate utilities. */
+:root {
+  --grid-line: rgba(255, 255, 255, 0.02);
+}
+
+/* ============================================================================
+   LIGHT MODE
+   Same structure, same accent hues — just re-mapped for a paper-and-ink
+   surface instead of carbon. Toggled via ThemeToggle.tsx setting
+   `data-theme="light"` on <html>. Accents are deepened here (not just the
+   dark-mode hex reused) because signal-amber/CRT-green/slate-violet at their
+   dark-mode brightness fail contrast against a light background.
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-void: #f6f3ea;
+  --color-panel: #ffffff;
+  --color-hairline: #ddd5bf;
+
+  --color-cyan: #a3660f;    /* deepened amber — legible as text on light bg */
+  --color-emerald: #2f7d5e; /* deepened CRT green */
+  --color-violet: #5b52a3;  /* deepened slate violet */
+
+  --color-ink: #211d15;
+  --color-muted: #6b6250;
+  --color-faint: #948a72;
+
+  --grid-line: rgba(0, 0, 0, 0.035);
+}
+
 :root {
   color-scheme: dark;
 }
@@ -56,11 +87,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
   /* fine grain + a single faint schematic grid — instrument-panel texture,
      not a decorative gradient bloom */
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 100% 100%, 56px 56px, 56px 56px;
 }
 
@@ -93,6 +125,17 @@ body {
 @utility glass {
   background: color-mix(in srgb, var(--color-panel) 70%, transparent);
   border: 1px solid var(--color-hairline);
+}
+
+/* Near-opaque + blurred — for anything that floats OVER other content
+   (chat widget, modals on small screens) where the 70%-transparent .glass
+   above lets too much of the page show through and hurts legibility. */
+@utility glass-solid {
+  background: color-mix(in srgb, var(--color-panel) 96%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--color-hairline);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 /* Corner-bracket panel — viewfinder / rack-unit reticle marks instead of a

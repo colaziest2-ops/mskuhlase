@@ -106,7 +106,7 @@ export default function ChatWidget() {
         data-cursor="hover"
         aria-label={open ? "Close chat assistant" : "Open chat assistant"}
         aria-expanded={open}
-        className="glass fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full text-cyan transition-transform hover:scale-105 md:bottom-6 md:right-6"
+        className="glass-solid fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full text-cyan transition-transform hover:scale-105 md:bottom-6 md:right-6"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>
@@ -121,7 +121,7 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 300, damping: 26 }}
-            className="glass fixed bottom-36 right-4 z-40 flex h-[70vh] max-h-[560px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl md:bottom-24 md:right-6"
+            className="glass-solid fixed bottom-36 right-4 z-40 flex h-[70vh] max-h-[560px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl md:bottom-24 md:right-6"
           >
             {/* Header */}
             <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
@@ -164,7 +164,7 @@ export default function ChatWidget() {
                   className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
                     m.role === "user"
                       ? "ml-auto bg-cyan text-void"
-                      : "glass text-ink"
+                      : "glass-solid text-ink"
                   }`}
                 >
                   {m.content || (
