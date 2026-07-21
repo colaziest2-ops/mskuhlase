@@ -3,9 +3,14 @@
  * -----------------
  * Powers the terminal's free-form fallback: any command the Terminal doesn't
  * recognise locally gets sent here instead of "command not found". Runs
- * server-side only — GEMINI_API_KEY never reaches the browser. Streams the
- * response back as plain text so it can be appended to the terminal output
- * line by line, the same way /api/chat streams into the ChatWidget.
+ * server-side only — GEMINI_API_KEY never reaches the browser.
+ *
+ * Uses plain (non-streaming) generateContent — the confirmed model list for
+ * this key only lists generateContent/countTokens/createCachedContent/
+ * batchGenerateContent as supported methods, not streamGenerateContent, so
+ * the streaming endpoint 404s regardless of model choice. The Terminal still
+ * reads the response via the same reader.read() loop; it just resolves in
+ * one pass instead of several.
  */
 
 import { profile, ALLOWED_GEMINI_MODELS, DEFAULT_GEMINI_MODEL, type GeminiModel } from "@/lib/data";
@@ -56,7 +61,7 @@ export async function POST(req: Request) {
 
   try {
     const upstream = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,64 +72,45 @@ export async function POST(req: Request) {
       }
     );
 
-    if (!upstream.ok || !upstream.body) {
-      const errText = await upstream.text().catch(() => "");
-      console.error("Gemini API error:", upstream.status, errText);
+    const raw = await upstream.text();
+
+    if (!upstream.ok) {
+      console.error("Gemini API error:", upstream.status, raw);
       return new Response(
         JSON.stringify({
           error: "Gemini request failed.",
           status: upstream.status,
-          detail: errText.slice(0, 500),
+          detail: raw.slice(0, 500),
           modelUsed: model,
         }),
         { status: 502, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Gemini's streaming endpoint sends Server-Sent Events: lines prefixed
-    // "data: {...json...}". We parse each event and forward just the text
-    // token, so the client gets a plain text stream like /api/chat does.
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
-    const reader = upstream.body.getReader();
+    let text = "";
+    try {
+      const parsed = JSON.parse(raw);
+      text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    } catch {
+      console.error("Gemini response parse error:", raw.slice(0, 500));
+    }
 
-    const readable = new ReadableStream({
-      async start(controller) {
-        let buffer = "";
-        try {
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
+    if (!text) {
+      return new Response(
+        JSON.stringify({
+          error: "Gemini returned an empty response.",
+          detail: raw.slice(0, 500),
+          modelUsed: model,
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-            const lines = buffer.split("\n");
-            buffer = lines.pop() ?? "";
-
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (!trimmed.startsWith("data:")) continue;
-              const jsonStr = trimmed.slice(5).trim();
-              if (!jsonStr || jsonStr === "[DONE]") continue;
-              try {
-                const parsed = JSON.parse(jsonStr);
-                const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (text) controller.enqueue(encoder.encode(text));
-              } catch {
-                // Skip any malformed/partial SSE chunk rather than failing
-                // the whole stream over one bad line.
-              }
-            }
-          }
-        } catch {
-          controller.enqueue(encoder.encode("\n[stream interrupted]"));
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(readable, {
+    // Not a token stream anymore (this endpoint doesn't support one on this
+    // key) — return the full answer as a single plain-text response. The
+    // Terminal's reader.read() loop still works fine; it just resolves in
+    // one pass instead of several.
+    return new Response(text, {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   } catch (err) {
