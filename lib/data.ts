@@ -187,16 +187,19 @@ export const pingJokes = [
 ];
 
 /**
- * Gemini models confirmed available on the deployed key (pulled directly
- * from https://generativelanguage.googleapis.com/v1beta/models). Shared
- * between the client Terminal (model switcher UI) and the server
+ * Gemini "-latest" aliases — Google maintains these specifically so code
+ * doesn't hardcode a dated model name that later gets retired for new API
+ * keys (which is exactly what happened with gemini-2.5-flash: it appeared in
+ * the /v1beta/models list but returned 404 "no longer available to new
+ * users" when actually called). These aliases always point to whatever
+ * Google currently recommends, so this class of error shouldn't recur.
+ * Shared between the client Terminal (model switcher UI) and the server
  * /api/gemini route (validation allow-list) so they can never drift apart.
  */
 export const ALLOWED_GEMINI_MODELS = [
-  "gemini-2.5-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-2.5-pro",
+  "gemini-flash-lite-latest",
+  "gemini-flash-latest",
+  "gemini-pro-latest",
 ] as const;
 export type GeminiModel = (typeof ALLOWED_GEMINI_MODELS)[number];
-export const DEFAULT_GEMINI_MODEL: GeminiModel = "gemini-2.5-flash";
+export const DEFAULT_GEMINI_MODEL: GeminiModel = "gemini-flash-latest";

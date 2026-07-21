@@ -24,6 +24,7 @@ import {
   pingFlavourFacts,
   pingJokes,
   ALLOWED_GEMINI_MODELS,
+  DEFAULT_GEMINI_MODEL,
   type GeminiModel,
 } from "@/lib/data";
 
@@ -48,6 +49,7 @@ const KNOWN_COMMANDS = new Set([
   "durban",
   "sudo",
   "sudo make me a sandwich",
+  "models",
   "clear",
 ]);
 
@@ -86,7 +88,7 @@ export default function Terminal() {
   const [history, setHistory] = useState<string[]>([]);
   const [hIndex, setHIndex] = useState(-1);
   const [busy, setBusy] = useState(false);
-  const [model, setModel] = useState<GeminiModel>("gemini-2.5-flash");
+  const [model, setModel] = useState<GeminiModel>(DEFAULT_GEMINI_MODEL);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -148,12 +150,42 @@ export default function Terminal() {
     setHistory((h) => [...h, raw]);
     setHIndex(-1);
 
+    // "model <name>" is a prefix command (not an exact match), so it's
+    // checked before the known-commands lookup below.
+    if (cmd.startsWith("model ")) {
+      const requested = cmd.slice(6).trim() as GeminiModel;
+      if (ALLOWED_GEMINI_MODELS.includes(requested)) {
+        setModel(requested);
+        push([{ type: "out", text: `Switched to ${requested}.` }]);
+      } else {
+        push([
+          {
+            type: "out",
+            text: `Unknown model "${requested}". Try "models" to see options.`,
+          },
+        ]);
+      }
+      return;
+    }
+
     if (!KNOWN_COMMANDS.has(cmd)) {
       await askGemini(raw);
       return;
     }
 
     switch (cmd) {
+      case "models":
+        push([
+          { type: "out", text: `Current model: ${model}` },
+          { type: "out", text: "Available:" },
+          ...ALLOWED_GEMINI_MODELS.map((m) => ({
+            type: "out" as const,
+            text: `  ${m === model ? "→" : " "} ${m}`,
+          })),
+          { type: "out", text: 'Switch with: model <name>' },
+        ]);
+        break;
+
       case "help":
         push([
           { type: "out", text: "AVAILABLE COMMANDS" },
@@ -165,6 +197,7 @@ export default function Terminal() {
           { type: "out", text: "  ping      — latency check (results vary)" },
           { type: "out", text: "  joke      — one dev joke, no refunds" },
           { type: "out", text: "  durban    — a fact about the city I work from" },
+          { type: "out", text: "  models    — list/switch the Gemini model in use" },
           { type: "out", text: "  clear     — clear the screen" },
           { type: "out", text: "  (anything else) — ask Gemini directly" },
         ]);
