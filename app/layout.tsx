@@ -4,6 +4,7 @@ import { profile } from "@/lib/data";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
 import MobileNav from "@/components/ui/MobileNav";
+import ChatWidget from "@/components/ui/ChatWidget";
 
 export const metadata: Metadata = {
   title: `${profile.name} — ${profile.role}`,
@@ -53,6 +54,8 @@ export default function RootLayout({
         <CustomCursor />
         {/* Fixed bottom nav — mobile/touch only */}
         <MobileNav />
+        {/* Floating AI copilot */}
+        <ChatWidget />
       </body>
     </html>
   );
