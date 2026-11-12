@@ -1,59 +1,38 @@
 /**
  * Single source of truth for all portfolio content.
  *
- * ⚠️ PLACEHOLDER FIELDS: [FILL: ...] marks anything I didn't invent — a
- * specific date, employer name, metric, or live URL I wasn't given. Replace
- * those with your real details before shipping. Everything else here comes
- * directly from what you specified.
+ * Project copy and tech badges below were written from what each live site
+ * actually ships (its own meta description, visible content and bundles).
+ * Anything marked [FILL] is something only you know — replace before shipping.
  */
 
 export const profile = {
   name: "Siyabonga Kuhlase",
+  initials: "SK",
   role: "Software Engineer & Technical Operations",
   subrole: "Full-Stack Development · VMS Operations",
-  location: "Durban, South Africa", // [FILL] confirm — carried over, update if wrong
+  location: "Durban, South Africa", // [FILL] confirm
   timezone: "Africa/Johannesburg", // GMT+2
   email: "mskuhlase1011@icloud.com",
-  phone: "[FILL: your real phone]",
+  /** Shown in the hero status badge. Change or blank it if it stops being true. */
+  status: "Available for select freelance projects",
   socials: {
-    github: "https://github.com/", // <- replace with your GitHub URL
-    linkedin: "https://www.linkedin.com/", // <- replace with your LinkedIn URL
+    // Bare placeholders are hidden automatically — add your real profile URLs.
+    github: "https://github.com/", // [FILL]
+    linkedin: "https://www.linkedin.com/", // [FILL]
   },
+  /** Optional: put a PDF in /public and set e.g. "/siyabonga-kuhlase-cv.pdf". */
+  resumeUrl: "", // [FILL]
   summary:
     "I build web apps and I keep systems running — two things that don't usually sit in the same job description, but here we are. Day to day that's Next.js and React for clients who need a real interface, and SQL Server and server-node work for video management systems running across mine sites. Different problems, same instinct: understand the system before you touch it.",
-  journey: [
-    {
-      year: "[FILL: year]",
-      text: "[FILL: e.g. \"Started in technical operations — VMS deployment, SQL-backed event protocols, the unglamorous server-room work that keeps a system honest.\"]",
-    },
-    {
-      year: "[FILL: year]",
-      text: "[FILL: e.g. \"Moved into full-stack development — Next.js, React, Tailwind — while keeping one foot in operations.\"]",
-    },
-    {
-      year: "Ongoing",
-      text: "Split between client web builds and large-scale VMS work across mine sites.",
-    },
-  ],
-  collabStyle: "",
   availability:
     "Got a question about the site, need something that isn't listed here, or want a copy of my CV? Just ask — happy to provide anything that isn't already on the page.",
 };
 
-export const statusMessages = [
-  "SYSTEM STATUS: ONLINE",
-  "COFFEE STATUS: REQUIRED",
-  "LOAD SHEDDING: NOT TODAY (SO FAR)",
-  "BUILD STATUS: PASSING (LOCALLY, ANYWAY)",
-];
-
-/** Skill clusters — feeds the interactive Skill Matrix radar. */
+/** Skill clusters — feed the stack grid, the marquee, the terminal and the AI prompt. */
 export interface SkillCluster {
-  id: string;
+  id: "frontend" | "backend" | "vms-ops";
   title: string;
-  accent: "cyan" | "emerald" | "violet";
-  /** 0–100 self-rated proficiency; drives the radar geometry */
-  level: number;
   skills: string[];
   story: string;
 }
@@ -62,17 +41,13 @@ export const skillClusters: SkillCluster[] = [
   {
     id: "frontend",
     title: "Frontend & App Development",
-    accent: "cyan",
-    level: 86,
-    skills: ["Next.js", "React", "Tailwind CSS", "Framer Motion", "HTML5"],
+    skills: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vite", "HTML5"],
     story:
       "This is the part clients actually see. Next.js and React for the structure, Tailwind for speed, Framer Motion for the interactions that make an app feel considered instead of just functional.",
   },
   {
     id: "backend",
     title: "Backend & Databases",
-    accent: "violet",
-    level: 80,
     skills: ["Microsoft SQL Server", "SQL", "PHP", "C#"],
     story:
       "Most of my database work isn't for a web app — it's event-protocol data from video management systems. That means schema decisions matter more than usual: this data gets queried under pressure, not browsed at leisure.",
@@ -80,82 +55,197 @@ export const skillClusters: SkillCluster[] = [
   {
     id: "vms-ops",
     title: "Systems & VMS Operations",
-    accent: "emerald",
-    level: 88,
-    skills: ["Video Management Systems", "Server Node Restoration", "Networking", "Multi-Site Deployment"],
+    skills: [
+      "Video Management Systems",
+      "Server Node Restoration",
+      "Networking",
+      "Multi-Site Deployment",
+    ],
     story:
       "Large-scale VMS rollouts across mine sites taught me that software is only as good as the server room it runs in. I've restored nodes on-site more times than I've shipped a clean deploy from a laptop.",
   },
 ];
 
-/** Featured project showcase. */
 export interface Project {
   id: string;
   name: string;
-  category: string;
-  focus: string;
-  /** [FILL] — a specific, true challenge you solved on this build. */
-  challenge: string;
-  /** [FILL] — what you'd do differently, or what it taught you. */
-  lesson: string;
-  /** Empty string = no public link yet. Projects.tsx handles this gracefully. */
+  /** Display domain, no protocol. */
+  domain: string;
   url: string;
+  /** Short type label shown on the card. */
+  category: string;
+  sector: string;
+  /** One line for the card. */
+  tagline: string;
+  /** Paragraph for the drawer. */
+  summary: string;
+  /** What the product actually does — concrete, verifiable on the live site. */
+  highlights: string[];
   stack: string[];
-  accent: "cyan" | "emerald" | "violet";
-  /** Optional — only include real, measured numbers. Leave undefined otherwise. */
-  lighthouse?: number;
-  loadMs?: number;
+  /** Tint for this card's ambient light. Keep these muted. */
+  hue: string;
+  /** false when the site forbids framing (X-Frame-Options) — skips the live preview. */
+  embed: boolean;
+  /** Optional GitHub URL — the "Source" button only renders when this is set. */
+  repo?: string;
+  /** Optional screenshot in /public (e.g. "/projects/lumiritin.jpg") — replaces the generated card art. */
+  image?: string;
 }
 
+/** Order matters: it drives the bento layout (see SPANS in Projects.tsx). */
 export const projects: Project[] = [
   {
-    id: "teez-flexx",
-    name: "Teez-Flexx Mobiles",
-    category: "E-Commerce & Service Booking",
-    focus:
-      "An e-commerce platform with a custom repair-booking system built in — calendar integrations, fluid UI animations, and a storefront that doesn't feel bolted together.",
-    challenge:
-      "[FILL: e.g. \"Booking and checkout needed to share state without feeling like two different apps — solved with a shared context layer across both flows.\"]",
-    lesson: "[FILL]",
-    url: "", // [FILL: add live URL when available]
-    stack: ["Next.js", "React", "Framer Motion", "Tailwind CSS"],
-    accent: "cyan",
+    id: "lumiritin",
+    name: "Lumiritin",
+    domain: "lumiritin.co.za",
+    url: "https://lumiritin.co.za/",
+    category: "Booking & credentialing platform",
+    sector: "Private aviation",
+    tagline:
+      "Private aircraft charter for South Africa, with SACAA-verified crew credentials built in.",
+    summary:
+      "A booking and credentialing platform for private aviation. Passengers request charter quotes between South African airfields, operators find verified flight and cabin crew, and pilots keep their credentials and logbook in one place.",
+    highlights: [
+      "Charter quote flow with instant estimates across airfields from O.R. Tambo to Kruger Mpumalanga",
+      "Separate entry points and sign-up for passengers, operators and pilots",
+      "Pilot credential lookup against SACAA records, with expiry reminders and a digital logbook",
+      "“Lumi”, an AI concierge for charter questions",
+    ],
+    stack: ["Next.js", "React", "Tailwind CSS", "Framer Motion", "GSAP"],
+    hue: "#7dd3fc",
+    embed: true,
   },
   {
-    id: "ruz-bio",
-    name: "Ruz Bio",
-    category: "Corporate & AgriTech Digital Presence",
-    focus:
-      "A company profile and digital footprint built entirely around modern agricultural technology and sustainable farming — the brand had to read as credible to both investors and farmers.",
-    challenge: "[FILL]",
-    lesson: "[FILL]",
-    url: "", // [FILL: add live URL when available]
-    stack: ["Next.js", "Tailwind CSS", "Framer Motion"],
-    accent: "emerald",
+    id: "nsk-innovations",
+    name: "NSK Innovations",
+    domain: "nskinnovations.co.za",
+    url: "https://www.nskinnovations.co.za/",
+    category: "Agency website",
+    sector: "Web design & development",
+    tagline: "A Durban studio's site, built to turn a free audit into a signed client.",
+    summary:
+      "The marketing site for a Durban web design and development studio serving businesses across South Africa — services, portfolio, process and pricing, all funnelling toward a free website audit.",
+    highlights: [
+      "Conversion path built around a free audit offer, with WhatsApp, phone and email contact",
+      "Portfolio of live client builds, a three-stage process and a Digital Care maintenance plan",
+      "Pre-rendered, SEO-ready pages with per-page metadata",
+      "Locked-down Content-Security-Policy and framing headers",
+    ],
+    stack: ["React", "Tailwind CSS", "Framer Motion"],
+    hue: "#a5b4fc",
+    embed: false,
+  },
+  {
+    id: "oxy-gas",
+    name: "Oxy Gas",
+    domain: "oxygas.co.za",
+    url: "https://www.oxygas.co.za/",
+    category: "E-commerce store",
+    sector: "Energy & retail",
+    tagline: "Order LPG online with free delivery across Pietermaritzburg.",
+    summary:
+      "An online store for a Pietermaritzburg LPG distributor that also sells animal feed, animal health products and second-hand furniture. Gas is ordered and paid for online; everything else routes to WhatsApp or the shop floor.",
+    highlights: [
+      "LPG refill and swap ordering with cart and card checkout through Yoco",
+      "Multi-category catalogue with per-category enquiry paths",
+      "Store and partner swap-point locations, live trading hours, FAQ and customer reviews",
+      "Staff login plus POPIA privacy, terms and returns pages",
+    ],
+    stack: ["PHP", "Yoco Payments", "JavaScript"],
+    hue: "#fcd34d",
+    embed: false,
+  },
+  {
+    id: "rainbow-directory",
+    name: "Rainbow Directory",
+    domain: "rainbow-directory.vercel.app",
+    url: "https://rainbow-directory.vercel.app/",
+    category: "Services & jobs marketplace",
+    sector: "Local services",
+    tagline: "Work that works for South Africans — checked pros and jobs, in one directory.",
+    summary:
+      "A two-sided directory for South Africa: find a checked plumber, electrician, carer or tutor nearby, or find your next job. Professionals set their own rates in rand.",
+    highlights: [
+      "Search for vetted tradespeople, carers and tutors near you",
+      "Job discovery alongside service listings",
+      "Pros publish their own rand-denominated rates",
+      "PayFast payment integration",
+    ],
+    stack: ["React", "Vite", "Tailwind CSS", "PayFast"],
+    hue: "#f0abfc",
+    embed: true,
+  },
+  {
+    id: "ruz-group",
+    name: "RUZ Group",
+    domain: "ruzgroup.vercel.app",
+    url: "https://ruzgroup.vercel.app/",
+    category: "Corporate website",
+    sector: "Engineering & energy",
+    tagline: "One digital home for an engineering group with five divisions.",
+    summary:
+      "The corporate site for an African engineering and sustainable energy group, presenting five divisions — Mining, Oil & Gas, Bio, Energy, and Water & Environment — under one brand.",
+    highlights: [
+      "Each division gets its own space inside a single brand system",
+      "Multi-page client-side routing",
+      "Motion-led section transitions",
+    ],
+    stack: ["React", "React Router", "Tailwind CSS", "Framer Motion"],
+    hue: "#6ee7b7",
+    embed: true,
+  },
+  {
+    id: "myaluza-civils",
+    name: "Myaluza Civils",
+    domain: "myaluzacivils.com",
+    url: "https://myaluzacivils.com/",
+    category: "Company website",
+    sector: "Civil engineering & construction",
+    tagline: "Where tradition meets innovation — a civils contractor's credentials, online.",
+    summary:
+      "The company site for a 100% black-owned, BBBEE Level 1 civil engineering and construction firm serving Pietermaritzburg, Durban and wider KwaZulu-Natal.",
+    highlights: [
+      "Leads with the firm's credentials: ownership and BBBEE Level 1 status",
+      "Service and region targeting for KwaZulu-Natal search traffic",
+      "Animated, mobile-first presentation",
+    ],
+    stack: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
+    hue: "#fdba74",
+    embed: true,
   },
   {
     id: "wrench-on-wheels",
-    name: "Wrench on Wheels",
-    category: "Mobile Service Business Framework",
-    focus:
-      "Web presence and business framework for a remote mobile vehicle cleaning and detailing service, with dynamic pricing rules that adjust to vehicle type and condition rather than one flat rate.",
-    challenge:
-      "[FILL: e.g. \"Pricing had too many variables for a static table — built a small rules engine instead of hardcoding every vehicle/condition combination.\"]",
-    lesson: "[FILL]",
-    url: "", // [FILL: add live URL when available]
-    stack: ["React", "Tailwind CSS", "Pricing Rules Engine"],
-    accent: "violet",
+    name: "WrenchOnWheels",
+    domain: "wrench-on-wheels.vercel.app",
+    url: "https://wrench-on-wheels.vercel.app/",
+    category: "On-demand booking app",
+    sector: "Automotive services",
+    tagline: "Certified mobile mechanics, booked to your door in 60 seconds.",
+    summary:
+      "An on-demand booking app for mobile mechanics anywhere in South Africa. Describe the problem or pick a service, choose a time and place, and a certified mechanic comes to you.",
+    highlights: [
+      "Three-step booking: issue or service, then date, time and location",
+      "Service catalogue with transparent from-prices in rand, diagnostics to alternator work",
+      "Real-time tracking of the mechanic on the way",
+    ],
+    stack: ["React", "React Router", "Tailwind CSS", "Framer Motion"],
+    hue: "#fca5a5",
+    embed: true,
   },
 ];
 
 /**
- * These are intentionally conservative. The first is a literal count of the
- * list above; the second is a placeholder — swap in your real number.
+ * Headline numbers. The first two are literal counts of the list above, so
+ * they stay true as you add projects; the third is yours to confirm.
  */
 export const stats = [
-  { value: projects.length, suffix: "+", label: "Projects Shipped", decimals: 0 },
-  { value: 3, suffix: "+", label: "Mine Sites Serviced (VMS)", decimals: 0 }, // [FILL] your real count
-  { value: 100, prefix: "<", suffix: "ms", label: "Edge System Latency", decimals: 0 }, // [FILL] your real number
+  { value: projects.length, suffix: "", label: "Platforms live in production" },
+  {
+    value: new Set(projects.map((p) => p.sector)).size,
+    suffix: "",
+    label: "Industries shipped for",
+  },
+  { value: 3, suffix: "+", label: "Mine sites serviced (VMS)" }, // [FILL] your real count
 ];
 
 /** Terminal `joke` command pool. */

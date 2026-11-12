@@ -3,28 +3,18 @@
 /**
  * SmoothScroll
  * ------------
- * Drives the whole page with Lenis momentum scrolling and — crucially — hands
- * Lenis's RAF loop to GSAP's ticker so GSAP ScrollTrigger and Lenis stay in
- * perfect sync (no jitter between pinned sections and momentum scroll).
- *
- * Respects prefers-reduced-motion by skipping Lenis entirely.
+ * Lenis momentum scrolling on its own rAF loop, plus eased in-page anchor
+ * jumps. Skipped entirely for prefers-reduced-motion, where native scrolling
+ * and anchors take over.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Lenis from "lenis";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { registerLenis } from "@/lib/ui";
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
-
   useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const lenis = new Lenis({
       duration: 1.1,
@@ -32,20 +22,32 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       smoothWheel: true,
       touchMultiplier: 1.5,
     });
-    lenisRef.current = lenis;
+    registerLenis(lenis);
 
-    // Keep ScrollTrigger's notion of scroll position in step with Lenis
-    lenis.on("scroll", ScrollTrigger.update);
+    let raf = requestAnimationFrame(function loop(time) {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    });
 
-    // Drive Lenis from GSAP's ticker for a single, unified RAF loop
-    const raf = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(raf);
-    gsap.ticker.lagSmoothing(0);
+    // Ease to #anchors instead of jumping.
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const link = (e.target as HTMLElement).closest?.('a[href^="#"]');
+      const hash = link?.getAttribute("href");
+      if (!hash || hash === "#") return;
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(hash === "#home" ? 0 : target, { offset: -72 });
+      history.replaceState(null, "", hash);
+    };
+    document.addEventListener("click", onClick);
 
     return () => {
-      gsap.ticker.remove(raf);
+      document.removeEventListener("click", onClick);
+      cancelAnimationFrame(raf);
+      registerLenis(null);
       lenis.destroy();
-      lenisRef.current = null;
     };
   }, []);
 

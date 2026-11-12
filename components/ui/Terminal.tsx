@@ -260,7 +260,7 @@ export default function Terminal() {
           { type: "out", text: pick(skillsIntros) },
           ...skillClusters.map((c) => ({
             type: "out" as const,
-            text: `  [${String(c.level).padStart(3)}%] ${c.title}: ${c.skills.join(", ")}`,
+            text: `  ${c.title}: ${c.skills.join(", ")}`,
           })),
         ]);
         break;
@@ -328,21 +328,20 @@ export default function Terminal() {
   };
 
   const color = (t: Line["type"]) =>
-    t === "in" ? "text-cyan" : t === "sys" ? "text-violet" : "text-muted";
+    t === "in" ? "text-accent" : t === "sys" ? "text-violet" : "text-muted";
 
   return (
     <section id="terminal" className="relative mx-auto max-w-4xl px-4 py-20 sm:px-6 sm:py-28">
       <header className="mb-8 max-w-2xl sm:mb-10">
-        <p className="eyebrow mb-3">04 — Playground</p>
-        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-5xl">
-          Talk to the <span className="neon-cyan">shell.</span>
+        <p className="eyebrow mb-4">Playground</p>
+        <h2 className="text-4xl font-semibold leading-[1.02] tracking-tighter sm:text-6xl">
+          Talk to the <span className="text-gradient">shell.</span>
         </h2>
       </header>
 
       <div
         className="glass-solid overflow-hidden rounded-2xl"
         onClick={() => inputRef.current?.focus()}
-        data-cursor="hover"
       >
         {/* title bar — wraps rather than overflowing on narrow screens */}
         <div className="flex flex-wrap items-center gap-2 border-b border-hairline px-3 py-2.5 sm:px-4 sm:py-3">
@@ -350,7 +349,7 @@ export default function Terminal() {
           <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
           <span className="h-3 w-3 rounded-full bg-[#28c840]" />
           <span className="ml-1 truncate font-mono text-[0.65rem] text-faint sm:ml-3 sm:text-xs">
-            masakhane@portfolio:~$
+            siyabonga@portfolio:~$
           </span>
         </div>
 
@@ -358,6 +357,7 @@ export default function Terminal() {
         <div
           ref={scrollRef}
           aria-live="polite"
+          data-lenis-prevent
           className="h-64 overflow-y-auto overflow-x-hidden p-3 font-mono text-[0.78rem] leading-relaxed sm:h-80 sm:p-4 sm:text-[0.8rem]"
         >
           {lines.map((l, i) => (

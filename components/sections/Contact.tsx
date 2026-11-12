@@ -3,38 +3,15 @@
 /**
  * Contact
  * -------
- * Magnetic contact form with floating labels + real-time validation feedback,
- * a live South Africa (GMT+2) operational clock, and kinetic social links.
- *
- * Submitting now actually sends an email (via /api/contact -> Resend) rather
- * than just opening the visitor's own mail app — that only worked if they
- * had one configured, which many mobile browsers don't guarantee.
+ * One large tile: the pitch, a click-to-copy email, and direct links on the
+ * left; a short form on the right that sends through /api/contact (Resend).
  */
 
-import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, MapPin, Check, X as XIcon } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Check, Copy, FileText, Github, Linkedin, Mail, X as XIcon } from "lucide-react";
 import { profile } from "@/lib/data";
-
-function useSATime() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-  const time = useMemo(() => {
-    if (!now) return "--:--:--";
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: profile.timezone,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(now);
-  }, [now]);
-  return time;
-}
+import { trackSpotlight, useCopy } from "@/lib/ui";
+import { Card } from "@/components/ui/Card";
 
 interface Field {
   value: string;
@@ -44,25 +21,41 @@ interface Field {
 type SendState = "idle" | "sending" | "sent" | "error";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const blank: Field = { value: "", touched: false };
+
+/** True only for a real profile URL — hides the bare-domain placeholders. */
+const isRealProfile = (url: string) => {
+  try {
+    return new URL(url).pathname.length > 1;
+  } catch {
+    return false;
+  }
+};
+
+const links = [
+  { icon: Github, label: "GitHub", href: profile.socials.github, show: isRealProfile(profile.socials.github) },
+  { icon: Linkedin, label: "LinkedIn", href: profile.socials.linkedin, show: isRealProfile(profile.socials.linkedin) },
+  { icon: FileText, label: "Resume", href: profile.resumeUrl, show: !!profile.resumeUrl },
+  { icon: Mail, label: "Open in mail app", href: `mailto:${profile.email}`, show: true },
+].filter((l) => l.show);
 
 export default function Contact() {
-  const time = useSATime();
-  const [name, setName] = useState<Field>({ value: "", touched: false });
-  const [email, setEmail] = useState<Field>({ value: "", touched: false });
-  const [message, setMessage] = useState<Field>({ value: "", touched: false });
+  const [copied, copy] = useCopy();
+  const [name, setName] = useState<Field>(blank);
+  const [email, setEmail] = useState<Field>(blank);
+  const [message, setMessage] = useState<Field>(blank);
   const [sendState, setSendState] = useState<SendState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const nameErr = name.touched && name.value.trim().length < 2;
-  const emailErr = email.touched && !emailRe.test(email.value);
-  const msgErr = message.touched && message.value.trim().length < 10;
-  const valid =
-    name.value.trim().length >= 2 &&
-    emailRe.test(email.value) &&
-    message.value.trim().length >= 10;
+  const nameOk = name.value.trim().length >= 2;
+  const emailOk = emailRe.test(email.value);
+  const msgOk = message.value.trim().length >= 10;
+  const valid = nameOk && emailOk && msgOk;
 
-  const handleSubmit = async () => {
-    if (!valid || sendState === "sending") {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (sendState === "sending") return;
+    if (!valid) {
       setName((f) => ({ ...f, touched: true }));
       setEmail((f) => ({ ...f, touched: true }));
       setMessage((f) => ({ ...f, touched: true }));
@@ -76,144 +69,134 @@ export default function Contact() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.value,
-          email: email.value,
-          message: message.value,
-        }),
+        body: JSON.stringify({ name: name.value, email: email.value, message: message.value }),
       });
       const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Something went wrong.");
-      }
+      if (!res.ok) throw new Error(data?.error || "Something went wrong.");
 
       setSendState("sent");
-      setName({ value: "", touched: false });
-      setEmail({ value: "", touched: false });
-      setMessage({ value: "", touched: false });
+      setName(blank);
+      setEmail(blank);
+      setMessage(blank);
     } catch (err) {
       setSendState("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
     }
   };
 
-  const socials = [
-    { icon: Github, label: "GitHub", href: profile.socials.github },
-    { icon: Linkedin, label: "LinkedIn", href: profile.socials.linkedin },
-    { icon: Mail, label: "Email", href: `mailto:${profile.email}` },
-  ];
-
   return (
-    <section id="contact" className="relative mx-auto max-w-6xl px-6 py-28">
-      <div className="grid gap-16 lg:grid-cols-2">
-        {/* Left: pitch + live widgets */}
-        <div>
-          <p className="eyebrow mb-3">05 — Contact</p>
-          <h2 className="font-display text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
-            Got something
-            <br />
-            <span className="neon-cyan">worth building?</span>
+    <section id="contact" className="relative mx-auto max-w-6xl px-6 py-24 sm:py-32">
+      <Card className="grid gap-12 p-7 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:p-14">
+        {/* Pitch + direct contact */}
+        <div className="flex flex-col">
+          <p className="eyebrow mb-4">Contact</p>
+          <h2 className="text-4xl font-semibold leading-[1.02] tracking-tighter sm:text-6xl">
+            Got something <span className="text-gradient">worth building?</span>
           </h2>
-          <p className="mt-6 max-w-md text-muted">{profile.availability}</p>
+          <p className="mt-6 max-w-md text-pretty leading-relaxed text-muted">
+            {profile.availability}
+          </p>
 
-          {/* Visible, clickable email */}
-          <a
-            href={`mailto:${profile.email}`}
-            data-cursor="hover"
-            className="mt-4 inline-flex items-center gap-2 font-mono text-sm text-cyan transition-colors hover:text-emerald"
+          {/* Click-to-copy email */}
+          <button
+            type="button"
+            onClick={() => copy(profile.email)}
+            onMouseMove={trackSpotlight}
+            aria-label={`Copy email address ${profile.email}`}
+            className="card group mt-10 flex w-full max-w-md cursor-pointer items-center justify-between gap-4 !rounded-2xl px-5 py-4 text-left"
           >
-            <Mail className="h-4 w-4" />
-            {profile.email}
-          </a>
+            <span className="min-w-0">
+              <span className="eyebrow block !text-[0.6rem]" aria-live="polite">
+                {copied ? "Copied to clipboard" : "Click to copy"}
+              </span>
+              <span className="mt-1 block truncate text-base text-ink sm:text-lg">
+                {profile.email}
+              </span>
+            </span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-hairline text-faint transition-colors group-hover:text-ink">
+              {copied ? <Check className="h-4 w-4 text-emerald" /> : <Copy className="h-4 w-4" />}
+            </span>
+          </button>
 
-          {/* Live operational clock */}
-          <div className="glass mt-8 inline-flex items-center gap-4 rounded-xl px-5 py-4">
-            <span className="status-dot" />
-            <div>
-              <p className="font-mono text-lg text-cyan">{time}</p>
-              <p className="flex items-center gap-1 font-mono text-[0.65rem] tracking-widest text-faint">
-                <MapPin className="h-3 w-3" /> {profile.location.toUpperCase()} · GMT+2
-              </p>
-            </div>
-          </div>
-
-          {/* Socials */}
-          <div className="mt-8 flex gap-3">
-            {socials.map((s) => (
-              <motion.a
-                key={s.label}
-                href={s.href}
-                target={s.href.startsWith("http") ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                data-cursor="hover"
-                whileHover={{ y: -4, scale: 1.08 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="glass flex h-12 w-12 items-center justify-center rounded-full text-muted transition-colors hover:text-cyan"
-              >
-                <s.icon className="h-5 w-5" />
-              </motion.a>
+          <ul className="mt-6 flex flex-wrap gap-2 lg:mt-auto lg:pt-10">
+            {links.map((l) => (
+              <li key={l.label}>
+                <a
+                  href={l.href}
+                  {...(l.href.startsWith("mailto:")
+                    ? {}
+                    : { target: "_blank", rel: "noopener noreferrer" })}
+                  className="group inline-flex h-10 items-center gap-2 rounded-full border border-hairline px-4 text-sm text-muted transition-colors hover:border-faint hover:text-ink"
+                >
+                  <l.icon className="h-4 w-4" />
+                  {l.label}
+                  <ArrowUpRight className="h-3.5 w-3.5 text-faint transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
-        {/* Right: form */}
-        <div className="glass rounded-2xl p-8">
-          <FloatingInput
+        {/* Form */}
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+          <FormField
             id="name"
             label="Your name"
+            autoComplete="name"
             value={name.value}
-            error={nameErr ? "Please enter your name" : ""}
+            error={name.touched && !nameOk ? "Please enter your name" : ""}
             onChange={(v) => setName({ value: v, touched: true })}
             onBlur={() => setName((f) => ({ ...f, touched: true }))}
           />
-          <FloatingInput
+          <FormField
             id="email"
             label="Email address"
             type="email"
+            autoComplete="email"
             value={email.value}
-            error={emailErr ? "Enter a valid email" : ""}
+            error={email.touched && !emailOk ? "Enter a valid email" : ""}
             onChange={(v) => setEmail({ value: v, touched: true })}
             onBlur={() => setEmail((f) => ({ ...f, touched: true }))}
           />
-          <FloatingInput
+          <FormField
             id="message"
             label="Message"
             textarea
             value={message.value}
-            error={msgErr ? "A little more detail helps (10+ chars)" : ""}
+            error={message.touched && !msgOk ? "A little more detail helps (10+ characters)" : ""}
             onChange={(v) => setMessage({ value: v, touched: true })}
             onBlur={() => setMessage((f) => ({ ...f, touched: true }))}
           />
 
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={sendState === "sending"}
-            data-cursor="hover"
-            className="mt-4 w-full rounded-full bg-cyan px-6 py-3.5 text-sm font-medium text-void transition-colors hover:bg-emerald disabled:opacity-40"
+            className="mt-1 h-12 w-full cursor-pointer rounded-full bg-ink px-6 text-sm font-medium text-void transition-colors hover:bg-ink/90 disabled:cursor-wait disabled:opacity-50"
           >
             {sendState === "sending" ? "Sending…" : "Send message"}
           </button>
 
-          {sendState === "sent" && (
-            <p className="mt-3 flex items-center gap-2 font-mono text-xs text-emerald">
-              <Check className="h-4 w-4" /> Sent — I'll reply as soon as I can.
-            </p>
-          )}
-          {sendState === "error" && (
-            <p className="mt-3 flex items-center gap-2 font-mono text-xs text-[#ff5f57]">
-              <XIcon className="h-4 w-4" /> {errorMsg || "Something went wrong — try again, or email me directly."}
-            </p>
-          )}
-        </div>
-      </div>
+          <div aria-live="polite" className="min-h-5">
+            {sendState === "sent" && (
+              <p className="flex items-center gap-2 text-sm text-emerald">
+                <Check className="h-4 w-4" /> Sent — I&apos;ll reply as soon as I can.
+              </p>
+            )}
+            {sendState === "error" && (
+              <p className="flex items-center gap-2 text-sm text-danger">
+                <XIcon className="h-4 w-4 shrink-0" />
+                {errorMsg || "Something went wrong — try again, or email me directly."}
+              </p>
+            )}
+          </div>
+        </form>
+      </Card>
     </section>
   );
 }
 
-/* --- Floating-label field ------------------------------------------------- */
-function FloatingInput({
+/* --- Labelled field ------------------------------------------------------- */
+function FormField({
   id,
   label,
   value,
@@ -222,6 +205,7 @@ function FloatingInput({
   error,
   type = "text",
   textarea = false,
+  autoComplete,
 }: {
   id: string;
   label: string;
@@ -231,46 +215,32 @@ function FloatingInput({
   error?: string;
   type?: string;
   textarea?: boolean;
+  autoComplete?: string;
 }) {
-  const [focused, setFocused] = useState(false);
-  const active = focused || value.length > 0;
-
   const shared = {
     id,
+    name: id,
     value,
+    autoComplete,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange(e.target.value),
-    onFocus: () => setFocused(true),
-    onBlur: () => {
-      setFocused(false);
-      onBlur();
-    },
+    onBlur,
     "aria-invalid": !!error,
     "aria-describedby": error ? `${id}-err` : undefined,
+    // text-base (16px) stops iOS Safari zooming the page on focus
     className:
-      "peer w-full border-b bg-transparent pb-2 pt-6 text-ink outline-none transition-colors " +
-      (error ? "border-[#ff5f57]" : "border-hairline focus:border-cyan"),
+      "w-full rounded-xl border bg-raised/60 px-4 py-3 text-base text-ink outline-none transition-colors placeholder:text-faint focus:bg-raised " +
+      (error ? "border-danger" : "border-hairline focus:border-accent"),
   };
 
   return (
-    <div className="relative mb-6">
-      <label
-        htmlFor={id}
-        className={`pointer-events-none absolute left-0 font-mono transition-all duration-200 ${
-          active
-            ? "top-0 text-[0.65rem] tracking-widest text-cyan"
-            : "top-6 text-sm text-faint"
-        }`}
-      >
-        {label.toUpperCase()}
+    <div>
+      <label htmlFor={id} className="eyebrow mb-2 block">
+        {label}
       </label>
-      {textarea ? (
-        <textarea rows={4} {...shared} />
-      ) : (
-        <input type={type} {...shared} />
-      )}
+      {textarea ? <textarea rows={5} {...shared} /> : <input type={type} {...shared} />}
       {error && (
-        <p id={`${id}-err`} className="mt-1 font-mono text-[0.65rem] text-[#ff5f57]">
+        <p id={`${id}-err`} className="mt-1.5 text-xs text-danger">
           {error}
         </p>
       )}

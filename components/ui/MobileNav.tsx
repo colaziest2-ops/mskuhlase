@@ -12,12 +12,12 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Home, Radar, LayoutGrid, Mail } from "lucide-react";
+import { Home, Layers, LayoutGrid, Mail } from "lucide-react";
 
 const ITEMS = [
   { id: "home", label: "Home", href: "#home", Icon: Home },
-  { id: "skills", label: "Skills", href: "#skills", Icon: Radar },
   { id: "projects", label: "Work", href: "#projects", Icon: LayoutGrid },
+  { id: "skills", label: "Stack", href: "#skills", Icon: Layers },
   { id: "contact", label: "Contact", href: "#contact", Icon: Mail },
 ] as const;
 
@@ -65,12 +65,12 @@ export default function MobileNav() {
           >
             <Icon
               className="h-5 w-5"
-              style={{ color: isActive ? "var(--color-cyan)" : "var(--color-faint)" }}
+              style={{ color: isActive ? "var(--color-accent)" : "var(--color-faint)" }}
               aria-hidden
             />
             <span
               className="font-mono text-[0.6rem] tracking-widest"
-              style={{ color: isActive ? "var(--color-cyan)" : "var(--color-faint)" }}
+              style={{ color: isActive ? "var(--color-accent)" : "var(--color-faint)" }}
             >
               {label.toUpperCase()}
             </span>

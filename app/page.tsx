@@ -1,68 +1,81 @@
 import Hero from "@/components/sections/Hero";
-import SkillMatrix from "@/components/sections/SkillMatrix";
 import Projects from "@/components/sections/Projects";
-import Stats from "@/components/sections/Stats";
+import Stack from "@/components/sections/Stack";
 import Terminal from "@/components/ui/Terminal";
 import Contact from "@/components/sections/Contact";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { profile } from "@/lib/data";
 
+const NAV = [
+  ["Work", "#projects"],
+  ["Stack", "#skills"],
+  ["Shell", "#terminal"],
+  ["Contact", "#contact"],
+] as const;
+
 /**
  * The full portfolio, top to bottom. Each section is self-contained and reads
- * from lib/data.ts. Section order is the narrative: thesis → capabilities →
- * proof → numbers → play → contact.
+ * from lib/data.ts. Order is the narrative: statement → proof → capabilities
+ * → play → contact.
  */
 export default function Page() {
   return (
     <main>
-      {/* Fixed lightweight nav */}
-      <nav className="fixed inset-x-0 top-0 z-50">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      {/* Floating pill nav */}
+      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
+        <nav
+          aria-label="Primary"
+          className="glass mx-auto flex h-14 max-w-3xl items-center justify-between rounded-full pl-5 pr-2"
+        >
           <a
             href="#home"
-            data-cursor="hover"
-            className="font-display text-sm font-bold tracking-tight"
+            aria-label={`${profile.name} — back to top`}
+            className="font-display text-base font-semibold tracking-tight"
           >
-            SK<span className="text-cyan">.</span>
+            {profile.initials}
+            <span className="text-accent">.</span>
           </a>
-          <div className="flex items-center gap-4">
-            <div className="hidden gap-8 font-mono text-[0.7rem] tracking-widest text-muted sm:flex">
-              {[
-                ["Skills", "#skills"],
-                ["Work", "#projects"],
-                ["Shell", "#terminal"],
-                ["Contact", "#contact"],
-              ].map(([label, href]) => (
-                <a
-                  key={href}
-                  href={href}
-                  data-cursor="hover"
-                  className="flex items-center transition-colors hover:text-cyan"
-                >
-                  {label.toUpperCase()}
-                </a>
+          <div className="flex items-center gap-1">
+            <ul className="hidden items-center sm:flex">
+              {NAV.map(([label, href]) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:text-ink"
+                  >
+                    {label}
+                  </a>
+                </li>
               ))}
-            </div>
+            </ul>
             <ThemeToggle />
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
       <Hero />
-      <SkillMatrix />
       <Projects />
-      <Stats />
+      <Stack />
       <Terminal />
       <Contact />
 
       <footer className="border-t border-hairline">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
-          <p className="font-mono text-[0.7rem] tracking-widest text-faint">
-            © {new Date().getFullYear()} {profile.name.toUpperCase()}
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-6 py-10 text-sm text-faint sm:flex-row">
+          <p>
+            © {new Date().getFullYear()} {profile.name}
           </p>
-          <p className="font-mono text-[0.7rem] tracking-widest text-faint">
-            BUILT WITH NEXT.JS · THREE.JS · GSAP
-          </p>
+          <ul className="flex items-center gap-6">
+            {NAV.map(([label, href]) => (
+              <li key={href}>
+                <a href={href} className="transition-colors hover:text-ink">
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a href="#home" className="transition-colors hover:text-ink">
+            Back to top ↑
+          </a>
         </div>
       </footer>
     </main>

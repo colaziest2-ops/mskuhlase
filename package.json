@@ -1,8 +1,8 @@
 {
-  "name": "masakhane-kuhlase-portfolio",
-  "version": "1.0.0",
+  "name": "siyabonga-kuhlase-portfolio",
+  "version": "2.0.0",
   "private": true,
-  "description": "Cybernetic-precision developer portfolio for Masakhane Kuhlase — Technical Engineer @ AxxonSoft",
+  "description": "Developer portfolio for Siyabonga Kuhlase — full-stack engineering and technical operations",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,25 +10,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "resend": "^6.17.2",
-    "groq-sdk": "^1.3.0",
-    "@react-three/drei": "^10.0.0",
-    "@react-three/fiber": "^9.0.0",
     "framer-motion": "^11.15.0",
-    "gsap": "^3.12.5",
+    "groq-sdk": "^1.3.0",
     "lenis": "^1.1.18",
     "lucide-react": "^0.469.0",
     "next": "^15.5.20",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "three": "^0.171.0"
+    "resend": "^6.17.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
-    "@types/three": "^0.171.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3"

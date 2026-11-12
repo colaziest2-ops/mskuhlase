@@ -103,10 +103,9 @@ export default function ChatWidget() {
       {/* Launcher */}
       <button
         onClick={() => setOpen((o) => !o)}
-        data-cursor="hover"
         aria-label={open ? "Close chat assistant" : "Open chat assistant"}
         aria-expanded={open}
-        className="glass-solid fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full text-cyan transition-transform hover:scale-105 md:bottom-6 md:right-6"
+        className="glass-solid fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full text-accent transition-transform hover:scale-105 md:bottom-6 md:right-6"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>
@@ -135,6 +134,7 @@ export default function ChatWidget() {
             <div
               ref={scrollRef}
               aria-live="polite"
+              data-lenis-prevent
               className="flex-1 space-y-3 overflow-y-auto p-4"
             >
               {messages.length === 0 && (
@@ -148,8 +148,7 @@ export default function ChatWidget() {
                       <button
                         key={s}
                         onClick={() => send(s)}
-                        data-cursor="hover"
-                        className="rounded-full border border-hairline px-3 py-1.5 font-mono text-[0.65rem] text-muted transition-colors hover:text-cyan"
+                        className="rounded-full border border-hairline px-3 py-1.5 font-mono text-[0.65rem] text-muted transition-colors hover:text-accent"
                       >
                         {s}
                       </button>
@@ -163,7 +162,7 @@ export default function ChatWidget() {
                   key={i}
                   className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
                     m.role === "user"
-                      ? "ml-auto bg-cyan text-void"
+                      ? "ml-auto bg-accent text-void"
                       : "glass-solid text-ink"
                   }`}
                 >
@@ -185,14 +184,13 @@ export default function ChatWidget() {
                 aria-label="Message the AI assistant"
                 autoComplete="off"
                 disabled={loading}
-                className="flex-1 rounded-full border border-hairline bg-transparent px-4 py-2 text-sm text-ink outline-none focus:border-cyan disabled:opacity-50"
+                className="flex-1 rounded-full border border-hairline bg-transparent px-4 py-2 text-sm text-ink outline-none focus:border-accent disabled:opacity-50"
               />
               <button
                 onClick={() => send(input)}
                 disabled={loading || !input.trim()}
                 aria-label="Send message"
-                data-cursor="hover"
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-cyan text-void transition-opacity disabled:opacity-40"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-void transition-opacity disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>

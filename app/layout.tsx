@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/lib/data";
-import SmoothScroll from "@/components/SmoothScroll";
-import CustomCursor from "@/components/ui/CustomCursor";
+import Providers from "@/components/Providers";
 import MobileNav from "@/components/ui/MobileNav";
 import ChatWidget from "@/components/ui/ChatWidget";
+
+// Self-hosted at build time by next/font — no render-blocking font requests.
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+const body = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jb", display: "swap" });
 
 export const metadata: Metadata = {
   title: `${profile.name} — ${profile.role}`,
@@ -26,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0f",
+  themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
 };
@@ -37,14 +46,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
         {/* Runs before paint so a saved "light" preference doesn't flash dark
             first — ThemeToggle.tsx reads/writes the same localStorage key. */}
         <script
@@ -54,10 +61,7 @@ export default function RootLayout({
         />
       </head>
       <body className="pb-16 md:pb-0">
-        {/* Lenis momentum scroll wraps the whole tree */}
-        <SmoothScroll>{children}</SmoothScroll>
-        {/* Velocity-aware custom cursor (auto-disabled on touch devices) */}
-        <CustomCursor />
+        <Providers>{children}</Providers>
         {/* Fixed bottom nav — mobile/touch only */}
         <MobileNav />
         {/* Floating AI copilot */}

@@ -11,7 +11,7 @@ export function buildSystemPrompt(): string {
   const projectList = projects
     .map(
       (p) =>
-        `- ${p.name} (${p.category}): ${p.focus} Stack: ${p.stack.join(", ")}.`
+        `- ${p.name} (${p.category}, ${p.sector}) — ${p.url}: ${p.summary} Stack: ${p.stack.join(", ")}.`
     )
     .join("\n");
 

@@ -1,68 +1,75 @@
-# Masakhane Kuhlase — Portfolio
+# Siyabonga Kuhlase — Portfolio
 
-Cybernetic-precision developer portfolio. Next.js 15 · React 19 · TypeScript · Tailwind v4 · Three.js (R3F) · GSAP · Framer Motion · Lenis.
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · Lenis · Lucide.
 
-## Run it (in VS Code)
-
-1. Extract this folder and open it in VS Code (`File → Open Folder`).
-2. Open the integrated terminal (`` Ctrl+` ``) and install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Start the dev server:
-
-   ```bash
-   npm run dev
-   ```
-
-4. Open **http://localhost:3000**.
-
-> Requires **Node.js 18.18+** (Node 20 LTS recommended). Check with `node -v`.
-
-## Make it yours (2-minute edit)
-
-Almost everything lives in **`lib/data.ts`** — edit there, not in the components:
-
-- `profile` — name, role, email, phone, location. **Add your real GitHub + LinkedIn URLs** (the socials are placeholders).
-- `skillClusters` — the 2027 skill radar (title, `level` 0–100, skills).
-- `projects` — the 6 featured builds (name, url, stack, Lighthouse, load time).
-- `stats` — the animated counter strip.
-
-## Notes
-
-- **Contact form** composes a `mailto:` on submit — works with no backend. To wire a real endpoint, replace `handleSubmit` in `components/sections/Contact.tsx` with a `fetch` to your API route.
-- **Project previews** load the live sites in an `<iframe>`. Some sites send `X-Frame-Options`/CSP headers that block embedding — those will show blank inside the modal, but the "Visit live site" button always works.
-- **Reduced motion** is respected: smooth scroll and heavy animation switch off for users who prefer it.
-- The custom cursor auto-disables on touch devices.
-
-## Build for production
+## Run it
 
 ```bash
-npm run build
-npm run start
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Deploys cleanly to **Vercel** (`vercel` or connect the repo) with zero config.
+Requires Node.js 18.18+ (20 LTS or newer recommended).
+
+The chat widget, terminal and contact form call API routes that need
+`GROQ_API_KEY`, `GEMINI_API_KEY` and `RESEND_API_KEY`. Set them in Vercel (and in
+`.env.local` for local work) — `npm run build` fails without `GROQ_API_KEY`.
+
+## Edit your content
+
+Everything lives in **`lib/data.ts`** — edit there, not in the components. Search
+for `[FILL]` to find what still needs your input.
+
+- `profile` — name, role, location, email, hero `status` line, social URLs and
+  `resumeUrl`. GitHub / LinkedIn / Resume links stay hidden until you set real URLs.
+- `projects` — the work grid. Order drives the bento layout (`SPANS` in
+  `components/sections/Projects.tsx`). Per project you can optionally set:
+  - `image` — a screenshot in `/public` (e.g. `/projects/lumiritin.jpg`) to
+    replace the generated card art.
+  - `repo` — a GitHub URL; adds a "Source" button to the drawer.
+  - `embed: false` — for sites that block iframes (`X-Frame-Options`), which
+    skips the live preview.
+- `skillClusters` — the three stack tiles and the hero marquee.
+- `stats` — the numbers in the About tile. The first two are computed from
+  `projects`.
+
+## Design system
+
+Tokens are defined once in `app/globals.css` under `@theme` (dark) and
+`[data-theme="light"]`: `void / panel / raised / hairline` surfaces,
+`ink / muted / faint` text, and a single `accent`. Reusable pieces:
+
+- `.card` — bento tile with a pointer-following spotlight (set `--spot` to tint it)
+- `.pill`, `.eyebrow`, `.text-gradient`, `glass`, `glass-solid`, `grid-fade`
+
+Fonts (Bricolage Grotesque, Inter, JetBrains Mono) load through `next/font`.
+All motion respects `prefers-reduced-motion`.
 
 ## Structure
 
 ```
 app/
-  layout.tsx        Root layout, metadata, providers
-  page.tsx          Assembles all sections + nav + footer
-  globals.css       Tailwind v4 design tokens (colors, type, motion)
+  layout.tsx          Fonts, metadata, providers
+  page.tsx            Nav + sections + footer
+  globals.css         Design tokens and primitives
+  api/                chat (Groq) · gemini (terminal) · contact (Resend)
 components/
-  SmoothScroll.tsx        Lenis + GSAP ticker sync
-  canvas/NodeBackground   R3F distributed-node particle network
-  sections/Hero           Kinetic headline + telemetry badge + CTA
-  sections/SkillMatrix    Interactive radar of skill clusters
-  sections/Projects       3D tilt cards + filters + live-preview modal
-  sections/Stats          GSAP scroll counters
-  sections/Contact        Floating-label form + live SA clock + socials
-  ui/Terminal             Functional CLI (help / axxon / skills / projects / ping)
-  ui/CustomCursor         Velocity-aware cursor
-  ui/MagneticButton       Magnetic hover button
-lib/data.ts               Single source of truth for all content
+  Providers.tsx       MotionConfig + smooth scroll
+  SmoothScroll.tsx    Lenis + eased anchor links
+  sections/Hero       Status badge, statement, CTAs, stack marquee
+  sections/Projects   Bento work grid
+  sections/Stack      About, local time and discipline tiles
+  sections/Contact    Copy-to-clipboard email, links, form
+  ui/ProjectDrawer    Project case file with scaled live preview
+  ui/ProjectArt       Generated / screenshot card art
+  ui/Card             Spotlight tile + scroll reveal
+  ui/MagneticButton   Magnetic CTA
+  ui/Terminal         Interactive shell
+  ui/ChatWidget       Floating AI assistant
+  ui/MobileNav        Bottom nav on phones
+  ui/ThemeToggle      Dark / light
+lib/
+  data.ts             All content
+  ui.ts               Spotlight, clipboard, clock, scroll-lock helpers
+  systemPrompt.ts     AI assistant prompt, built from data.ts
 ```

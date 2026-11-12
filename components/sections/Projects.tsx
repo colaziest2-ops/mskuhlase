@@ -3,303 +3,128 @@
 /**
  * Projects
  * --------
- * Filterable gallery of 6 featured builds. Each card does a pointer-driven 3D
- * tilt (parallax) and opens a full-screen drawer with a live iframe preview,
- * the engineering focus, and performance stats.
+ * Selected work as an asymmetric bento grid. Each tile carries generated
+ * "browser" art tinted with the project's hue (or a real screenshot if
+ * `image` is set in lib/data.ts), a pointer-following spotlight, and opens a
+ * drawer with the full case file — no page navigation.
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ExternalLink, Gauge, Timer, X } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { projects, type Project } from "@/lib/data";
+import { EASE, trackSpotlight } from "@/lib/ui";
+import { Reveal } from "@/components/ui/Card";
+import ProjectArt from "@/components/ui/ProjectArt";
+import ProjectDrawer from "@/components/ui/ProjectDrawer";
 
-const accentHex: Record<string, string> = {
-  cyan: "#f2a93b",
-  emerald: "#6fae8f",
-  violet: "#948bc4",
+/** Column spans on the 6-col desktop grid, by position: 4+2 / 2+4 / 2+2+2. */
+const SPANS = [4, 2, 2, 4, 2, 2, 2];
+const spanClass: Record<number, string> = {
+  2: "lg:col-span-2",
+  3: "lg:col-span-3",
+  4: "lg:col-span-4",
+  6: "lg:col-span-6",
 };
 
-// Build a unique, stable list of filter categories.
-const FILTERS = ["All", ...Array.from(new Set(projects.map((p) => p.category)))];
-
-/* --- Individual tilt card -------------------------------------------------- */
-function TiltCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [t, setT] = useState({ rx: 0, ry: 0 });
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    setT({ rx: py * -10, ry: px * 12 });
-  };
-
+function ProjectCard({
+  project,
+  span,
+  index,
+  onOpen,
+}: {
+  project: Project;
+  span: number;
+  index: number;
+  onOpen: (trigger: HTMLElement) => void;
+}) {
+  const wide = span >= 4;
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 30 }}
+    <motion.button
+      type="button"
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{ perspective: 1000 }}
+      transition={{ duration: 0.6, delay: (index % 3) * 0.07, ease: EASE }}
+      whileHover={{ scale: 1.012 }}
+      whileTap={{ scale: 0.995 }}
+      onMouseMove={trackSpotlight}
+      onClick={(e) => onOpen(e.currentTarget)}
+      aria-haspopup="dialog"
+      aria-label={`${project.name} — ${project.category}. Open project details`}
+      style={{ "--spot": project.hue } as React.CSSProperties}
+      className={`card group flex cursor-pointer flex-col p-3 text-left ${
+        index === 0 ? "md:col-span-2" : ""
+      } ${spanClass[span] ?? ""}`}
     >
-      <button
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={() => setT({ rx: 0, ry: 0 })}
-        onClick={onOpen}
-        data-cursor="hover"
-        aria-label={`Open case study for ${project.name}`}
-        className="group glass block w-full rounded-2xl p-6 text-left transition-shadow"
-        style={{
-          transform: `rotateX(${t.rx}deg) rotateY(${t.ry}deg)`,
-          transformStyle: "preserve-3d",
-          transition: "transform 0.15s ease-out",
-          boxShadow: `0 0 0 1px transparent`,
-        }}
-      >
-        <div className="flex items-start justify-between" style={{ transform: "translateZ(40px)" }}>
-          <span
-            className="font-mono text-[0.68rem] tracking-widest"
-            style={{ color: accentHex[project.accent] }}
-          >
-            {project.category}
+      <ProjectArt project={project} tall={wide} />
+
+      <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
+        <div className="flex items-start justify-between gap-4">
+          <p className="eyebrow">{project.category}</p>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-hairline text-faint transition-all duration-300 group-hover:rotate-45 group-hover:border-faint group-hover:text-ink">
+            <ArrowUpRight className="h-4 w-4" />
           </span>
-          <ArrowUpRight className="h-5 w-5 text-faint transition-colors group-hover:text-cyan" />
         </div>
 
-        <h3
-          className="mt-4 font-display text-2xl font-bold tracking-tight"
-          style={{ transform: "translateZ(30px)" }}
-        >
-          {project.name}
-        </h3>
-
-        <p className="mt-3 text-sm leading-relaxed text-muted" style={{ transform: "translateZ(20px)" }}>
-          {project.focus}
+        <h3 className={`mt-1 font-semibold ${wide ? "text-3xl" : "text-2xl"}`}>{project.name}</h3>
+        <p className={`mt-2 text-sm leading-relaxed text-muted ${wide ? "max-w-xl" : ""}`}>
+          {project.tagline}
         </p>
 
-        <div className="mt-5 flex flex-wrap gap-2" style={{ transform: "translateZ(15px)" }}>
-          {project.stack.map((s) => (
-            <span
-              key={s}
-              className="rounded-full border border-hairline px-2.5 py-1 font-mono text-[0.65rem] text-muted"
-            >
+        <ul className="mt-auto flex flex-wrap gap-1.5 pt-5">
+          {project.stack.slice(0, wide ? 5 : 3).map((s) => (
+            <li key={s} className="pill">
               {s}
-            </span>
+            </li>
           ))}
-        </div>
-      </button>
-    </motion.div>
+        </ul>
+      </div>
+    </motion.button>
   );
 }
 
-/* --- Full-screen case-study drawer ---------------------------------------- */
-function Drawer({ project, onClose }: { project: Project; onClose: () => void }) {
-  return (
-    <motion.div
-      className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden
-      />
-      <motion.div
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${project.name} case study`}
-        initial={{ y: 60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 60, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 260, damping: 28 }}
-        className="glass relative z-10 m-4 grid max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl lg:grid-cols-[1.2fr_1fr]"
-      >
-        {/* Live preview — iframes are heavy and often blocked on mobile
-            browsers, so below md we skip the embed entirely and just link
-            out. If there's no public URL at all, show a plain fallback. */}
-        <div className="relative min-h-[160px] border-b border-hairline bg-void lg:min-h-[240px] lg:border-b-0 lg:border-r">
-          {project.url ? (
-            <>
-              <iframe
-                src={project.url}
-                title={`${project.name} live preview`}
-                className="hidden h-full min-h-[240px] w-full md:block"
-                loading="lazy"
-                sandbox="allow-scripts allow-same-origin"
-              />
-              {/* Mobile fallback: no iframe, just a clear link out */}
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cursor="hover"
-                className="flex min-h-[160px] flex-col items-center justify-center gap-2 p-6 text-center md:hidden"
-              >
-                <ExternalLink className="h-6 w-6 text-cyan" />
-                <span className="font-mono text-xs text-muted">
-                  Preview embeds don&apos;t play nicely with mobile browsers —
-                  tap to open the live site instead.
-                </span>
-              </a>
-              <span
-                className="absolute left-3 top-3 rounded-full px-3 py-1 font-mono text-[0.6rem] tracking-widest text-void"
-                style={{ background: accentHex[project.accent] }}
-              >
-                ● LIVE PREVIEW
-              </span>
-            </>
-          ) : (
-            <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 p-6 text-center lg:min-h-[240px]">
-              <span className="font-mono text-xs text-faint">
-                No public link yet — internal / proprietary build.
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Detail */}
-        <div className="flex flex-col gap-6 overflow-y-auto p-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <p
-                className="font-mono text-[0.68rem] tracking-widest"
-                style={{ color: accentHex[project.accent] }}
-              >
-                {project.category}
-              </p>
-              <h3 className="mt-2 font-display text-3xl font-bold">{project.name}</h3>
-            </div>
-            <button
-              onClick={onClose}
-              data-cursor="hover"
-              aria-label="Close case study"
-              className="rounded-full border border-hairline p-2 text-muted transition-colors hover:text-cyan"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div>
-            <p className="eyebrow mb-2">Architectural Focus</p>
-            <p className="text-sm leading-relaxed text-muted">{project.focus}</p>
-          </div>
-
-          <div>
-            <p className="eyebrow mb-2">The Real Challenge</p>
-            <p className="text-sm leading-relaxed text-muted">{project.challenge}</p>
-          </div>
-
-          <div>
-            <p className="eyebrow mb-2">What It Taught Me</p>
-            <p className="text-sm leading-relaxed text-muted">{project.lesson}</p>
-          </div>
-
-          {typeof project.lighthouse === "number" && typeof project.loadMs === "number" && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass rounded-xl p-4">
-                <Gauge className="mb-2 h-4 w-4 text-emerald" />
-                <p className="font-display text-2xl font-bold text-emerald">
-                  {project.lighthouse}
-                </p>
-                <p className="font-mono text-[0.6rem] tracking-widest text-faint">
-                  LIGHTHOUSE
-                </p>
-              </div>
-              <div className="glass rounded-xl p-4">
-                <Timer className="mb-2 h-4 w-4 text-cyan" />
-                <p className="font-display text-2xl font-bold text-cyan">
-                  {project.loadMs}ms
-                </p>
-                <p className="font-mono text-[0.6rem] tracking-widest text-faint">
-                  LOAD TIME
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-2">
-            {project.stack.map((s) => (
-              <span
-                key={s}
-                className="rounded-full border border-hairline px-3 py-1 font-mono text-[0.7rem] text-muted"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-
-          {project.url && (
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cursor="hover"
-              className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-void transition-colors hover:bg-emerald"
-            >
-              Visit live site <ExternalLink className="h-4 w-4" />
-            </a>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* --- Section -------------------------------------------------------------- */
 export default function Projects() {
-  const [filter, setFilter] = useState("All");
-  const [open, setOpen] = useState<Project | null>(null);
-
-  const shown = useMemo(
-    () => (filter === "All" ? projects : projects.filter((p) => p.category === filter)),
-    [filter]
-  );
+  const [open, setOpen] = useState<{ project: Project; trigger: HTMLElement } | null>(null);
 
   return (
-    <section id="projects" className="relative mx-auto max-w-6xl px-6 py-28">
-      <header className="mb-10 max-w-2xl">
-        <p className="eyebrow mb-3">03 — Selected Work</p>
-        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-          Systems shipped to <span className="neon-cyan">production.</span>
-        </h2>
-      </header>
+    <section id="projects" className="relative mx-auto max-w-6xl px-6 py-24 sm:py-32">
+      <Reveal className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="max-w-2xl">
+          <p className="eyebrow mb-4">Selected work</p>
+          <h2 className="text-4xl font-semibold leading-[1.02] tracking-tighter sm:text-6xl">
+            {projects.length} platforms, <span className="text-gradient">all live.</span>
+          </h2>
+        </div>
+        <p className="max-w-xs text-sm leading-relaxed text-muted">
+          Real businesses, real traffic. Open any project for what it does, what it runs on, and
+          a link to the live site.
+        </p>
+      </Reveal>
 
-      {/* Filters */}
-      <div className="mb-10 flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            data-cursor="hover"
-            className={`rounded-full border px-4 py-2 font-mono text-[0.7rem] tracking-wide transition-colors ${
-              filter === f
-                ? "border-cyan bg-cyan/10 text-cyan"
-                : "border-hairline text-muted hover:text-ink"
-            }`}
-          >
-            {f}
-          </button>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
+        {projects.map((p, i) => (
+          <ProjectCard
+            key={p.id}
+            project={p}
+            index={i}
+            span={SPANS[i] ?? 2}
+            onOpen={(trigger) => setOpen({ project: p, trigger })}
+          />
         ))}
       </div>
 
-      {/* Grid */}
-      <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {shown.map((p) => (
-            <TiltCard key={p.id} project={p} onOpen={() => setOpen(p)} />
-          ))}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Drawer */}
       <AnimatePresence>
-        {open && <Drawer project={open} onClose={() => setOpen(null)} />}
+        {open && (
+          <ProjectDrawer
+            key={open.project.id}
+            project={open.project}
+            onClose={() => {
+              open.trigger.focus({ preventScroll: true });
+              setOpen(null);
+            }}
+          />
+        )}
       </AnimatePresence>
     </section>
   );
