@@ -309,6 +309,48 @@ h3 {
   }
 }
 
+/* ---- Liquid theme pour (see lib/liquid.ts) --------------------------------------
+   The new theme's snapshot is revealed through --liquid-clip, a polygon rebuilt
+   every frame. The old snapshot just sits underneath, fully opaque. The "hold"
+   animation exists only to keep the transition alive for the pour's duration. */
+html.theme-pour * {
+  transition: none !important; /* tokens must flip at once, not fade, or the liquid and the page disagree */
+}
+
+::view-transition-group(root) {
+  animation-duration: var(--pour-ms, 1.5s);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: pour-hold var(--pour-ms, 1.5s) linear both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  clip-path: var(--liquid-clip);
+}
+
+/* the live canvas that draws the liquid's lit edge */
+::view-transition-group(pour-rim) {
+  animation-duration: var(--pour-ms, 1.5s);
+}
+::view-transition-old(pour-rim) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(pour-rim) {
+  animation: pour-hold var(--pour-ms, 1.5s) linear both;
+  mix-blend-mode: normal;
+}
+
+@keyframes pour-hold {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
