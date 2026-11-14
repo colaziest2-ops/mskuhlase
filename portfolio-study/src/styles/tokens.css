@@ -1,0 +1,34 @@
+:root {
+  /* desk field — slightly warmer than pure black */
+  --field-0: #0a0908;
+  --field-1: #12100e;
+  --field-2: #1c1a17;
+  --field-light: 980px 640px at 28% 12%;
+
+  /* type */
+  --font-display: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ink: #e8e4dc;
+  --ink-dim: #9a958c;
+  --ink-faint: #5c584f;
+
+  /* accent — not a brand colour, more like residual heat */
+  --heat: #e8a060;
+  --heat-soft: rgb(232 160 96 / 0.35);
+  --heat-glow: radial-gradient(circle, rgb(255 170 90 / 0.45) 0%, rgb(255 140 50 / 0.12) 42%, transparent 72%);
+
+  /* paper cards */
+  --paper: #f3efe6;
+  --paper-aged: #ebe6db;
+  --paper-edge: #d8d2c4;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 0.82, 0.18, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --settle: 1.05s;
+  --rail-time: 0.28s;
+
+  /* layout */
+  --gutter: clamp(24px, 4vw, 64px);
+  --max: 1120px;
+}

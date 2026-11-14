@@ -1,0 +1,461 @@
+.shell {
+  width: 100%;
+}
+
+.stack {
+  --cardW: min(560px, calc(100vw - 2 * var(--gutter) - 56px));
+  --cardH: clamp(390px, 54vh, 440px);
+  --peel: 220px;
+  position: relative;
+  width: 100%;
+  height: calc(var(--cardH) + 200px);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* click-away layer for the expanded state */
+.scrim {
+  position: absolute;
+  inset: -40px -100vw;
+  z-index: 40;
+  pointer-events: none;
+}
+.scrim[data-on="true"] {
+  pointer-events: auto;
+}
+
+/* ---- a card: positioned by JS springs; CSS only places the resting origin ---- */
+
+.card {
+  position: absolute;
+  left: calc((100% - var(--cardW) - 56px) / 2);
+  top: 190px;
+  width: var(--cardW);
+  height: var(--cardH);
+  touch-action: pan-y; /* vertical scroll stays native; horizontal drags are ours */
+  will-change: transform, opacity;
+}
+
+.card[data-front="true"] {
+  cursor: grab;
+}
+.card[data-front="false"] {
+  cursor: pointer;
+}
+.card[data-expanded="true"] {
+  cursor: default;
+}
+.card[data-dimmed="true"] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* cards pushed aside go soft, so the open one is the only thing in focus */
+.card .paper {
+  transition: filter calc(0.45s * var(--z, 1)) var(--ease-out);
+}
+.card[data-dimmed="true"] .paper {
+  filter: blur(2px) saturate(0.7);
+}
+
+/* ---- the paper -------------------------------------------------------------- */
+
+/* tilts about its top edge: the edge stays put, so tabs behind it stay clickable */
+.tilt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 0;
+}
+
+.paper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0 clamp(18px, 3vw, 28px) 20px;
+  border-radius: 3px;
+  background:
+    linear-gradient(168deg, var(--paper) 0%, var(--paper-aged) 100%);
+  color: #1b1916;
+  overflow: hidden;
+  transform-origin: 0% 100%;
+}
+
+/* fibre grain + a darkening at the edges, like old stock */
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--grain);
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+.paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 38px rgb(120 96 60 / 0.16);
+}
+
+.tab {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgb(27 25 22 / 0.14);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4a443b;
+  text-align: left;
+  white-space: nowrap;
+}
+
+button.tab {
+  cursor: pointer;
+}
+button.tab:hover {
+  color: #1b1916;
+}
+button.tab:focus-visible {
+  outline-offset: -3px;
+}
+
+.idx {
+  color: #a8671f;
+  font-weight: 500;
+}
+.tabName {
+  font-weight: 500;
+  color: #1b1916;
+}
+.tabCat {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #7a7366;
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  height: calc(100% - 30px);
+}
+
+/* ---- compact face ------------------------------------------------------------ */
+
+.compact,
+.full {
+  position: absolute;
+  inset: 0;
+  transition: opacity calc(0.3s * var(--z, 1)) var(--ease-out);
+}
+
+.compact {
+  display: flex;
+  flex-direction: column;
+  padding-top: 22px;
+}
+.compact[data-hidden="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sector {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7a7366;
+}
+
+.title {
+  margin: 8px 0 0;
+  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #15130f;
+}
+
+.tagline {
+  max-width: 40ch;
+  margin-top: 14px;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: #38342d;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.tags li {
+  padding: 3px 8px;
+  border: 1px dashed rgb(27 25 22 / 0.4);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #4a443b;
+}
+
+.foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.domain {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #7a7366;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.actions button,
+.actions a,
+.close,
+.visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  background: none;
+  border: 1px solid rgb(27 25 22 / 0.35);
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #1b1916;
+  transition:
+    background var(--rail-time) var(--ease-out),
+    color var(--rail-time) var(--ease-out),
+    border-color var(--rail-time) var(--ease-out);
+}
+
+.actions button:hover,
+.actions a:hover,
+.close:hover,
+.visit:hover {
+  background: #1b1916;
+  border-color: #1b1916;
+  color: var(--paper);
+}
+
+kbd {
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.9em;
+  opacity: 0.65;
+}
+
+/* ---- expanded face ----------------------------------------------------------- */
+
+.full {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 2px 4px 0;
+  opacity: 0;
+  pointer-events: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #bfb7a6 transparent;
+}
+.full[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fullTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.summary {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #2c2924;
+}
+
+.noteBlock {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-left: 2px solid #c9792b;
+  background: rgb(201 121 43 / 0.09);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: #2c2924;
+}
+.noteBlock span {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #a8671f;
+}
+
+.highlights {
+  margin-top: 16px;
+  display: grid;
+  gap: 6px;
+}
+.highlights li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #38342d;
+}
+.highlights li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 1px;
+  background: #a8671f;
+}
+
+.visit {
+  align-self: flex-start;
+  margin-top: 18px;
+}
+
+/* ---- what's under the paper -------------------------------------------------- */
+
+.strip {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: var(--peel);
+  padding: 16px 16px 14px;
+  background: linear-gradient(90deg, #cfc7b4, #c2baa6);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  line-height: 1.5;
+  color: #2b2822;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.strip[data-side="left"] {
+  left: 0;
+  box-shadow: inset -10px 0 14px -10px rgb(0 0 0 / 0.35);
+}
+.strip[data-side="right"] {
+  right: 0;
+  box-shadow: inset 10px 0 14px -10px rgb(0 0 0 / 0.35);
+}
+
+.stripLabel {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6d6554;
+}
+
+.stripTags {
+  margin: 4px 0 10px;
+}
+.stripTags li {
+  color: #1b1916;
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.live i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2f8a54;
+  box-shadow: 0 0 0 2px rgb(47 138 84 / 0.25);
+}
+
+.stripRow {
+  margin-bottom: 4px;
+  color: #4a443b;
+}
+
+.stripNote {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(27 25 22 / 0.2);
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #38342d;
+}
+
+/* ---- the line under the stack ------------------------------------------------ */
+
+.hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 24px;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hint span:first-child {
+  color: var(--ink-dim);
+}
+
+@media (max-width: 640px) {
+  .stack {
+    --cardH: 460px;
+  }
+  .tabCat {
+    display: none;
+  }
+  .hint span:last-child {
+    display: none;
+  }
+}

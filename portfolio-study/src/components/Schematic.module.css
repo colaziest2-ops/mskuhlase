@@ -1,0 +1,230 @@
+.diagram {
+  position: relative;
+  height: 450px; /* three strata × 150px */
+  margin-bottom: 70px; /* room for the last note to open downward */
+}
+
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.line {
+  --h: 0;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke: color-mix(in srgb, var(--heat) calc(var(--h) * 100%), var(--ink-faint));
+  stroke-opacity: calc(0.3 + var(--h) * 0.7);
+  stroke-width: calc(1px + var(--h) * 0.7px);
+  stroke-linecap: round;
+}
+
+.hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 22px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+.layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--row) * 150px);
+  height: 150px;
+  border-top: 1px solid rgb(232 228 220 / 0.07);
+}
+
+.layerHead {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  z-index: 1;
+  padding: 3px 10px 3px 0;
+  background: color-mix(in srgb, var(--field-1) 92%, transparent); /* lines pass behind the label */
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.layerHead span {
+  color: var(--heat);
+}
+
+.layerHead em {
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--ink-faint);
+}
+
+.slot {
+  position: absolute;
+  left: var(--x);
+  top: 58px; /* DOT_Y */
+  z-index: 2;
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 10px 0;
+  margin-left: -6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  transform: translateY(-50%);
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+.node:hover,
+.node[aria-expanded="true"] {
+  color: var(--ink);
+}
+
+.node:focus-visible {
+  outline-offset: 0;
+}
+
+.dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faint);
+  background: var(--field-1);
+  box-shadow: inset 0 0 0 3px var(--field-1);
+  transition:
+    border-color var(--rail-time) var(--ease-out),
+    box-shadow var(--rail-time) var(--ease-out),
+    background var(--rail-time) var(--ease-out);
+}
+
+.dot[data-on="true"] {
+  border-color: var(--heat);
+  background: var(--heat);
+  box-shadow:
+    inset 0 0 0 3px var(--field-1),
+    0 0 14px 2px var(--heat-soft);
+}
+
+/* the operational note: opens beneath its node, underline draws in */
+.note {
+  position: absolute;
+  top: 26px;
+  left: -6px;
+  width: max-content;
+  max-width: min(300px, 70vw);
+  padding: 10px 12px 12px;
+  background: var(--field-1);
+  border: 1px solid rgb(232 228 220 / 0.12);
+  border-radius: 3px;
+  box-shadow: 0 14px 30px rgb(0 0 0 / 0.5);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--ink);
+  animation: open calc(0.32s * var(--z, 1)) var(--ease-out) both;
+}
+
+.slot[data-side="right"] .note {
+  left: auto;
+  right: -8px;
+}
+
+.note::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  bottom: 7px;
+  height: 1px;
+  width: calc(100% - 24px);
+  background: var(--heat);
+  transform-origin: left;
+  animation: draw calc(0.55s * var(--z, 1)) var(--ease-out) 0.08s both;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+:global([data-reduced="true"]) .note,
+:global([data-reduced="true"]) .note::after {
+  animation: none;
+}
+
+/* narrow screens: a stacked list, no lines, notes open inline */
+@media (max-width: 760px) {
+  .diagram {
+    height: auto;
+    margin-bottom: 24px;
+  }
+
+  .lines {
+    display: none;
+  }
+
+  .layer {
+    position: relative;
+    top: auto;
+    height: auto;
+    padding: 16px 0 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 18px;
+  }
+
+  .layerHead {
+    position: static;
+    flex: 0 0 100%;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    padding: 0;
+    background: none; /* no lines on this layout, so no backing needed */
+  }
+
+  .slot {
+    position: static;
+  }
+
+  .node {
+    transform: none;
+    padding: 8px 4px 8px 0;
+    margin-left: 0;
+  }
+
+  .note {
+    position: static;
+    margin: 0 0 10px;
+    max-width: none;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  .slot[data-side="right"] .note {
+    right: auto;
+  }
+}

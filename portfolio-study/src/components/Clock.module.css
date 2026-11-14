@@ -1,0 +1,56 @@
+.clock {
+  position: fixed;
+  top: clamp(14px, 2.4vw, 28px);
+  right: var(--gutter);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: var(--font-mono);
+  pointer-events: none;
+  mix-blend-mode: normal;
+}
+
+.zone {
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  color: var(--ink-faint);
+}
+
+.time {
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.time i {
+  font-style: normal;
+  color: var(--ink-faint);
+}
+
+.time b {
+  font-weight: 500;
+  color: var(--heat);
+}
+
+.tick {
+  animation: flick 220ms steps(1, end) both;
+  animation-duration: calc(220ms * var(--z, 1));
+}
+
+@keyframes flick {
+  0% {
+    opacity: 0.35;
+  }
+  35% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,124 @@
+.rail {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 var(--gutter) max(10px, env(safe-area-inset-bottom));
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+.rail::before {
+  /* a soft floor so labels stay legible over cards */
+  content: "";
+  position: absolute;
+  inset: -36px 0 0;
+  z-index: -1;
+  background: linear-gradient(transparent, rgb(10 9 8 / 0.82) 70%);
+}
+
+.readout {
+  align-self: center;
+  min-width: 0;
+  max-width: 48ch;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.readout span {
+  margin-right: 1.1em;
+  color: var(--heat);
+}
+
+.marks {
+  display: flex;
+  gap: clamp(2px, 1.2vw, 10px);
+  pointer-events: auto;
+}
+
+.mark {
+  --level: 0;
+  position: relative;
+  display: block;
+  padding: 18px clamp(8px, 1.4vw, 14px) 8px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--heat) calc(var(--level) * 100%), var(--ink-faint));
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+/* the luminous line: a hairline at rest, it lifts and brightens on hover/focus */
+.mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1px;
+  height: calc(5px + var(--level) * 9px);
+  margin-bottom: -9px;
+  background: linear-gradient(transparent, currentColor);
+  transform: translateX(-50%);
+  transition:
+    height var(--rail-time) var(--ease-spring),
+    box-shadow var(--rail-time) var(--ease-out),
+    color var(--rail-time) var(--ease-out);
+}
+
+/* heat bloom behind the active marker */
+.mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 64px;
+  height: 36px;
+  translate: -50% 0;
+  background: var(--heat-glow);
+  opacity: calc(var(--level) * 0.75);
+  pointer-events: none;
+}
+
+.mark:hover,
+.mark:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.mark:hover::before,
+.mark:focus-visible::before {
+  height: 26px;
+  box-shadow: 0 0 10px 1px var(--heat-soft);
+  color: var(--heat);
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .rail {
+    justify-content: center;
+  }
+  .readout {
+    display: none;
+  }
+  .label {
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+  }
+}
