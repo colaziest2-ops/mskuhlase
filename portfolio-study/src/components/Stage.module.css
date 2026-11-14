@@ -295,6 +295,116 @@
   border-color: var(--heat-soft);
 }
 
+/* ---- message form ------------------------------------------------------------- */
+
+.form {
+  display: grid;
+  gap: 14px;
+  max-width: 640px;
+  margin-top: 44px;
+}
+
+.formHead {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgb(232 228 220 / 0.03);
+  border: 1px solid rgb(232 228 220 / 0.14);
+  border-radius: 2px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color var(--rail-time) var(--ease-out);
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: none;
+  border-color: var(--heat-soft);
+}
+
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.formFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+}
+
+.send {
+  padding: 8px 18px;
+  background: none;
+  border: 1px solid rgb(232 228 220 / 0.25);
+  border-radius: 2px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color var(--rail-time) var(--ease-out),
+    border-color var(--rail-time) var(--ease-out);
+}
+
+.send:hover:not(:disabled) {
+  color: var(--heat);
+  border-color: var(--heat-soft);
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.formStatus {
+  min-height: 1.4em;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--heat);
+}
+
+.formStatus[data-kind="error"] {
+  color: #e07a6a;
+}
+
 .footer {
   display: flex;
   flex-wrap: wrap;

@@ -64,3 +64,12 @@ src/
   styles/               tokens.css, global.css
   components/           Stage, Rail, WorkStack, Schematic, Terminal, Clock, Cursor, ReLuma
 ```
+
+## Serverless functions (Vercel)
+
+`api/` holds two Vercel functions, deployed automatically when the project's Root Directory is `portfolio-study`:
+
+- `api/contact.ts` — the contact form. Sends via Resend. Env: `RESEND_API_KEY` (required), `CONTACT_TO` (optional), `GOOGLE_FORM_URL` + `GOOGLE_FORM_ENTRY_*` (optional sheet logging).
+- `api/assistant.ts` — the shell's free-form questions, via Gemini with model fallback. Env: `GEMINI_API_KEY`. The shell calls `/api/assistant` unless `VITE_ASSISTANT_URL` points elsewhere.
+
+`npm run dev` doesn't serve `api/`; use `vercel dev` to try them locally.

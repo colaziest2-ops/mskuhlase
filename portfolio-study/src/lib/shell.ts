@@ -58,7 +58,8 @@ function findProject(query: string) {
 }
 
 async function ask(prompt: string, head: string): Promise<ShellResult> {
-  const endpoint = import.meta.env.VITE_ASSISTANT_URL as string | undefined;
+  // Defaults to the serverless function in api/assistant.ts; override with VITE_ASSISTANT_URL.
+  const endpoint = (import.meta.env.VITE_ASSISTANT_URL as string | undefined) || "/api/assistant";
   if (!endpoint) {
     return {
       lines: [

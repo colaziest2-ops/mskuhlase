@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, RefObject } from "react";
+import type { CSSProperties, FormEvent, RefObject } from "react";
 import { FOOTER, INTRO, PERSON, PROJECTS } from "../content";
 import { createScroller } from "../lib/physics";
 import { PARAMS } from "../lib/params";
@@ -62,6 +62,66 @@ async function copyText(text: string): Promise<void> {
     /* nothing more to try */
   }
   ta.remove();
+}
+
+type SendState = { kind: "idle" | "sending" | "sent" } | { kind: "error"; message: string };
+
+/** Writes straight to the inbox through api/contact.ts (Resend). */
+function MessageForm() {
+  const [state, setState] = useState<SendState>({ kind: "idle" });
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    setState({ kind: "sending" });
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+      form.reset();
+      setState({ kind: "sent" });
+    } catch (err) {
+      setState({ kind: "error", message: err instanceof Error ? err.message : "Couldn't send." });
+    }
+  };
+
+  const busy = state.kind === "sending";
+
+  return (
+    <form className={styles.form} onSubmit={(e) => void submit(e)}>
+      <p className={styles.formHead}>or leave a message</p>
+      <div className={styles.formRow}>
+        <label className={styles.field}>
+          <span>Name</span>
+          <input name="name" type="text" autoComplete="name" required minLength={2} maxLength={200} disabled={busy} />
+        </label>
+        <label className={styles.field}>
+          <span>Email</span>
+          <input name="email" type="email" autoComplete="email" required maxLength={200} disabled={busy} />
+        </label>
+      </div>
+      <label className={styles.field}>
+        <span>Message</span>
+        <textarea name="message" rows={4} required minLength={10} maxLength={4000} disabled={busy} />
+      </label>
+      {/* honeypot — hidden from people, tempting to bots */}
+      <input className={styles.trap} name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+      <div className={styles.formFoot}>
+        <button type="submit" className={styles.send} disabled={busy}>
+          {busy ? "sending…" : "send"}
+        </button>
+        <p className={styles.formStatus} role="status" data-kind={state.kind}>
+          {state.kind === "sent" && `sent · ${sastHM()} SAST · I'll reply by email`}
+          {state.kind === "error" && state.message}
+        </p>
+      </div>
+    </form>
+  );
 }
 
 function Contact({ reduced }: { reduced: boolean }) {
@@ -135,6 +195,8 @@ function Contact({ reduced }: { reduced: boolean }) {
           </a>
         ))}
       </p>
+
+      <MessageForm />
 
       <footer className={styles.footer}>
         <span>{FOOTER}</span>
