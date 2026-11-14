@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BOOT, loadHistory, runCommand, saveHistory, type Line } from "../lib/shell";
 import { PARAMS } from "../lib/params";
+import { useInView } from "../lib/scroll";
 import styles from "./Terminal.module.css";
 
 /** Blink with a 1.1 s period and a duty cycle that wanders a little. Solid while typing. */
@@ -59,12 +60,52 @@ function useKeyClick(enabled: boolean): () => void {
 }
 
 export function Terminal({ reduced }: { reduced: boolean }) {
-  const [lines, setLines] = useState<readonly Line[]>(BOOT);
+  const [lines, setLines] = useState<readonly Line[]>([]);
+  const [booted, setBooted] = useState(false);
+  const [wrap, seen] = useInView<HTMLDivElement>({ threshold: 0.35 });
   const [history, setHistory] = useState<string[]>(loadHistory);
   const [value, setValue] = useState("");
   const [shown, setShown] = useState(""); // what's drawn: lags the input by 8–18 ms
   const [busy, setBusy] = useState(false);
   const [sound, setSound] = useState(false);
+
+  // The boot banner types itself out the first time the shell scrolls into view.
+  useEffect(() => {
+    if (!seen || booted) return;
+    if (reduced) {
+      setLines(BOOT);
+      setBooted(true);
+      return;
+    }
+    let cancelled = false;
+    const timers: number[] = [];
+    let delay = 260;
+    BOOT.forEach((line, li) => {
+      for (let c = 1; c <= line.text.length; c++) {
+        timers.push(
+          window.setTimeout(() => {
+            if (cancelled) return;
+            setLines((prev) => {
+              const next: Line[] = prev.slice(0, li);
+              next.push({ ...line, text: line.text.slice(0, c) });
+              return next;
+            });
+          }, delay * PARAMS.z),
+        );
+        delay += 13 + (c % 7 === 0 ? 34 : 0);
+      }
+      delay += 170;
+    });
+    timers.push(
+      window.setTimeout(() => {
+        if (!cancelled) setBooted(true);
+      }, delay * PARAMS.z),
+    );
+    return () => {
+      cancelled = true;
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, [seen, booted, reduced]);
 
   const cursorOn = useBlink(shown, reduced);
   const click = useKeyClick(sound);
@@ -137,7 +178,7 @@ export function Terminal({ reduced }: { reduced: boolean }) {
   };
 
   return (
-    <div className={styles.term} onClick={() => input.current?.focus({ preventScroll: true })}>
+    <div ref={wrap} className={styles.term} onClick={() => input.current?.focus({ preventScroll: true })}>
       <div className={styles.bar}>
         <span className={styles.dots} aria-hidden="true">
           <i />
@@ -184,7 +225,7 @@ export function Terminal({ reduced }: { reduced: boolean }) {
           ref={input}
           className={styles.input}
           value={value}
-          readOnly={busy}
+          readOnly={busy || !booted}
           onChange={(e) => {
             const v = e.target.value;
             setValue(v);

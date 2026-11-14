@@ -31,22 +31,51 @@ export const PERSON: Person = {
   linkedin: "", // [FILL]
 };
 
-export const INTRO =
-  "I build web apps and I keep systems running — two things that don't usually sit in the same job description, but here we are. Day to day that's Next.js and React for clients who need a real interface, and SQL Server and server-node work for video management systems running across mine sites. Different problems, same instinct: understand the system before you touch it.";
+export type ColorName = "amber" | "teal" | "sky" | "violet" | "rose" | "lime";
+
+export interface IntroPart {
+  readonly t: string;
+  /** Lit in this colour. Unset = plain text. */
+  readonly c?: ColorName;
+}
+
+export const INTRO_PARTS: readonly IntroPart[] = [
+  { t: "I build " },
+  { t: "web apps", c: "sky" },
+  { t: " and I " },
+  { t: "keep systems running", c: "amber" },
+  { t: " — two things that don't usually sit in the same job description, but here we are. Day to day that's " },
+  { t: "Next.js", c: "sky" },
+  { t: " and " },
+  { t: "React", c: "sky" },
+  { t: " for clients who need a real interface, and " },
+  { t: "SQL Server", c: "violet" },
+  { t: " and server-node work for " },
+  { t: "video management systems", c: "teal" },
+  { t: " running across " },
+  { t: "mine sites", c: "rose" },
+  { t: ". Different problems, same instinct: " },
+  { t: "understand the system before you touch it", c: "lime" },
+  { t: "." },
+];
+
+export const INTRO = INTRO_PARTS.map((p) => p.t).join("");
 
 export interface Section {
   readonly id: string;
   readonly label: string;
   /** Shown in the rail's readout. */
   readonly title: string;
+  /** The section's accent: eyebrow, rule, rail marker, nav highlight. */
+  readonly color: ColorName;
 }
 
 export const SECTIONS: readonly Section[] = [
-  { id: "home", label: "Home", title: "Siyabonga Kuhlase — arrival" },
-  { id: "work", label: "Work", title: "Seven platforms, all live" },
-  { id: "stack", label: "Stack", title: "Interface to server room" },
-  { id: "play", label: "Play", title: "Talk to the shell" },
-  { id: "contact", label: "Contact", title: "Got something worth building?" },
+  { id: "home", label: "Home", title: "Siyabonga Kuhlase — arrival", color: "amber" },
+  { id: "work", label: "Work", title: "Seven platforms, all live", color: "rose" },
+  { id: "stack", label: "Stack", title: "Interface to server room", color: "teal" },
+  { id: "play", label: "Play", title: "Talk to the shell", color: "lime" },
+  { id: "contact", label: "Contact", title: "Got something worth building?", color: "violet" },
 ];
 
 export interface Project {
@@ -63,6 +92,8 @@ export interface Project {
   readonly stack: readonly string[];
   /** One line shown on the peeled strip. Only claims that are visible on the live site. */
   readonly note: string;
+  /** Accent for this card (index, note block, tags, status dot). Chosen to read on paper. */
+  readonly ac: string;
   /** Optional. Leave unset until you've confirmed it — the strip hides the row. */
   readonly year?: string; // [FILL]
 }
@@ -70,6 +101,7 @@ export interface Project {
 export const PROJECTS: readonly Project[] = [
   {
     id: "lumiritin",
+    ac: "#1f6fe0",
     name: "Lumiritin",
     domain: "lumiritin.co.za",
     url: "https://lumiritin.co.za/",
@@ -89,6 +121,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "nsk-innovations",
+    ac: "#6d3fe0",
     name: "NSK Innovations",
     domain: "nskinnovations.co.za",
     url: "https://www.nskinnovations.co.za/",
@@ -108,6 +141,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "oxy-gas",
+    ac: "#d9690b",
     name: "Oxy Gas",
     domain: "oxygas.co.za",
     url: "https://www.oxygas.co.za/",
@@ -127,6 +161,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "rainbow-directory",
+    ac: "#d12f68",
     name: "Rainbow Directory",
     domain: "rainbow-directory.vercel.app",
     url: "https://rainbow-directory.vercel.app/",
@@ -146,6 +181,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "ruz-group",
+    ac: "#0e8f7d",
     name: "RUZ Group",
     domain: "ruzgroup.vercel.app",
     url: "https://ruzgroup.vercel.app/",
@@ -164,6 +200,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "myaluza-civils",
+    ac: "#5b8a0e",
     name: "Myaluza Civils",
     domain: "myaluzacivils.com",
     url: "https://myaluzacivils.com/",
@@ -182,6 +219,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: "wrench-on-wheels",
+    ac: "#e0472a",
     name: "WrenchOnWheels",
     domain: "wrench-on-wheels.vercel.app",
     url: "https://wrench-on-wheels.vercel.app/",
@@ -211,6 +249,7 @@ export interface SkillLayer {
   readonly id: string;
   readonly label: string;
   readonly caption: string;
+  readonly color: ColorName;
   readonly nodes: readonly SkillNode[];
 }
 
@@ -219,6 +258,7 @@ export const SKILLS: readonly SkillLayer[] = [
     id: "frontend",
     label: "Frontend surface",
     caption: "what people touch",
+    color: "sky",
     nodes: [
       { id: "nextjs", label: "Next.js", note: "App Router builds — Lumiritin runs on it." },
       { id: "react", label: "React", note: "Behind six of the seven live platforms." },
@@ -232,6 +272,7 @@ export const SKILLS: readonly SkillLayer[] = [
     id: "backend",
     label: "Backend substrate",
     caption: "what holds the data",
+    color: "violet",
     nodes: [
       { id: "mssql", label: "Microsoft SQL Server", note: "Event-protocol data under pressure — queried during incidents, not browsed at leisure." },
       { id: "sql", label: "SQL", note: "Schema decisions matter more when the data is read under pressure." },
@@ -243,6 +284,7 @@ export const SKILLS: readonly SkillLayer[] = [
     id: "systems",
     label: "Systems & VMS foundation",
     caption: "what it all runs on",
+    color: "teal",
     nodes: [
       { id: "vms", label: "Video Management Systems", note: "Large-scale rollouts across mine sites." },
       { id: "restore", label: "Server Node Restoration", note: "Done on-site, in the server room — not from a laptop." },

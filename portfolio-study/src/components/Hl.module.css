@@ -1,0 +1,26 @@
+.hl {
+  padding: 0 0.14em;
+  margin: 0 -0.14em;
+  border-radius: 3px;
+  color: var(--hc);
+  font-weight: 500;
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--hc) 20%, transparent),
+    color-mix(in srgb, var(--hc) 20%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+  background-size: 0% 62%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size calc(0.9s * var(--z, 1)) var(--ease-out) calc(0.15s * var(--z, 1));
+}
+
+.hl[data-in="true"] {
+  background-size: 100% 62%;
+}
+
+:global([data-reduced="true"]) .hl {
+  background-size: 100% 62%;
+  transition: none;
+}

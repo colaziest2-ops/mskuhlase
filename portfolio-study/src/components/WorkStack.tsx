@@ -56,7 +56,7 @@ function grainUrl(seed: number): string {
 function edgeShadow(thick: number, lift: number): string {
   const edges: string[] = [];
   for (let t = 1; t <= thick; t++) edges.push(`0 ${t}px 0 ${t % 2 ? "var(--paper-edge)" : "#c9c2b2"}`);
-  const rim = `0 0 0 1px rgb(232 160 96 / ${(Math.max(0, lift - 0.12) * 0.32).toFixed(3)})`;
+  const rim = `0 0 0 1px rgb(var(--heat-rgb) / ${(Math.max(0, lift - 0.12) * 0.32).toFixed(3)})`;
   const drop = `0 ${(2 + lift * 16).toFixed(1)}px ${(10 + lift * 34).toFixed(1)}px rgb(0 0 0 / ${(0.32 + lift * 0.22).toFixed(2)})`;
   return [...edges, rim, drop].join(", ");
 }
@@ -95,6 +95,12 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
   const boxRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
+
+  // The cards are dealt onto the pile the first time the section scrolls into view.
+  const dealt = useRef(reduced);
+  const dealing = useRef(false);
+  const reducedRef = useRef(reduced);
+  const [entered, setEntered] = useState(false);
 
   const commitOrder = useCallback((o: number[]) => {
     orderRef.current = o;
@@ -153,12 +159,15 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
       const ex = expandedRef.current;
       const m = metrics.current;
       const now = performance.now();
+      if (!snap && !dealt.current) return; // still waiting off-stage for the section to come into view
 
       o.forEach((pi, depth) => {
         const c = rigs[pi];
         if (!c || pulledRef.current === pi) return;
         const put = (key: Key, value: number, delay = 0) =>
           snap ? c.bag.jump(key, value) : c.bag.set(key, value, delay * PARAMS.z, now);
+        // While dealing, the back of the pile lands first and the top card lands last.
+        const dd = dealing.current ? (N - 1 - depth) * 85 : 0;
 
         // Everything not at the front sheds tilt, peel and lift.
         if (depth !== 0 || ex !== null) {
@@ -169,12 +178,12 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
         }
 
         if (ex === null) {
-          put("x", depth * m.stepX + c.jx);
-          put("y", depth * m.stepY + c.jy);
-          put("rot", c.rot);
-          put("scale", 1 - depth * 0.01);
-          put("op", 1);
-          put("lift", depth === 0 ? 0.12 : 0);
+          put("x", depth * m.stepX + c.jx, dd);
+          put("y", depth * m.stepY + c.jy, dd);
+          put("rot", c.rot, dd);
+          put("scale", 1 - depth * 0.01, dd);
+          put("op", 1, dd);
+          put("lift", depth === 0 ? 0.12 : 0, dd);
         } else if (pi === ex) {
           put("x", 0);
           put("y", 0);
@@ -200,6 +209,22 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
     [rigs, kick],
   );
 
+  /** Park every card off to the side, invisible, ready to be dealt in. */
+  const offstage = useCallback(() => {
+    const m = metrics.current;
+    orderRef.current.forEach((pi, depth) => {
+      const c = rigs[pi];
+      if (!c) return;
+      const side = pi % 2 === 0 ? -1 : 1;
+      c.bag.jump("x", depth * m.stepX + c.jx + side * m.cardW * 1.25);
+      c.bag.jump("y", depth * m.stepY + c.jy + 170);
+      c.bag.jump("rot", side * 16);
+      c.bag.jump("scale", 0.9);
+      c.bag.jump("op", 0);
+      c.bag.jump("lift", 0);
+    });
+  }, [rigs]);
+
   /* ---- measure, and keep measuring ------------------------------------------ */
 
   useEffect(() => {
@@ -216,7 +241,8 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
         stepY: narrow ? -26 : -30,
       };
       box.style.setProperty("--peel", `${metrics.current.peel}px`);
-      applyTargets(first);
+      if (first && !reducedRef.current) offstage();
+      else applyTargets(first);
       paint();
     };
 
@@ -224,9 +250,10 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
     const ro = new ResizeObserver(() => measure(false));
     ro.observe(box);
     return () => ro.disconnect();
-  }, [rigs, applyTargets, paint]);
+  }, [rigs, applyTargets, offstage, paint]);
 
   useEffect(() => {
+    reducedRef.current = reduced;
     for (const c of rigs) c.bag.instant = reduced;
   }, [rigs, reduced]);
 
@@ -249,6 +276,34 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
     const id = window.setTimeout(fn, ms);
     timers.current.push(id);
   }, []);
+
+  // Wait for the stack to scroll into view…
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setEntered(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3, rootMargin: "0px 0px -6% 0px" },
+    );
+    io.observe(box);
+    return () => io.disconnect();
+  }, []);
+
+  // …then deal the cards in.
+  useEffect(() => {
+    if (!entered || dealt.current) return;
+    dealt.current = true;
+    dealing.current = true;
+    applyTargets();
+    later(() => {
+      dealing.current = false;
+    }, 1700 * PARAMS.z);
+  }, [entered, applyTargets, later]);
 
   const pull = useCallback(
     (pi: number) => {
@@ -440,6 +495,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                 if (rig) rig.wrap = el;
               }}
               className={styles.card}
+              style={{ "--ac": p.ac } as CSSProperties}
               role="group"
               aria-label={`${p.name}, card ${depth + 1} of ${N} in the stack`}
               data-front={isFront}

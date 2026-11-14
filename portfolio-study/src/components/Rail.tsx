@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { SECTIONS } from "../content";
 import { PARAMS } from "../lib/params";
 import styles from "./Rail.module.css";
@@ -62,6 +63,7 @@ export function Rail({ active, onGo, reduced }: RailProps) {
               }}
               type="button"
               className={styles.mark}
+              style={{ "--mc": `var(--c-${s.color})` } as CSSProperties}
               aria-current={i === active ? "true" : undefined}
               aria-label={`${s.label} — ${s.title}`}
               onClick={() => onGo(i)}

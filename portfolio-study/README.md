@@ -18,7 +18,24 @@ npm run build      # tsc + vite build → dist/
 | a card's tab | click to pull it forward |
 | `Esc` | close the open card |
 | `C` or the corner control | crumple the page once |
+| `T` or the sun/moon button | pour the other theme over the page as a liquid, from the button |
+| top bar / phone menu | jump to a section; the rainbow line along its edge is your scroll progress |
 | shell | `help` `whoami` `projects [n]` `stack` `time` `cv` `clear` · `↑ ↓` history · `Ctrl+L` clears |
+
+## Colour and scroll animation
+
+Each section owns a highlight colour (`color` in `SECTIONS`, `src/content.ts`): amber, rose, teal, lime, violet. Words that matter are lit in the palette — `<Hl c="teal">` in running text, `{ t: "…", c: "rose" }` in headings via `<Words>`. Project cards carry their own accent (`ac`), and the three skill layers have theirs (`color`). Light-theme values are deepened in `src/styles/tokens.css`.
+
+Things arrive as you scroll, each section with a different move (`<Reveal variant="…">`: rise, drop, left, right, pop, blur, wipe, tilt):
+
+- **Work** — headline words rise out of a mask; the seven cards are *dealt* onto the pile (back of the pile first).
+- **Stack** — the connection lines draw themselves downward, then the nodes pop in, layer by layer.
+- **Play** — the terminal flips up from the floor and types its own boot banner.
+- **Contact** — fields slide in from alternating sides; copying the email throws confetti.
+- **Between Home and Work** — two crossing bands of words; scrolling speeds them up and scrolling back up reverses them.
+- Always on: colour fields that drift behind the page and travel with the scroll, a halo and parallax on the portrait, a progress line in the top bar.
+
+All of it collapses to its end state under reduced motion.
 
 ## URL parameters
 

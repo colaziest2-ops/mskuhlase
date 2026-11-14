@@ -34,6 +34,7 @@
   height: var(--cardH);
   touch-action: pan-y; /* vertical scroll stays native; horizontal drags are ours */
   will-change: transform, opacity;
+  opacity: 0; /* the springs own opacity once measured; until then nothing flashes on the pile */
 }
 
 .card[data-front="true"] {
@@ -132,7 +133,7 @@ button.tab:focus-visible {
 }
 
 .idx {
-  color: #a8671f;
+  color: var(--ac, #a8671f);
   font-weight: 500;
 }
 .tabName {
@@ -205,7 +206,7 @@ button.tab:focus-visible {
 
 .tags li {
   padding: 3px 8px;
-  border: 1px dashed rgb(27 25 22 / 0.4);
+  border: 1px dashed color-mix(in srgb, var(--ac, #1b1916) 60%, transparent);
   border-radius: 2px;
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -313,8 +314,8 @@ kbd {
 .noteBlock {
   margin-top: 16px;
   padding: 10px 12px;
-  border-left: 2px solid #c9792b;
-  background: rgb(201 121 43 / 0.09);
+  border-left: 2px solid var(--ac, #c9792b);
+  background: color-mix(in srgb, var(--ac, #c9792b) 11%, transparent);
   font-size: 0.86rem;
   line-height: 1.5;
   color: #2c2924;
@@ -326,7 +327,7 @@ kbd {
   font-size: 0.6rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #a8671f;
+  color: var(--ac, #a8671f);
 }
 
 .highlights {
@@ -348,7 +349,7 @@ kbd {
   top: 0.62em;
   width: 7px;
   height: 1px;
-  background: #a8671f;
+  background: var(--ac, #a8671f);
 }
 
 .visit {
@@ -411,8 +412,8 @@ kbd {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #2f8a54;
-  box-shadow: 0 0 0 2px rgb(47 138 84 / 0.25);
+  background: var(--ac, #2f8a54);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ac, #2f8a54) 28%, transparent);
 }
 
 .stripRow {

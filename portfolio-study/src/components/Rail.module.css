@@ -19,7 +19,7 @@
   position: absolute;
   inset: -36px 0 0;
   z-index: -1;
-  background: linear-gradient(transparent, rgb(10 9 8 / 0.82) 70%);
+  background: linear-gradient(transparent, rgb(var(--field-rgb) / 0.82) 70%);
 }
 
 .readout {
@@ -54,7 +54,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  color: color-mix(in srgb, var(--heat) calc(var(--level) * 100%), var(--ink-faint));
+  color: color-mix(in srgb, var(--mc, var(--heat)) calc(var(--level) * 100%), var(--ink-faint));
   transition: color var(--rail-time) var(--ease-out);
 }
 
@@ -84,7 +84,7 @@
   width: 64px;
   height: 36px;
   translate: -50% 0;
-  background: var(--heat-glow);
+  background: radial-gradient(circle, color-mix(in srgb, var(--mc, var(--heat)) 50%, transparent) 0%, transparent 70%);
   opacity: calc(var(--level) * 0.75);
   pointer-events: none;
 }
@@ -98,8 +98,8 @@
 .mark:hover::before,
 .mark:focus-visible::before {
   height: 26px;
-  box-shadow: 0 0 10px 1px var(--heat-soft);
-  color: var(--heat);
+  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--mc, var(--heat)) 40%, transparent);
+  color: var(--mc, var(--heat));
 }
 
 .label {
@@ -110,15 +110,8 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .rail {
-    justify-content: center;
-  }
-  .readout {
     display: none;
-  }
-  .label {
-    font-size: 0.64rem;
-    letter-spacing: 0.1em;
   }
 }

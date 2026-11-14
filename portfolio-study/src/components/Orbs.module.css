@@ -1,0 +1,82 @@
+.orbs {
+  --sp: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.o {
+  position: absolute;
+  width: 78vmax;
+  height: 78vmax;
+  border-radius: 50%;
+  will-change: transform;
+  transform: translate3d(calc(var(--sp) * var(--mx)), calc(var(--sp) * var(--my)), 0);
+}
+
+/* the glow itself lives on a child so its idle drift never fights the scroll travel */
+.o::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--oc) calc(var(--orb-a) * 100%), transparent) 0%,
+    transparent 62%
+  );
+  animation: drift calc(26s * var(--z, 1)) ease-in-out infinite alternate;
+}
+
+.a {
+  --oc: var(--c-amber);
+  --mx: -12vw;
+  --my: 40vh;
+  top: -34vmax;
+  left: -22vmax;
+}
+.b {
+  --oc: var(--c-violet);
+  --mx: 14vw;
+  --my: -30vh;
+  top: 8vh;
+  right: -40vmax;
+}
+.c {
+  --oc: var(--c-teal);
+  --mx: -18vw;
+  --my: -50vh;
+  bottom: -50vmax;
+  left: -10vmax;
+}
+.d {
+  --oc: var(--c-rose);
+  --mx: 20vw;
+  --my: -60vh;
+  bottom: -46vmax;
+  right: -30vmax;
+  width: 60vmax;
+  height: 60vmax;
+}
+.b::before {
+  animation-duration: calc(32s * var(--z, 1));
+  animation-direction: alternate-reverse;
+}
+.c::before {
+  animation-duration: calc(29s * var(--z, 1));
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-3vmax, -2vmax, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4vmax, 3vmax, 0) scale(1.12);
+  }
+}
+
+:global([data-reduced="true"]) .o::before {
+  animation: none;
+}

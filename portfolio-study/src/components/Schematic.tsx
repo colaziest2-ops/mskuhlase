@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { SKILLS } from "../content";
+import { SKILLS, type ColorName } from "../content";
+import { useInView } from "../lib/scroll";
 import { PARAMS } from "../lib/params";
 import styles from "./Schematic.module.css";
 
@@ -12,6 +13,7 @@ interface Edge {
   readonly id: string;
   readonly from: string;
   readonly to: string;
+  readonly color: ColorName;
   readonly d: string;
 }
 
@@ -44,6 +46,7 @@ function buildEdges(): Edge[] {
           id: `${a.id}>${b.id}`,
           from: a.id,
           to: b.id,
+          color: up.color,
           d: `M${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}`,
         });
       }
@@ -55,6 +58,7 @@ function buildEdges(): Edge[] {
 export function Schematic({ reduced }: { reduced: boolean }) {
   const edges = useMemo(buildEdges, []);
   const [active, setActive] = useState<string | null>(null);
+  const [diagram, seen] = useInView<HTMLDivElement>({ threshold: 0.2 });
 
   const activeRef = useRef<string | null>(null);
   const heat = useRef<Record<string, number>>({});
@@ -111,7 +115,7 @@ export function Schematic({ reduced }: { reduced: boolean }) {
   };
 
   return (
-    <div className={styles.diagram} onPointerLeave={() => select(null)}>
+    <div ref={diagram} className={styles.diagram} data-in={seen} onPointerLeave={() => select(null)}>
       <svg
         className={styles.lines}
         viewBox={`0 0 1000 ${SKILLS.length * ROW}`}
@@ -125,6 +129,7 @@ export function Schematic({ reduced }: { reduced: boolean }) {
                 paths.current[e.id] = el;
               }}
               className={styles.line}
+              style={{ "--lc": `var(--c-${e.color})` } as CSSProperties}
               d={e.d}
             />
             {/* fat invisible stroke: the pointer only has to cross near the line */}
@@ -137,7 +142,7 @@ export function Schematic({ reduced }: { reduced: boolean }) {
         <section
           key={layer.id}
           className={styles.layer}
-          style={{ "--row": l } as CSSProperties}
+          style={{ "--row": l, "--lc": `var(--c-${layer.color})` } as CSSProperties}
           aria-label={layer.label}
         >
           <header className={styles.layerHead}>
@@ -153,7 +158,7 @@ export function Schematic({ reduced }: { reduced: boolean }) {
               <div
                 key={node.id}
                 className={styles.slot}
-                style={{ "--x": `${x}%` } as CSSProperties}
+                style={{ "--x": `${x}%`, "--k": l * 6 + i } as CSSProperties}
                 data-side={x > 58 ? "right" : "left"}
               >
                 <button

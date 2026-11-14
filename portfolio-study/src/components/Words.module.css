@@ -1,0 +1,57 @@
+.words {
+  display: inline;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* the mask each word rises out of */
+.w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0 0.05em 0.16em;
+  margin: 0 -0.05em -0.16em;
+}
+
+.wi {
+  display: inline-block;
+  transform: translateY(115%) rotate(6deg);
+  transform-origin: 0 100%;
+  transition: transform calc(0.95s * var(--z, 1)) var(--ease-out)
+    calc((var(--base, 0ms) + var(--i) * 65ms) * var(--z, 1));
+}
+
+.words[data-in="true"] .wi {
+  transform: none;
+}
+
+.hl {
+  background-image: linear-gradient(100deg, var(--c1), var(--c2), var(--c1));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+:global([data-reduced="true"]) .wi {
+  transform: none;
+  transition: none;
+}
+:global([data-reduced="true"]) .hl {
+  animation: none;
+}

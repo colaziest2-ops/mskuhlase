@@ -7,9 +7,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--heat) calc(var(--warm) * 100%), rgb(232 228 220 / 0.35));
-  background: radial-gradient(circle, rgb(232 160 96 / calc(var(--warm) * 0.22)), transparent 70%);
-  box-shadow: 0 0 calc(var(--warm) * 18px) rgb(232 160 96 / calc(var(--warm) * 0.45));
+  border: 1px solid color-mix(in srgb, var(--heat) calc(var(--warm) * 100%), rgb(var(--edge) / 0.35));
+  background: radial-gradient(circle, rgb(var(--heat-rgb) / calc(var(--warm) * 0.22)), transparent 70%);
+  box-shadow: 0 0 calc(var(--warm) * 18px) rgb(var(--heat-rgb) / calc(var(--warm) * 0.45));
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s var(--ease-out);

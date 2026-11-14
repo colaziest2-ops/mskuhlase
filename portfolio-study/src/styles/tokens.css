@@ -32,3 +32,64 @@
   --gutter: clamp(24px, 4vw, 64px);
   --max: 1120px;
 }
+
+/* ---- extensions: colour palette + theme plumbing ------------------------------
+   Highlight colours. Each section owns one (see SECTIONS in content.ts) and the
+   words that matter are lit in these. Light-theme values are deepened so they
+   hold contrast on paper-white. */
+:root {
+  --c-amber: #f0a45d;
+  --c-teal: #4fd6c1;
+  --c-sky: #6aa9ff;
+  --c-violet: #a98bff;
+  --c-rose: #ff7a9c;
+  --c-lime: #b6e35a;
+
+  /* raw channels, so alpha can be applied: rgb(var(--edge) / .12) */
+  --edge: 232 228 220;
+  --field-rgb: 10 9 8;
+  --heat-rgb: 232 160 96;
+
+  --orb-a: 0.2;
+  --grain-a: 0.035;
+  --grain-inv: 0;
+  --name-shadow-a: 0.7;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --field-0: #efeadf;
+  --field-1: #f6f2e9;
+  --field-2: #fffdf8;
+
+  --ink: #1b1916;
+  --ink-dim: #5b554a;
+  --ink-faint: #8d8676;
+
+  --heat: #c4651a;
+  --heat-soft: rgb(196 101 26 / 0.3);
+  --heat-glow: radial-gradient(circle, rgb(230 130 40 / 0.4) 0%, rgb(230 120 30 / 0.1) 42%, transparent 72%);
+
+  --paper: #fffdf8;
+  --paper-aged: #f7f2e7;
+  --paper-edge: #d9d2c2;
+
+  --c-amber: #c4651a;
+  --c-teal: #0e9f8c;
+  --c-sky: #2563d8;
+  --c-violet: #6d3fe0;
+  --c-rose: #d12f68;
+  --c-lime: #5b8a0e;
+
+  --edge: 27 25 22;
+  --field-rgb: 239 234 223;
+  --heat-rgb: 196 101 26;
+
+  --orb-a: 0.26;
+  --grain-a: 0.05;
+  --grain-inv: 1;
+  --name-shadow-a: 0.16;
+
+  color-scheme: light;
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Clock } from "./components/Clock";
 import { Cursor } from "./components/Cursor";
+import { Nav } from "./components/Nav";
+import { Orbs } from "./components/Orbs";
 import { Rail } from "./components/Rail";
 import { Stage, type StageApi } from "./components/Stage";
 import { SECTIONS } from "./content";
@@ -67,6 +68,10 @@ export function App() {
         case "E":
           window.dispatchEvent(new Event("study:expand"));
           break;
+        case "t":
+        case "T":
+          window.dispatchEvent(new Event("study:theme"));
+          break;
         default:
           if (/^[1-9]$/.test(e.key) && Number(e.key) <= SECTIONS.length) goTo(Number(e.key) - 1);
       }
@@ -108,10 +113,11 @@ export function App() {
         </filter>
       </svg>
 
+      <Orbs />
       <Stage active={active} onActive={onActive} apiRef={apiRef} reduced={reduced} />
       <canvas ref={canvas} className={styles.creases} aria-hidden="true" />
 
-      <Clock reduced={reduced} />
+      <Nav active={active} onGo={goTo} reduced={reduced} />
       <Rail active={active} onGo={goTo} reduced={reduced} />
       <Cursor reduced={reduced} />
 

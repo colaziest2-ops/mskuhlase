@@ -70,7 +70,7 @@ async function ask(prompt: string, head: string): Promise<ShellResult> {
   }
 
   const ctl = new AbortController();
-  const timer = window.setTimeout(() => ctl.abort(), 20_000);
+  const timer = window.setTimeout(() => ctl.abort(), 28_000);
   try {
     const res = await fetch(endpoint, {
       method: "POST",
@@ -82,7 +82,7 @@ async function ask(prompt: string, head: string): Promise<ShellResult> {
     if (!res.ok) throw new Error(body || `HTTP ${res.status}`);
     return { lines: (body || "…").split("\n").map(out) };
   } catch (e) {
-    const reason = e instanceof Error && e.name === "AbortError" ? "timed out after 20s" : e instanceof Error ? e.message : "failed";
+    const reason = e instanceof Error && e.name === "AbortError" ? "timed out after 28s" : e instanceof Error ? e.message : "failed";
     return { lines: [err(`assistant: ${reason}`)] };
   } finally {
     window.clearTimeout(timer);

@@ -11,7 +11,6 @@ body,
 }
 
 html {
-  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
   --z: 1; /* time dilation, set from ?z= */
   --lx: 0; /* light direction, -1…1, follows the pointer */
@@ -39,18 +38,20 @@ body::before {
   pointer-events: none;
   background:
     radial-gradient(var(--field-light), var(--field-2) 0%, transparent 70%),
-    radial-gradient(900px 700px at 92% 104%, rgb(232 160 96 / 0.055), transparent 70%),
+    radial-gradient(900px 700px at 92% 104%, rgb(var(--heat-rgb) / 0.07), transparent 70%),
     linear-gradient(var(--field-1), var(--field-0));
 }
 
-/* Fine static grain so the dark gradient doesn't band. */
+/* Fine static grain so the gradient doesn't band. Plain alpha, no blend mode —
+   a blended full-screen layer repaints under every scroll frame. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.035; /* plain alpha, no blend mode — a blended full-screen layer repaints under every scroll frame */
+  opacity: var(--grain-a);
+  filter: invert(var(--grain-inv));
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
@@ -97,6 +98,48 @@ button {
 }
 .no-bar::-webkit-scrollbar {
   display: none;
+}
+
+/* ---- Liquid theme pour (see lib/liquid.ts) --------------------------------------
+   The new theme's snapshot is revealed through --liquid-clip, a polygon rebuilt
+   every frame. The old snapshot just sits underneath, fully opaque. The "hold"
+   animation only exists to keep the transition alive for the pour's duration. */
+html.theme-pour * {
+  transition: none !important; /* tokens must flip at once, not fade, or the liquid and the page disagree */
+}
+
+::view-transition-group(root) {
+  animation-duration: var(--pour-ms, 1.7s);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: pour-hold var(--pour-ms, 1.7s) linear both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  clip-path: var(--liquid-clip);
+}
+
+/* the live canvas that draws the liquid's lit edge */
+::view-transition-group(pour-rim) {
+  animation-duration: var(--pour-ms, 1.7s);
+}
+::view-transition-old(pour-rim) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(pour-rim) {
+  animation: pour-hold var(--pour-ms, 1.7s) linear both;
+  mix-blend-mode: normal;
+}
+
+@keyframes pour-hold {
+  from,
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

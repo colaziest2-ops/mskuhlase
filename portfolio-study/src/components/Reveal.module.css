@@ -1,0 +1,55 @@
+.r {
+  opacity: 0;
+  transition:
+    opacity calc(0.8s * var(--z, 1)) var(--ease-out),
+    transform calc(0.95s * var(--z, 1)) var(--ease-out),
+    filter calc(0.8s * var(--z, 1)) var(--ease-out),
+    clip-path calc(1.05s * var(--z, 1)) var(--ease-out);
+  transition-delay: calc(var(--d, 0ms) * var(--z, 1));
+}
+
+.rise {
+  transform: translateY(38px);
+}
+.drop {
+  transform: translateY(-38px);
+}
+.left {
+  transform: translateX(-70px);
+}
+.right {
+  transform: translateX(70px);
+}
+.pop {
+  transform: scale(0.8);
+  transform-origin: 50% 60%;
+}
+.blur {
+  filter: blur(14px);
+  transform: translateY(14px);
+}
+.tilt {
+  transform: perspective(900px) rotateX(18deg) translateY(44px) scale(0.95);
+  transform-origin: 50% 100%;
+}
+.wipe {
+  opacity: 1;
+  clip-path: inset(0 100% 0 0);
+}
+
+.r[data-in="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.wipe[data-in="true"] {
+  clip-path: inset(0 0 0 0);
+}
+
+:global([data-reduced="true"]) .r {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  clip-path: none !important;
+  transition: none !important;
+}
