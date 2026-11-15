@@ -3,8 +3,8 @@
   display: grid;
   place-items: center;
   flex: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   background: color-mix(in srgb, var(--c-amber) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--c-amber) 40%, transparent);

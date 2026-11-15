@@ -1,0 +1,36 @@
+.logo {
+  display: block;
+  flex: none;
+  color: var(--lg, currentColor);
+}
+
+.logo[data-mono="true"] {
+  color: currentColor;
+}
+
+/* typographic badge for the two technologies with no mark to inline */
+.logo[data-kind="text"] {
+  display: grid;
+  place-items: center;
+  width: auto;
+  font-family: var(--font-mono);
+  min-width: 1.6em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* near-black marks (Next.js, C#) go pale on a dark page; they're already fine on a light one */
+:global(:root:not([data-theme="light"])) .logo[data-tone="dark"]:not([data-mono="true"]) {
+  color: color-mix(in srgb, var(--lg, #fff) 28%, #ffffff);
+}
+
+/* mid-bright purples (Framer, Vite) lift a little on a dark page */
+:global(:root:not([data-theme="light"])) .logo[data-tone="dim"]:not([data-mono="true"]) {
+  color: color-mix(in srgb, var(--lg, #fff) 75%, #ffffff);
+}
+
+/* light marks (React cyan, Tailwind teal, Node green, PHP) get deepened on a light page */
+:global(:root[data-theme="light"]) .logo[data-tone="pale"]:not([data-mono="true"]) {
+  color: color-mix(in srgb, var(--lg, #000) 45%, #1b1916);
+}

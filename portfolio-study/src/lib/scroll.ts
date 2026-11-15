@@ -67,6 +67,10 @@ export function useInView<T extends Element>(opts: InViewOptions = {}): [RefObje
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // A tall element (the portrait is ~560px) can't reach "18% visible" on a short phone until
+    // the user has scrolled well past it, so cap the requirement at ~140px of actual height.
+    const height = el.getBoundingClientRect().height;
+    const needed = height > 0 ? Math.min(threshold, Math.max(0.01, 140 / height)) : threshold;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
@@ -77,7 +81,7 @@ export function useInView<T extends Element>(opts: InViewOptions = {}): [RefObje
           setSeen(false);
         }
       },
-      { threshold, rootMargin },
+      { threshold: needed, rootMargin },
     );
     io.observe(el);
     return () => io.disconnect();

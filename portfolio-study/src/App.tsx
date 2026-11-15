@@ -117,7 +117,7 @@ export function App() {
       <Stage active={active} onActive={onActive} apiRef={apiRef} reduced={reduced} />
       <canvas ref={canvas} className={styles.creases} aria-hidden="true" />
 
-      <Nav active={active} onGo={goTo} reduced={reduced} />
+      <Nav active={active} onGo={goTo} reduced={reduced} onCrumple={doCrumple} />
       <Rail active={active} onGo={goTo} reduced={reduced} />
       <Cursor reduced={reduced} />
 

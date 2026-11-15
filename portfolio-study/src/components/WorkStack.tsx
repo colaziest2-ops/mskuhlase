@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { PROJECTS } from "../content";
+import { DetailSheet } from "./DetailSheet";
 import { CARD, SpringBag } from "../lib/physics";
 import { PARAMS } from "../lib/params";
 import { between, rngFor } from "../lib/rng";
@@ -101,6 +102,33 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
   const dealing = useRef(false);
   const reducedRef = useRef(reduced);
   const [entered, setEntered] = useState(false);
+
+  // Phones: no hover, no keyboard, no room to peel a card sideways. A tap opens the card,
+  // and the details come up as a bottom sheet instead of morphing the card in place.
+  const coarse = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
+  const narrowRef = useRef(false);
+  const [narrow, setNarrow] = useState(false);
+  const [sheet, setSheet] = useState<number | null>(null);
+  const sheetRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 760px)");
+    const sync = () => {
+      narrowRef.current = mq.matches;
+      setNarrow(mq.matches);
+      // an in-place card open on a desktop window that shrinks to phone width has no room: hand it to the sheet
+      const open = expandedRef.current;
+      if (mq.matches && open !== null) {
+        expandedRef.current = null;
+        setExpanded(null);
+        sheetRef.current = open;
+        setSheet(open);
+      }
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const commitOrder = useCallback((o: number[]) => {
     orderRef.current = o;
@@ -233,14 +261,16 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
 
     const measure = (first: boolean) => {
       const cardW = rigs[0]?.wrap?.offsetWidth ?? START.cardW;
-      const narrow = box.clientWidth < 640;
+      const narrow = narrowRef.current; // same 760px viewport query the CSS uses
       metrics.current = {
         cardW,
         peel: Math.round(clamp(cardW * 0.4, 140, 230)),
         stepX: narrow ? 7 : 12,
-        stepY: narrow ? -26 : -30,
+        stepY: narrow ? -34 : -30, // phones: each tab fully visible, 34px tall — a real tap target
       };
       box.style.setProperty("--peel", `${metrics.current.peel}px`);
+      // room above the front card for the other six tabs to peek out
+      box.style.setProperty("--pile", `${(N - 1) * Math.abs(metrics.current.stepY) + 16}px`);
       if (first && !reducedRef.current) offstage();
       else applyTargets(first);
       paint();
@@ -332,25 +362,36 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
   );
 
   const collapse = useCallback(() => {
-    if (expandedRef.current === null) return;
-    commitExpanded(null);
+    if (sheetRef.current !== null) {
+      sheetRef.current = null;
+      setSheet(null);
+    } else if (expandedRef.current !== null) {
+      commitExpanded(null);
+    } else {
+      return;
+    }
     returnFocus.current?.focus({ preventScroll: true });
     returnFocus.current = null;
   }, [commitExpanded]);
 
   const openFront = useCallback(() => {
-    if (expandedRef.current !== null || pullingRef.current) return;
+    if (expandedRef.current !== null || sheetRef.current !== null || pullingRef.current) return;
     const front = orderRef.current[0];
     if (front === undefined) return;
     returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    commitExpanded(front);
+    if (narrowRef.current) {
+      sheetRef.current = front;
+      setSheet(front);
+    } else {
+      commitExpanded(front);
+    }
   }, [commitExpanded]);
 
   // `E` (relayed from App) toggles the front card while this section is on screen.
   useEffect(() => {
     const onExpand = () => {
       if (!active) return;
-      if (expandedRef.current !== null) collapse();
+      if (expandedRef.current !== null || sheetRef.current !== null) collapse();
       else openFront();
     };
     window.addEventListener("study:expand", onExpand);
@@ -379,6 +420,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>, pi: number) => {
     if (e.button !== 0 || orderRef.current[0] !== pi || expandedRef.current !== null) return;
+    if (narrowRef.current) return; // no peeling on phones: there's no room for the strip, and a tap opens the card
     if (e.target instanceof Element && e.target.closest("a, button")) return;
     drag.current = { pi, sx: e.clientX, moved: false };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -455,7 +497,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
     kick();
   };
 
-  const onCardClick = (pi: number) => {
+  const onCardClick = (pi: number, e?: ReactMouseEvent) => {
     if (suppressClick.current) {
       suppressClick.current = false;
       return;
@@ -464,7 +506,12 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
       if (expandedRef.current !== pi) collapse();
       return;
     }
-    if (orderRef.current[0] !== pi) pull(pi);
+    if (orderRef.current[0] !== pi) {
+      pull(pi);
+      return;
+    }
+    // Touch: a tap anywhere on the front card (except its own buttons and links) opens it.
+    if ((coarse || narrowRef.current) && !(e?.target instanceof Element && e.target.closest("a, button"))) openFront();
   };
 
   const front = order[0] ?? 0;
@@ -504,7 +551,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
               onPointerDown={(e) => onPointerDown(e, pi)}
               onPointerUp={(e) => endDrag(e, pi)}
               onPointerCancel={(e) => endDrag(e, pi)}
-              onClick={() => onCardClick(pi)}
+              onClick={(e) => onCardClick(pi, e)}
               onDoubleClick={() => {
                 if (isFront && expandedRef.current === null) openFront();
               }}
@@ -628,8 +675,16 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
         <span>
           {String(front + 1).padStart(2, "0")}/{String(N).padStart(2, "0")} · {frontProject?.name}
         </span>
-        <span>click a tab to pull it forward · drag the top card sideways to peel · double-click or E to open</span>
+        <span>
+          {narrow || coarse
+            ? "tap a tab to pull it forward · tap the card to open it"
+            : "click a tab to pull it forward · drag the top card to peel · double-click or E to open"}
+        </span>
       </p>
+
+      {sheet !== null && PROJECTS[sheet] && (
+        <DetailSheet project={PROJECTS[sheet]} index={sheet} total={N} grain={grain} onClose={collapse} />
+      )}
     </div>
   );
 }

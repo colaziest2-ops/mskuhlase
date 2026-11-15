@@ -6,6 +6,7 @@
   z-index: 85;
   padding: 0 clamp(12px, 3vw, 28px);
   pointer-events: none;
+  transform: translate(var(--vv-x, 0px), var(--vv-y, 0px)); /* iOS visual-viewport correction, see lib/vvFix.ts */
 }
 
 .bar {
@@ -97,8 +98,8 @@
 .burger {
   display: none;
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   background: none;
   border: 1px solid rgb(var(--edge) / 0.18);
@@ -108,8 +109,8 @@
 
 .burger span {
   position: absolute;
-  left: 11px;
-  right: 11px;
+  left: 13px;
+  right: 13px;
   height: 1.6px;
   border-radius: 2px;
   background: var(--ink);
@@ -118,17 +119,17 @@
     top calc(0.3s * var(--z, 1)) var(--ease-out);
 }
 .burger span:first-child {
-  top: 15px;
+  top: 17px;
 }
 .burger span:last-child {
-  top: 22px;
+  top: 24px;
 }
 .wrap[data-open="true"] .burger span:first-child {
-  top: 19px;
+  top: 21px;
   transform: rotate(45deg);
 }
 .wrap[data-open="true"] .burger span:last-child {
-  top: 19px;
+  top: 21px;
   transform: rotate(-45deg);
 }
 
@@ -165,6 +166,11 @@
 
 .menu {
   display: none;
+}
+
+/* the extra action row under the sections */
+.extra {
+  border-top: 1px dashed rgb(var(--edge) / 0.2) !important;
 }
 
 @media (max-width: 760px) {

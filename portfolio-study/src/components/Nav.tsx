@@ -10,6 +10,8 @@ interface NavProps {
   readonly active: number;
   readonly onGo: (index: number) => void;
   readonly reduced: boolean;
+  /** Phones have no `C` key and no room for a floating button, so the crumple lives in the menu. */
+  readonly onCrumple?: () => void;
 }
 
 const tint = (i: number) => ({ "--lc": `var(--c-${SECTIONS[i]?.color ?? "amber"})` }) as CSSProperties;
@@ -19,7 +21,7 @@ const tint = (i: number) => ({ "--lc": `var(--c-${SECTIONS[i]?.color ?? "amber"}
  * clock, the theme toggle, and on phones a menu that unfolds beneath it. A
  * rainbow hairline along its edge fills as you scroll.
  */
-export function Nav({ active, onGo, reduced }: NavProps) {
+export function Nav({ active, onGo, reduced, onCrumple }: NavProps) {
   const [open, setOpen] = useState(false);
   const progress = useRef<HTMLSpanElement>(null);
   const wrap = useRef<HTMLElement>(null);
@@ -111,6 +113,23 @@ export function Nav({ active, onGo, reduced }: NavProps) {
               </button>
             </li>
           ))}
+          {onCrumple && (
+            <li style={{ "--lc": "var(--c-rose)", "--n": SECTIONS.length } as CSSProperties}>
+              <button
+                type="button"
+                className={`${styles.item} ${styles.extra}`}
+                onClick={() => {
+                  setOpen(false);
+                  // let the menu fold away first so it isn't part of what gets crumpled
+                  window.setTimeout(onCrumple, 260);
+                }}
+              >
+                <span className={styles.num}>✦</span>
+                <span className={styles.name}>Crumple the page</span>
+                <span className={styles.what}>fold it up, watch it settle</span>
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </header>

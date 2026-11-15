@@ -44,8 +44,9 @@
   border-color: var(--heat-soft);
 }
 
+/* on phones there's no `C` key and no spare corner — the crumple lives in the nav menu instead */
 @media (max-width: 760px) {
   .crumple {
-    bottom: max(18px, env(safe-area-inset-bottom));
+    display: none;
   }
 }

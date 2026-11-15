@@ -6,10 +6,12 @@ import styles from "./Reveal.module.css";
  * How a block arrives as it scrolls into view. Each section uses different ones
  * so the page doesn't feel like one effect on repeat.
  *   rise  – lifts up      drop – settles down    left / right – slides in
- *   pop   – scales up     blur – focuses in      wipe – unmasks left to right
- *   tilt  – flips up from the floor like a card
+ *   pop   – scales up     blur – focuses in      tilt – flips up from the floor like a card
+ *
+ * (There is deliberately no clip-path "wipe" here: a fully clipped element has zero visible
+ * area, so the IntersectionObserver that triggers these would never see it.)
  */
-export type RevealVariant = "rise" | "drop" | "left" | "right" | "pop" | "blur" | "wipe" | "tilt";
+export type RevealVariant = "rise" | "drop" | "left" | "right" | "pop" | "blur" | "tilt";
 
 interface RevealProps {
   readonly variant?: RevealVariant;

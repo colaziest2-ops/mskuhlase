@@ -2,9 +2,12 @@ import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import type { ColorName } from "../content";
 import { scrollVelocity } from "../lib/scroll";
+import { Logo } from "./Logo";
 import styles from "./Ticker.module.css";
 
 export interface TickerItem {
+  /** Key into lib/logos.ts — the item shows that technology's real logo. */
+  readonly id: string;
   readonly label: string;
   readonly color: ColorName;
 }
@@ -16,13 +19,15 @@ interface TickerProps {
   /** px / second at rest */
   readonly speed?: number;
   readonly reduced: boolean;
+  /** Draw the logos in the band's own text colour instead of their brand colours (for a coloured band). */
+  readonly mono?: boolean;
 }
 
 /**
  * A band of words that drifts sideways. Scrolling speeds it up, and scrolling
  * back up reverses it — so the page physically pushes on it.
  */
-export function Ticker({ items, dir = 1, speed = 44, reduced }: TickerProps) {
+export function Ticker({ items, dir = 1, speed = 44, reduced, mono = false }: TickerProps) {
   const track = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,7 +78,7 @@ export function Ticker({ items, dir = 1, speed = 44, reduced }: TickerProps) {
         style={{ "--c": `var(--c-${it.color})` } as CSSProperties}
         aria-hidden={copy > 0}
       >
-        <i className={styles.star} />
+        <Logo id={it.id} size={28} mono={mono} decorative />
         {it.label}
       </span>
     ));

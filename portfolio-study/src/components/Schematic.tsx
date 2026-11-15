@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { SKILLS, type ColorName } from "../content";
 import { useInView } from "../lib/scroll";
+import { Logo } from "./Logo";
 import { PARAMS } from "../lib/params";
 import styles from "./Schematic.module.css";
 
@@ -103,19 +104,40 @@ export function Schematic({ reduced }: { reduced: boolean }) {
     [],
   );
 
-  const select = (id: string | null) => {
-    activeRef.current = id;
-    setActive(id);
-    kick();
-  };
+  const select = useCallback(
+    (id: string | null) => {
+      activeRef.current = id;
+      setActive(id);
+      kick();
+    },
+    [kick],
+  );
 
   const ignite = (id: string) => {
     heat.current[id] = 1;
     kick();
   };
 
+  // On touch there's no "pointer leaving", so a tap anywhere outside the diagram closes the open note.
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      const root = diagram.current;
+      if (root && e.target instanceof Node && !root.contains(e.target)) select(null);
+    };
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    return () => window.removeEventListener("pointerdown", onDown);
+  }, [diagram, select]);
+
   return (
-    <div ref={diagram} className={styles.diagram} data-in={seen} onPointerLeave={() => select(null)}>
+    <div
+      ref={diagram}
+      className={styles.diagram}
+      data-in={seen}
+      // Touch fires pointerleave right after pointerup, which would close the note the tap just opened.
+      onPointerLeave={(e) => {
+        if (e.pointerType !== "touch") select(null);
+      }}
+    >
       <svg
         className={styles.lines}
         viewBox={`0 0 1000 ${SKILLS.length * ROW}`}
@@ -166,12 +188,20 @@ export function Schematic({ reduced }: { reduced: boolean }) {
                   className={styles.node}
                   aria-expanded={on}
                   aria-describedby={on ? `note-${node.id}` : undefined}
-                  onPointerEnter={() => select(node.id)}
-                  onFocus={() => select(node.id)}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType !== "touch") select(node.id); // hover is a mouse thing; touch uses tap
+                  }}
+                  // keyboard focus opens the note; a tap/click also focuses the button on Android/Edge,
+                  // and that must not open-then-immediately-close it via the click toggle below
+                  onFocus={(e) => {
+                    if (e.currentTarget.matches(":focus-visible")) select(node.id);
+                  }}
                   onBlur={() => select(null)}
-                  onClick={() => select(on ? null : node.id)}
+                  onClick={() => select(activeRef.current === node.id ? null : node.id)}
                 >
-                  <i className={styles.dot} data-on={on} />
+                  <span className={styles.chip} data-on={on}>
+                    <Logo id={node.id} size={20} decorative />
+                  </span>
                   <span>{node.label}</span>
                 </button>
                 {on && (

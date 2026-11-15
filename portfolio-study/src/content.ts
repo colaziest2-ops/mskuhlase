@@ -274,6 +274,7 @@ export const SKILLS: readonly SkillLayer[] = [
     caption: "what holds the data",
     color: "violet",
     nodes: [
+      { id: "nodejs", label: "Node.js", note: "Runs this site's own API — the contact form and the shell's assistant are Node functions." },
       { id: "mssql", label: "Microsoft SQL Server", note: "Event-protocol data under pressure — queried during incidents, not browsed at leisure." },
       { id: "sql", label: "SQL", note: "Schema decisions matter more when the data is read under pressure." },
       { id: "php", label: "PHP", note: "Oxy Gas's storefront runs on it." },

@@ -102,14 +102,14 @@
 .node {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 8px 10px 0;
-  margin-left: -6px;
+  gap: 12px;
+  padding: 6px 8px 6px 0;
+  margin-left: -18px; /* centre the logo chip on the node's x, which is where the connecting lines land */
   background: none;
   border: 0;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   white-space: nowrap;
   color: var(--ink-dim);
   transform: translateY(-50%);
@@ -125,33 +125,35 @@
   outline-offset: 0;
 }
 
-.dot {
+/* the real logo sits in a round chip; generic icons take the layer's colour */
+.chip {
+  display: grid;
+  place-items: center;
   flex: none;
-  width: 12px;
-  height: 12px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--lc) 65%, var(--ink-faint));
-  background: var(--field-1);
-  box-shadow: inset 0 0 0 3px var(--field-1);
+  color: var(--lc);
+  border: 1px solid color-mix(in srgb, var(--lc) 55%, var(--ink-faint));
+  background: color-mix(in srgb, var(--field-1) 94%, var(--lc));
   transition:
     border-color var(--rail-time) var(--ease-out),
     box-shadow var(--rail-time) var(--ease-out),
-    background var(--rail-time) var(--ease-out);
+    transform var(--rail-time) var(--ease-spring);
 }
 
-.dot[data-on="true"] {
+.node:hover .chip,
+.chip[data-on="true"] {
+  transform: scale(1.12);
   border-color: var(--lc);
-  background: var(--lc);
-  box-shadow:
-    inset 0 0 0 3px var(--field-1),
-    0 0 16px 3px color-mix(in srgb, var(--lc) 55%, transparent);
+  box-shadow: 0 0 20px 3px color-mix(in srgb, var(--lc) 42%, transparent);
 }
 
 /* the operational note: opens beneath its node, underline draws in */
 .note {
   position: absolute;
-  top: 26px;
-  left: -6px;
+  top: 34px;
+  left: -18px;
   width: max-content;
   max-width: min(300px, 70vw);
   padding: 10px 12px 12px;
@@ -201,8 +203,9 @@
   animation: none;
 }
 
-/* narrow screens: a stacked list, no lines, notes open inline */
-@media (max-width: 760px) {
+/* narrow screens: each layer is a row of tappable logos hanging off a coloured rail that draws
+   itself downward; an open note takes the full row */
+@media (max-width: 1100px) {
   .diagram {
     height: auto;
     margin-bottom: 24px;
@@ -216,42 +219,78 @@
     position: relative;
     top: auto;
     height: auto;
-    padding: 16px 0 18px;
+    padding: 18px 0 20px 22px;
     display: flex;
     flex-wrap: wrap;
-    gap: 0 18px;
+    gap: 2px 16px;
+    border-top: 0;
+  }
+
+  /* the rail */
+  .layer::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(var(--lc), color-mix(in srgb, var(--lc) 12%, transparent));
+    transform-origin: top;
+    transform: scaleY(0);
+    transition: transform calc(1.1s * var(--z, 1)) var(--ease-out) calc((0.15s + var(--row) * 0.3s) * var(--z, 1));
+  }
+  .diagram[data-in="true"] .layer::before {
+    transform: scaleY(1);
   }
 
   .layerHead {
     position: static;
     flex: 0 0 100%;
     flex-wrap: wrap;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding: 0;
     background: none; /* no lines on this layout, so no backing needed */
+    font-size: 0.75rem;
   }
 
   .slot {
     position: static;
   }
+  /* the slot that holds the open note spans the row, so the note isn't squeezed to the button's width */
+  .slot:has(.note) {
+    flex: 1 0 100%;
+  }
 
   .node {
     transform: none;
-    padding: 8px 4px 8px 0;
+    min-height: 44px;
+    padding: 4px 6px 4px 0;
     margin-left: 0;
+  }
+
+  .chip {
+    width: 34px;
+    height: 34px;
   }
 
   .note {
     position: static;
-    margin: 0 0 10px;
+    margin: 4px 0 10px;
     max-width: none;
     width: 100%;
     box-shadow: none;
+    font-size: 0.8rem;
   }
 
   .slot[data-side="right"] .note {
     right: auto;
   }
+}
+
+:global([data-reduced="true"]) .layer::before {
+  transform: none;
+  transition: none;
 }
 
 :global([data-reduced="true"]) .lines {

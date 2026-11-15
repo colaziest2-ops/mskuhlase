@@ -8,15 +8,16 @@
   --peel: 220px;
   position: relative;
   width: 100%;
-  height: calc(var(--cardH) + 200px);
+  height: calc(var(--cardH) + var(--pile, 190px) + 10px); /* --pile is set from JS: room for the other tabs to peek out */
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* click-away layer for the expanded state */
+/* click-away layer for the expanded state. Fixed to the screen, NOT stretched sideways with
+   negative insets: that made the whole page scroller horizontally scrollable on iOS. */
 .scrim {
-  position: absolute;
-  inset: -40px -100vw;
+  position: fixed;
+  inset: 0;
   z-index: 40;
   pointer-events: none;
 }
@@ -29,7 +30,7 @@
 .card {
   position: absolute;
   left: calc((100% - var(--cardW) - 56px) / 2);
-  top: 190px;
+  top: var(--pile, 190px);
   width: var(--cardW);
   height: var(--cardH);
   touch-action: pan-y; /* vertical scroll stays native; horizontal drags are ours */
@@ -449,14 +450,49 @@ kbd {
   color: var(--ink-dim);
 }
 
-@media (max-width: 640px) {
+/* cards behind the front one only ever show their tab — the rest is hidden, which also stops a
+   long title from poking out beside the front card */
+.card[data-front="false"] .body {
+  visibility: hidden;
+}
+
+/* ---- phones ------------------------------------------------------------------------ */
+
+@media (max-width: 760px) {
   .stack {
-    --cardH: 460px;
+    --cardH: 400px;
+  }
+  .tab {
+    height: 34px; /* each tab fully visible and tappable */
+  }
+  .body {
+    height: calc(100% - 34px);
   }
   .tabCat {
     display: none;
   }
-  .hint span:last-child {
+  .full,
+  .strip {
+    display: none; /* the details come up as a bottom sheet; there's no room to peel */
+  }
+  /* 12px floor for the small mono labels */
+  .tab,
+  .sector,
+  .tags li,
+  .domain,
+  .hint {
+    font-size: 0.75rem;
+  }
+}
+
+/* no keyboard on a touch screen, and fingers need 44px */
+@media (hover: none), (pointer: coarse) {
+  kbd {
     display: none;
+  }
+  .actions button,
+  .actions a {
+    min-height: 44px;
+    padding: 0 16px;
   }
 }

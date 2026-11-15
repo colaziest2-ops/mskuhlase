@@ -10,6 +10,10 @@
 
 .content {
   position: relative;
+  /* Things slide in from the sides as they reveal. `clip` (not `hidden`) trims them without turning
+     this into a second scroll container that could be panned sideways. */
+  overflow-x: hidden; /* fallback for Safari < 16, which has no clip */
+  overflow-x: clip;
 }
 
 .section {
@@ -51,13 +55,31 @@
   box-shadow: 0 0 14px 1px var(--sec);
 }
 
-.rule {
+/* the observed box: taller than the line and never clipped */
+.ruleBox {
   position: absolute;
   top: 0;
   left: var(--gutter);
   right: var(--gutter);
+  height: 16px;
+  pointer-events: none;
+}
+
+.rule {
+  display: block;
   height: 1px;
   background: linear-gradient(90deg, var(--sec), transparent 72%);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path calc(1.3s * var(--z, 1)) var(--ease-out);
+}
+
+.ruleBox[data-in="true"] .rule {
+  clip-path: inset(0 0 0 0);
+}
+
+:global([data-reduced="true"]) .rule {
+  clip-path: none;
+  transition: none;
 }
 
 .h2 {
@@ -299,6 +321,35 @@
     justify-self: center;
     max-width: min(330px, 80vw);
     margin-top: 12px;
+  }
+}
+
+/* ---- phones: tighter rhythm, readable small text -------------------------------------- */
+
+@media (max-width: 760px) {
+  /* a full screen per section left huge empty gaps between short sections */
+  .section {
+    min-height: auto;
+    padding-block: 84px 52px;
+  }
+  .home {
+    min-height: 100svh;
+  }
+
+  .eyebrow,
+  .status,
+  .alt,
+  .portrait figcaption,
+  .stamp,
+  .formHead,
+  .field > span,
+  .addrHint {
+    font-size: 0.75rem;
+  }
+
+  .alt a {
+    display: inline-block;
+    padding: 12px 0;
   }
 }
 
@@ -610,4 +661,11 @@
   border-top: 1px solid rgb(var(--edge) / 0.1);
   font-size: 0.78rem;
   color: var(--ink-faint);
+}
+
+/* peeling needs room and a pointer; phones just tap */
+@media (max-width: 760px) {
+  .peelOnly {
+    display: none;
+  }
 }

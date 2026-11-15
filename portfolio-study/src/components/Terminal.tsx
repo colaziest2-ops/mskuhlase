@@ -145,10 +145,19 @@ export function Terminal({ reduced }: { reduced: boolean }) {
     const result = await runCommand(raw);
     setBusy(false);
     setLines((l) => (result.clear ? BOOT : [...l, ...result.lines]));
-    input.current?.focus({ preventScroll: true });
+    // (No programmatic re-focus here: on iOS that can pop the keyboard back up and pan the page.
+    // The input never lost focus — it isn't read-only while busy any more.)
   };
 
+  const locked = busy || !booted;
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (locked) {
+      // Ignore typing while the banner is still printing or a command is running — but via the
+      // handlers, not `readOnly`, which makes the on-screen keyboard vanish and reappear.
+      if (e.key !== "Tab" && !e.metaKey && !e.ctrlKey) e.preventDefault();
+      return;
+    }
     if (e.key.length === 1 || e.key === "Backspace" || e.key === "Enter") click();
 
     if (e.key === "Enter") {
@@ -218,15 +227,17 @@ export function Terminal({ reduced }: { reduced: boolean }) {
         <span className={styles.caret} data-on={cursorOn && !busy} aria-hidden="true" />
         {busy && (
           <span className={styles.busy} aria-hidden="true">
-            …
+            thinking<i>.</i>
+            <i>.</i>
+            <i>.</i>
           </span>
         )}
         <input
           ref={input}
           className={styles.input}
           value={value}
-          readOnly={busy || !booted}
           onChange={(e) => {
+            if (locked) return; // controlled: React puts the old value straight back
             const v = e.target.value;
             setValue(v);
             window.clearTimeout(lag.current);

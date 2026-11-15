@@ -32,20 +32,11 @@
   transform: perspective(900px) rotateX(18deg) translateY(44px) scale(0.95);
   transform-origin: 50% 100%;
 }
-.wipe {
-  opacity: 1;
-  clip-path: inset(0 100% 0 0);
-}
-
 .r[data-in="true"] {
   opacity: 1;
   transform: none;
   filter: none;
 }
-.wipe[data-in="true"] {
-  clip-path: inset(0 0 0 0);
-}
-
 :global([data-reduced="true"]) .r {
   opacity: 1 !important;
   transform: none !important;

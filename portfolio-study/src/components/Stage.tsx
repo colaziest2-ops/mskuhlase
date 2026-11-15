@@ -4,7 +4,7 @@ import { FOOTER, INTRO_PARTS, PERSON, PROJECTS, SECTIONS, SKILLS, type ColorName
 import { createScroller } from "../lib/physics";
 import { PARAMS } from "../lib/params";
 import { rngFor } from "../lib/rng";
-import { publishScroll, subscribeScroll } from "../lib/scroll";
+import { publishScroll, subscribeScroll, useInView } from "../lib/scroll";
 import { sastHM } from "../lib/time";
 import { Hl } from "./Hl";
 import { ReLuma } from "./ReLuma";
@@ -30,7 +30,9 @@ interface StageProps {
 }
 
 const PALETTE: readonly ColorName[] = ["amber", "teal", "sky", "violet", "rose", "lime"];
-const TICKER: readonly TickerItem[] = SKILLS.flatMap((l) => l.nodes.map((n) => ({ label: n.label, color: l.color })));
+const TICKER: readonly TickerItem[] = SKILLS.flatMap((l) =>
+  l.nodes.map((n) => ({ id: n.id, label: n.label, color: l.color })),
+);
 
 const sec = (i: number) => ({ "--sec": `var(--c-${SECTIONS[i]?.color ?? "amber"})` }) as CSSProperties;
 
@@ -103,9 +105,18 @@ function Eyebrow({ i, children }: { i: number; children: ReactNode }) {
   );
 }
 
-/** A hairline that draws itself across the top of a section, in that section's colour. */
+/**
+ * A hairline that draws itself across the top of a section, in that section's colour.
+ * The observed box is a taller, unclipped wrapper: a 1px line that starts fully clipped has
+ * no visible area, so an observer watching *it* would never fire.
+ */
 function Rule({ i }: { i: number }) {
-  return <Reveal variant="wipe" className={styles.rule} style={sec(i)} threshold={0.5} />;
+  const [ref, seen] = useInView<HTMLDivElement>({ threshold: 0.01, rootMargin: "0px 0px -4% 0px" });
+  return (
+    <div ref={ref} className={styles.ruleBox} data-in={seen} style={sec(i)} aria-hidden="true">
+      <i className={styles.rule} />
+    </div>
+  );
 }
 
 /** Confetti: a ring of coloured shards thrown from the email address when it's copied. */
@@ -344,6 +355,9 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
       }
     };
     const onScroll = () => {
+      // This surface only ever scrolls vertically. If anything (iOS focus, a stray pan) nudges it
+      // sideways, put it straight back — otherwise the whole page ends up offset and clipped.
+      if (el.scrollLeft !== 0) el.scrollLeft = 0;
       publishScroll(el.scrollTop, Math.max(0, el.scrollHeight - el.clientHeight), performance.now());
       if (ticking) return;
       ticking = true;
@@ -376,7 +390,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
   };
 
   return (
-    <div ref={viewport} className={`${styles.viewport} no-bar`} tabIndex={-1}>
+    <div ref={viewport} className={`${styles.viewport} no-bar`} tabIndex={-1} data-scroll-root="">
       <div className={styles.content}>
         {/* 00 — arrival */}
         <section
@@ -441,7 +455,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
         <div className={styles.bands} aria-hidden="true">
           <Reveal variant="left" className={styles.bandSlot} style={{ top: "34px" }}>
             <div className={`${styles.band} ${styles.bandA}`}>
-              <Ticker items={TICKER} dir={1} speed={52} reduced={reduced} />
+              <Ticker items={TICKER} dir={1} speed={52} reduced={reduced} mono />
             </div>
           </Reveal>
           <Reveal variant="right" delay={140} className={styles.bandSlot} style={{ top: "92px" }}>
@@ -466,8 +480,11 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                 />
               </h2>
               <Reveal as="p" variant="blur" delay={300} className={styles.lede}>
-                Real businesses, real traffic. <Hl c="rose">Pull a card forward</Hl>, <Hl c="amber">peel it sideways</Hl>{" "}
-                to see what's under it, or <Hl c="sky">open it</Hl> for the working notes.
+                Real businesses, real traffic. <Hl c="rose">Pull a card forward</Hl>,{" "}
+                <span className={styles.peelOnly}>
+                  <Hl c="amber">peel it sideways</Hl> to see what's under it,{" "}
+                </span>
+                or <Hl c="sky">open it</Hl> for the working notes.
               </Reveal>
             </div>
             <WorkStack active={active === 1} reduced={reduced} />
