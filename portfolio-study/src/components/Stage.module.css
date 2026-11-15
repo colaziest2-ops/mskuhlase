@@ -669,3 +669,16 @@
     display: none;
   }
 }
+
+/* phone type floor + tap targets; sits last so the earlier per-element sizes can't win */
+@media (max-width: 760px) {
+  .addrHint.addrHint,
+  .formHead.formHead,
+  .field.field > span {
+    font-size: 0.75rem;
+  }
+  .send,
+  .address {
+    min-height: 44px;
+  }
+}

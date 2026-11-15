@@ -505,7 +505,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
               />
             </h2>
             <Reveal as="p" variant="blur" delay={300} className={styles.lede}>
-              Three layers, one working system. Move across a node and its connections light, then fade like{" "}
+              Three layers, one working system. Move across (or tap) a node and its connections light, then fade like{" "}
               <Hl c="amber">heat leaving metal</Hl>.
             </Reveal>
             <Schematic reduced={reduced} />
