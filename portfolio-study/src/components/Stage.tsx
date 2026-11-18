@@ -11,6 +11,7 @@ import { Logo } from "./Logo";
 import { ReLuma } from "./ReLuma";
 import { Reveal } from "./Reveal";
 import { Schematic } from "./Schematic";
+import { SignalPath } from "./SignalPath";
 import { Terminal } from "./Terminal";
 import { Ticker, type TickerItem } from "./Ticker";
 import { Words } from "./Words";
@@ -42,17 +43,40 @@ const mix = (a: ColorName, b: ColorName, f: number) =>
 /** The surname runs amber → rose → violet, letter by letter. */
 const surnameTint = (f: number) => (f < 0.5 ? mix("amber", "rose", f * 2) : mix("rose", "violet", (f - 0.5) * 2));
 
+/**
+ * The bio, split into words so a soft beam of light can run through it on a loop.
+ * Highlighted phrases travel as one unit; whitespace stays plain text (`i: -1`).
+ */
+const INTRO_SWEEP: readonly { k: string; t: string; i: number; c?: ColorName }[] = (() => {
+  const out: { k: string; t: string; i: number; c?: ColorName }[] = [];
+  let i = 0;
+  INTRO_PARTS.forEach((p, pi) => {
+    if (p.c) {
+      out.push({ k: `${pi}`, t: p.t, i: i++, c: p.c });
+      return;
+    }
+    p.t.split(/(\s+)/).forEach((tok, ti) => {
+      if (!tok) return;
+      out.push({ k: `${pi}.${ti}`, t: tok, i: /^\s+$/.test(tok) ? -1 : i++ });
+    });
+  });
+  return out;
+})();
+
 /** Name letters resolve on a slight mechanical delay — stepped, a little uneven, never smooth. */
 function Resolve({
   text,
   label,
   start,
   tint,
+  offset = 0,
 }: {
   text: string;
   label: string;
   start: number;
   tint?: (f: number) => string;
+  /** where this word starts in the light sweep that runs through the whole name */
+  offset?: number;
 }) {
   const glyphs = useMemo(() => {
     const r = rngFor(PARAMS.seed, `arrival:${label}`);
@@ -67,7 +91,7 @@ function Resolve({
   return (
     <span aria-hidden="true">
       {glyphs.map((g, i) => (
-        <span key={i} className={styles.glyph} style={{ "--d": `${g.delay}ms`, color: g.color } as CSSProperties}>
+        <span key={i} className={styles.glyph} style={{ "--d": `${g.delay}ms`, "--gi": offset + i, color: g.color } as CSSProperties}>
           {g.ch === " " ? " " : g.ch}
         </span>
       ))}
@@ -272,8 +296,8 @@ function Contact({ reduced }: { reduced: boolean }) {
       <h2 className={styles.h2}>
         <Words
           parts={[
-            { t: "Got something" },
-            { t: "worth building?", c: "violet" },
+            { t: "Let's work" },
+            { t: "together.", c: "violet" },
           ]}
         />
       </h2>
@@ -411,22 +435,33 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                   <Resolve text={PERSON.first} label="first" start={120} />
                 </span>
                 <span className={styles.nameLine}>
-                  <Resolve text={PERSON.last} label="last" start={120 + PERSON.first.length * 58 + 140} tint={surnameTint} />
+                  <Resolve
+                    text={PERSON.last}
+                    label="last"
+                    start={120 + PERSON.first.length * 58 + 140}
+                    tint={surnameTint}
+                    offset={PERSON.first.length + 1}
+                  />
                 </span>
               </h1>
               <p className={styles.role}>
                 <span className={styles.roleA}>Software Engineer</span> <span className={styles.roleAmp}>·</span>{" "}
                 <span className={styles.roleB}>Full-Stack &amp; Networking</span> <span className={styles.roleAmp}>·</span>{" "}
-                <span className={styles.roleC}>AI Solutions</span>
+                <span className={styles.roleC}>AI Solutions</span> <span className={styles.roleAmp}>·</span>{" "}
+                <span className={styles.roleD}>Technical Operations</span>
               </p>
               <Reveal as="p" variant="blur" delay={650} className={styles.intro}>
-                {INTRO_PARTS.map((p, i) =>
-                  p.c ? (
-                    <Hl key={i} c={p.c}>
-                      {p.t}
-                    </Hl>
+                {INTRO_SWEEP.map((w) =>
+                  w.c ? (
+                    <span key={w.k} className={styles.wh} style={{ "--wi": w.i } as CSSProperties}>
+                      <Hl c={w.c}>{w.t}</Hl>
+                    </span>
+                  ) : w.i < 0 ? (
+                    w.t
                   ) : (
-                    p.t
+                    <span key={w.k} className={styles.w} style={{ "--wi": w.i } as CSSProperties}>
+                      {w.t}
+                    </span>
                   ),
                 )}
               </Reveal>
@@ -523,10 +558,11 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
               />
             </h2>
             <Reveal as="p" variant="blur" delay={300} className={styles.lede}>
-              Three layers, one working system. Move across (or tap) a node and its connections light, then fade like{" "}
+              Four layers, one working system. Move across (or tap) a node and its connections light, then fade like{" "}
               <Hl c="amber">heat leaving metal</Hl>.
             </Reveal>
             <Schematic reduced={reduced} />
+            <SignalPath reduced={reduced} />
           </div>
         </section>
 

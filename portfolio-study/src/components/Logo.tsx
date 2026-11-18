@@ -17,8 +17,8 @@ const TEXT: Readonly<Record<string, { label: string; hex: string }>> = {
 
 /** Marks that vanish on a near-black page (we lighten them) or on a white one (we deepen them). */
 const DARK_ON_DARK = new Set(["nextjs", "csharp"]);
-const DIM_ON_DARK = new Set(["framer", "vite"]);
-const PALE_ON_LIGHT = new Set(["react", "tailwind", "nodejs", "sql", "php"]);
+const DIM_ON_DARK = new Set(["framer", "vite", "postgresql"]);
+const PALE_ON_LIGHT = new Set(["react", "tailwind", "nodejs", "sql", "php", "linux", "javascript"]);
 
 interface LogoProps {
   readonly id: string;

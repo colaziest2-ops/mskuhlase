@@ -8,7 +8,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  padding: 0 var(--gutter) max(10px, env(safe-area-inset-bottom));
+  padding: 0 var(--gutter) calc(max(8px, env(safe-area-inset-bottom)) + 30px); /* level with the tab bar's middle */
   font-family: var(--font-label);
   pointer-events: none;
 }
@@ -25,7 +25,7 @@
 .readout {
   align-self: center;
   min-width: 0;
-  max-width: 48ch;
+  max-width: min(48ch, calc(50vw - 250px)); /* stops short of the tab bar */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -120,83 +120,10 @@
   animation: none;
 }
 
-.marks {
-  display: flex;
-  gap: clamp(2px, 1.2vw, 10px);
-  pointer-events: auto;
-}
 
-.mark {
-  --level: 0;
-  position: relative;
-  display: block;
-  padding: 18px clamp(8px, 1.4vw, 14px) 8px;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  color: color-mix(in srgb, var(--mc, var(--heat)) calc(var(--level) * 100%), var(--ink-faint));
-  transition: color var(--rail-time) var(--ease-out);
-}
 
-/* the luminous line: a hairline at rest, it lifts and brightens on hover/focus */
-.mark::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  width: 1px;
-  height: calc(5px + var(--level) * 9px);
-  margin-bottom: -9px;
-  background: linear-gradient(transparent, currentColor);
-  transform: translateX(-50%);
-  transition:
-    height var(--rail-time) var(--ease-spring),
-    box-shadow var(--rail-time) var(--ease-out),
-    color var(--rail-time) var(--ease-out);
-}
-
-/* heat bloom behind the active marker */
-.mark::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  width: 64px;
-  height: 36px;
-  translate: -50% 0;
-  background: radial-gradient(circle, color-mix(in srgb, var(--mc, var(--heat)) 50%, transparent) 0%, transparent 70%);
-  opacity: calc(var(--level) * 0.75);
-  pointer-events: none;
-}
-
-.mark:hover,
-.mark:focus-visible {
-  color: var(--ink);
-  outline: none;
-}
-
-.mark:hover::before,
-.mark:focus-visible::before {
-  height: 26px;
-  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--mc, var(--heat)) 40%, transparent);
-  color: var(--mc, var(--heat));
-}
-
-.icon {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-@media (max-width: 760px) {
-  .rail {
+@media (max-width: 1100px) {
+  .readout {
     display: none;
   }
 }

@@ -22,9 +22,9 @@ export const PERSON: Person = {
   name: "Siyabonga Kuhlase",
   first: "Siyabonga",
   last: "Kuhlase",
-  role: "Software Engineer · Full-Stack & Networking · AI Solutions",
+  role: "Software Engineer · Full-Stack & Networking · AI Solutions · Technical Operations",
   location: "Durban, South Africa", // [FILL] confirm
-  availability: "Available for select freelance projects",
+  availability: "Open to interesting work",
   email: "mskuhlase1011@icloud.com",
   resumeUrl: "", // [FILL]
   github: "", // [FILL]
@@ -50,11 +50,13 @@ export const INTRO_PARTS: readonly IntroPart[] = [
   { t: "video management systems", c: "teal" },
   { t: ", " },
   { t: "networking", c: "violet" },
-  { t: ", and " },
+  { t: ", " },
   { t: "multi-site deployments", c: "rose" },
-  { t: " that need to stay reliable. Lately I've been layering " },
+  { t: ", and " },
+  { t: "the databases that hold it all together", c: "amber" },
+  { t: ". Lately I've been layering " },
   { t: "AI solutions", c: "lime" },
-  { t: " into these environments to surface useful signals faster and cut manual work. The goal is the same in every project: make things more efficient and contribute to a " },
+  { t: " into these environments to surface useful signals faster and reduce manual work. The goal is the same in every project: make things more efficient and contribute to a " },
   { t: "safer, better-run South Africa", c: "rose" },
   { t: "." },
 ];
@@ -74,7 +76,7 @@ export const SECTIONS: readonly Section[] = [
   { id: "work", label: "Work", title: "Seven platforms, all live", color: "rose" },
   { id: "stack", label: "Stack", title: "Interface to server room", color: "teal" },
   { id: "play", label: "Play", title: "Talk to the shell", color: "lime" },
-  { id: "contact", label: "Contact", title: "Got something worth building?", color: "violet" },
+  { id: "contact", label: "Contact", title: "Let's work together", color: "violet" },
 ];
 
 export interface Project {
@@ -238,9 +240,12 @@ export const PROJECTS: readonly Project[] = [
 ];
 
 export interface SkillNode {
+  /** Also the key into lib/logos.ts (or Logo.tsx's text badges). */
   readonly id: string;
   readonly label: string;
-  /** One operational sentence, shown on hover / focus / tap. */
+  /** Optional short qualifier set under the label in the diagram, e.g. the product behind a category. */
+  readonly tag?: string;
+  /** One or two plain operational sentences, shown on hover / focus / tap. */
   readonly note: string;
 }
 
@@ -252,6 +257,10 @@ export interface SkillLayer {
   readonly nodes: readonly SkillNode[];
 }
 
+/**
+ * Four strata, top (what people touch) to bottom (the server room). Notes say what a tool is
+ * used for in this kind of work; project names only appear where PROJECTS above lists that tool.
+ */
 export const SKILLS: readonly SkillLayer[] = [
   {
     id: "frontend",
@@ -259,25 +268,108 @@ export const SKILLS: readonly SkillLayer[] = [
     caption: "what people touch",
     color: "sky",
     nodes: [
-      { id: "nextjs", label: "Next.js", note: "App Router builds — Lumiritin runs on it." },
-      { id: "react", label: "React", note: "Behind six of the seven live platforms." },
-      { id: "typescript", label: "TypeScript", note: "Strict mode, so mistakes surface at build time instead of on a customer's phone." },
-      { id: "tailwind", label: "Tailwind CSS", note: "Styling for six of the seven live sites." },
-      { id: "framer", label: "Framer Motion", note: "Interactions that make an app feel considered, not just functional." },
-      { id: "vite", label: "Vite", note: "Rainbow Directory and Myaluza Civils ship on it." },
+      {
+        id: "nextjs",
+        label: "Next.js",
+        note: "Routing, server rendering and API routes in one project. Lumiritin's booking and crew-credential flows are built on it.",
+      },
+      {
+        id: "react",
+        label: "React",
+        note: "Components and state for every interface here. Six of the seven live platforms use it.",
+      },
+      {
+        id: "typescript",
+        label: "TypeScript",
+        note: "Strict mode on, so a wrong prop or an unhandled null fails the build instead of failing on someone's phone.",
+      },
+      {
+        id: "javascript",
+        label: "JavaScript",
+        note: "The runtime under everything else in this layer. Plain JS still covers small jobs, like the storefront scripts on Oxy Gas.",
+      },
+      {
+        id: "tailwind",
+        label: "Tailwind CSS",
+        note: "Utility classes keep spacing and colour consistent without a stylesheet that grows with every page. Used on six of the seven live builds.",
+      },
+      {
+        id: "framer",
+        label: "Framer Motion",
+        note: "Enter, exit and layout animation for React, used where motion shows what changed. This site skips it and hand-writes its motion.",
+      },
+      {
+        id: "vite",
+        label: "Vite",
+        note: "Dev server and production builds for React apps that don't need a framework. This site, Rainbow Directory and Myaluza Civils use it.",
+      },
     ],
   },
   {
     id: "backend",
-    label: "Backend substrate",
+    label: "Backend & data",
     caption: "what holds the data",
     color: "violet",
     nodes: [
-      { id: "nodejs", label: "Node.js", note: "Runs this site's own API — the contact form and the shell's assistant are Node functions." },
-      { id: "mssql", label: "Microsoft SQL Server", note: "Event-protocol data under pressure — queried during incidents, not browsed at leisure." },
-      { id: "sql", label: "SQL", note: "Schema decisions matter more when the data is read under pressure." },
-      { id: "php", label: "PHP", note: "Oxy Gas's storefront runs on it." },
-      { id: "csharp", label: "C#", note: "Backend language in the toolkit." }, // [FILL] your own note
+      {
+        id: "nodejs",
+        label: "Node.js",
+        note: "Server-side JavaScript. This site's contact form and shell assistant run as Node serverless functions.",
+      },
+      {
+        id: "php",
+        label: "PHP",
+        note: "Server-rendered pages and form handling that run on almost any host. The Oxy Gas storefront is PHP.",
+      },
+      {
+        id: "csharp",
+        label: "C#",
+        note: "Typed .NET code for Windows services, integrations and internal tools, often running next to SQL Server.",
+      },
+      {
+        id: "sql",
+        label: "SQL",
+        note: "Joins, indexes and query plans. A slow screen is often a missing index, or a query reading far more rows than it returns.",
+      },
+      {
+        id: "postgresql",
+        label: "PostgreSQL",
+        note: "Open-source relational database with real constraints, JSON columns and good tooling. A sensible default for a new web app.",
+      },
+      {
+        id: "mssql",
+        label: "Microsoft SQL Server",
+        note: "Holds event and operations data that gets queried in a hurry during an incident, so indexes, backups and log growth need regular checks.",
+      },
+    ],
+  },
+  {
+    id: "automation",
+    label: "AI & automation",
+    caption: "what takes the repetitive work",
+    color: "lime",
+    nodes: [
+      {
+        id: "gemini",
+        label: "Gemini API",
+        tag: "this site's shell",
+        note: "The model behind this site's shell. A serverless function keeps the key off the browser and falls back to another Gemini model when one is busy.",
+      },
+      {
+        id: "llm",
+        label: "LLM integrations",
+        note: "A model given one narrow job inside an existing system, such as summarising, sorting or drafting, so useful signals surface sooner. A person still makes the call.",
+      },
+      {
+        id: "aitools",
+        label: "AI tooling",
+        note: "Assistants for reading logs, drafting scripts and reviewing code. Good for a first pass; anything headed for production still gets read and tested.",
+      },
+      {
+        id: "powershell",
+        label: "PowerShell",
+        note: "Scripts for repetitive Windows work: checking services, collecting logs, applying one setting across many machines.",
+      },
     ],
   },
   {
@@ -286,10 +378,33 @@ export const SKILLS: readonly SkillLayer[] = [
     caption: "what it all runs on",
     color: "teal",
     nodes: [
-      { id: "vms", label: "Video Management Systems", note: "Large-scale rollouts across mine sites." },
-      { id: "restore", label: "Server Node Restoration", note: "Done on-site, in the server room — not from a laptop." },
-      { id: "network", label: "Networking", note: "Software is only as good as the network under it." },
-      { id: "multisite", label: "Multi-Site Deployment", note: "One standard, several sites." },
+      {
+        id: "vms",
+        label: "Video Management Systems",
+        tag: "Axxon One · PSIM",
+        note: "Axxon One as VMS and PSIM: cameras, recording and retention on one side; alarms, event rules and operator views on the other.",
+      },
+      {
+        id: "network",
+        label: "Networking",
+        note: "Switching, VLANs and IP plans for camera and server networks. Video is heavy, constant traffic, so the network has to be sized for it.",
+      },
+      {
+        id: "multisite",
+        label: "Multi-Site Deployment",
+        note: "The same configuration, naming and access rules at every site, so each one can be supported the same way.",
+      },
+      {
+        id: "restore",
+        label: "Server Nodes",
+        tag: "restoration · maintenance",
+        note: "Hands-on work in the server room: replacing disks, rebuilding arrays, reinstalling the OS and services, then checking recordings are being written again.",
+      },
+      {
+        id: "linux",
+        label: "Linux Migrations",
+        note: "Moving services onto Linux hosts: list what actually runs, rebuild it from config, then cut over with a way back.",
+      },
     ],
   },
 ];
@@ -303,7 +418,7 @@ export const SHELL_COMMANDS: readonly ShellCommand[] = [
   { name: "help", desc: "list commands" },
   { name: "whoami", desc: "who, where, and whether available" },
   { name: "projects", desc: "the seven platforms — projects <n> for detail" },
-  { name: "stack", desc: "the three layers, top to bottom" },
+  { name: "stack", desc: "the four layers, top to bottom" },
   { name: "time", desc: "Durban time, SAST" },
   { name: "cv", desc: "where to get a CV" },
   { name: "clear", desc: "clear the screen" },

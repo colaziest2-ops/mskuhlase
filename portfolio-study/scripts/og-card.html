@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+  Source for public/og.png, the 1200×630 link-preview image (og:image / twitter:image).
+  To regenerate: open this file in a browser at a 1200×630 viewport, device scale 1, wait for
+  the fonts, and screenshot the viewport as PNG to public/og.png. Keep the role line in step
+  with PERSON.role in src/content.ts.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>OG card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500&display=block" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0908;
+    --ink: #e8e4dc;
+    --dim: #9a958c;
+    --faint: #5c584f;
+    --amber: #e8a23b;
+    --rose: #ff7a9c;
+    --violet: #a98bff;
+    --teal: #4fd6c1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+  body {
+    position: relative;
+    color: var(--ink);
+    font-family: "Space Grotesk", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* the site's desk: a lamp high on the left, a faint warm spill bottom-right */
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(760px 520px at 24% 8%, #1c1a17 0%, transparent 70%),
+      radial-gradient(700px 520px at 96% 108%, rgb(232 160 96 / 0.07), transparent 70%),
+      linear-gradient(#12100e, #0a0908);
+  }
+  .card {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    padding: 64px 80px 58px;
+    display: flex;
+    flex-direction: column;
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mark {
+    font-family: "Fraunces", serif;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: 0.01em;
+  }
+  .mark i {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-left: 3px;
+    border-radius: 50%;
+    background: var(--rose);
+  }
+  .where {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .where b { color: var(--faint); font-weight: 400; margin: 0 0.35em; }
+  .name {
+    margin-top: 46px;
+    font-family: "Fraunces", serif;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144;
+    font-size: 150px;
+    line-height: 0.9;
+    letter-spacing: -0.028em;
+  }
+  .name span { display: block; }
+  .name .last { margin-top: 6px; }
+  .role {
+    margin-top: 38px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .role .sep { color: var(--faint); margin: 0 0.5em; }
+  .foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 22px;
+    border-top: 1px solid rgb(232 228 220 / 0.1);
+  }
+  .url {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .heat {
+    display: flex;
+    gap: 6px;
+  }
+  .heat i {
+    width: 34px;
+    height: 3px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div class="mark">SK<i></i></div>
+      <div class="where">Durban<b>·</b>South Africa</div>
+    </div>
+
+    <h1 class="name">
+      <span>Siyabonga</span>
+      <span class="last" id="last">Kuhlase</span>
+    </h1>
+
+    <p class="role">
+      <span style="color: var(--amber)">Software Engineer</span><span class="sep">·</span><span style="color: var(--teal)">Full-Stack &amp; Networking</span><span class="sep">·</span><span style="color: var(--violet)">AI Solutions</span><span class="sep">·</span><span style="color: var(--rose)">Technical Operations</span>
+    </p>
+
+    <div class="foot">
+      <div class="url">mskuhlase.vercel.app</div>
+      <div class="heat" aria-hidden="true">
+        <i style="background: var(--amber)"></i><i style="background: var(--rose)"></i><i style="background: var(--violet)"></i><i style="background: var(--teal)"></i>
+      </div>
+    </div>
+  </div>
+  <script>
+    // The surname runs amber → rose → violet, letter by letter, as it does on the site.
+    const el = document.getElementById("last");
+    const chars = [...el.textContent];
+    const mix = (a, b, f) => `color-mix(in srgb, var(--${a}) ${Math.round((1 - f) * 100)}%, var(--${b}))`;
+    el.innerHTML = chars
+      .map((ch, i) => {
+        const f = i / (chars.length - 1);
+        const c = f < 0.5 ? mix("amber", "rose", f * 2) : mix("rose", "violet", (f - 0.5) * 2);
+        return `<span style="display:inline;color:${c}">${ch}</span>`;
+      })
+      .join("");
+  </script>
+</body>
+</html>

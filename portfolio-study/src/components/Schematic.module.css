@@ -1,7 +1,7 @@
 ﻿.diagram {
   position: relative;
-  height: 450px; /* three strata × 150px */
-  margin-bottom: 70px; /* room for the last note to open downward */
+  height: calc(var(--layers, 4) * 150px); /* one stratum per layer */
+  margin-bottom: 84px; /* room for the last note to open downward */
 }
 
 @property --reveal {
@@ -42,6 +42,36 @@
   stroke-width: 22px;
   vector-effect: non-scaling-stroke;
   pointer-events: stroke;
+}
+
+/* a packet: a small bright core in a soft halo of the connection's colour. Position and opacity
+   are written per frame by Schematic.tsx, and only while its connection is lit. */
+.packet {
+  pointer-events: none;
+}
+
+.halo {
+  fill: var(--lc);
+  opacity: 0.55;
+}
+
+.core {
+  fill: color-mix(in srgb, var(--lc) 45%, #ffffff);
+}
+
+/* on paper a coloured dot vanishes into its own coloured line, so the packet becomes a light bead with a coloured rim */
+:global(:root[data-theme="light"]) .core {
+  fill: var(--field-2);
+  stroke: var(--lc);
+  stroke-width: 1.6px;
+}
+
+:global(:root[data-theme="light"]) .halo {
+  opacity: 0.45;
+}
+
+:global([data-reduced="true"]) .packet {
+  display: none;
 }
 
 .layer {
@@ -86,34 +116,67 @@
   left: var(--x);
   top: 58px; /* DOT_Y */
   z-index: 2;
+  /* never wider than the gap to the next node (--w comes from Schematic.tsx), so labels wrap instead of colliding */
+  max-width: calc(var(--w, 20%) - 24px);
   opacity: 0;
   transform: scale(0.4) translateY(10px);
   transform-origin: 0 50%;
   transition:
     opacity calc(0.5s * var(--z, 1)) var(--ease-out),
     transform calc(0.7s * var(--z, 1)) var(--ease-spring);
-  transition-delay: calc((0.15s + var(--k) * 0.07s) * var(--z, 1));
+  transition-delay: calc((0.15s + var(--k) * 0.05s) * var(--z, 1));
 }
 .diagram[data-in="true"] .slot {
   opacity: 1;
   transform: none;
 }
 
+/* the open note floats over the layers below it */
+.slot[data-open="true"] {
+  z-index: 6;
+}
+
 .node {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 6px 8px 6px 0;
   margin-left: -18px; /* centre the logo chip on the node's x, which is where the connecting lines land */
   background: none;
   border: 0;
   cursor: pointer;
   font-family: var(--font-label);
-  font-size: 0.82rem;
-  white-space: nowrap;
+  font-size: 0.8rem;
+  text-align: left;
   color: var(--ink-dim);
   transform: translateY(-50%);
   transition: color var(--rail-time) var(--ease-out);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.label {
+  text-wrap: balance;
+}
+
+/* the product or scope behind a category label */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--lc) 30%, var(--ink-dim));
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+.node:hover .tag,
+.node[aria-expanded="true"] .tag {
+  color: color-mix(in srgb, var(--lc) 75%, var(--ink));
 }
 
 .node:hover,
@@ -155,7 +218,7 @@
   top: 34px;
   left: -18px;
   width: max-content;
-  max-width: min(300px, 70vw);
+  max-width: min(320px, 70vw);
   padding: 10px 12px 12px;
   background: var(--field-1);
   border: 1px solid rgb(var(--edge) / 0.12);
@@ -256,6 +319,7 @@
 
   .slot {
     position: static;
+    max-width: none;
   }
   /* the slot that holds the open note spans the row, so the note isn't squeezed to the button's width */
   .slot:has(.note) {

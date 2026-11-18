@@ -242,3 +242,54 @@
 :global([data-reduced="true"]) .icons li {
   transition: none;
 }
+
+/* the call to action breathes and its arrow nudges toward the stack, so the next step is obvious */
+.open {
+  position: relative;
+}
+.gate[data-phase="closed"] .open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: callRing calc(2.4s * var(--z, 1)) var(--ease-out) infinite;
+}
+.gate[data-phase="closed"] .open svg {
+  animation: callNudge calc(1.2s * var(--z, 1)) ease-in-out infinite;
+}
+
+@keyframes callRing {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-rose) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--c-rose) 0%, transparent);
+  }
+}
+
+@keyframes callNudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 5px 0;
+  }
+}
+
+.open:active {
+  transform: scale(0.95);
+  transition-duration: 60ms;
+}
+
+/* the app icons press in like real ones */
+.icons li {
+  cursor: default;
+}
+
+:global([data-reduced="true"]) .gate .open::before,
+:global([data-reduced="true"]) .gate .open svg {
+  animation: none;
+}

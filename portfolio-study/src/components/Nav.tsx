@@ -1,30 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
-import { SECTIONS } from "../content";
+import { useEffect, useRef } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { Clock } from "./Clock";
 import { ThemeToggle } from "./ThemeToggle";
 import styles from "./Nav.module.css";
 
 interface NavProps {
-  readonly active: number;
   readonly onGo: (index: number) => void;
   readonly reduced: boolean;
-  /** Phones have no `C` key and no room for a floating button, so the crumple lives in the menu. */
+  /** Phones have no `C` key and no room for the floating button, so the crumple sits up here. */
   readonly onCrumple?: () => void;
 }
 
-const tint = (i: number) => ({ "--lc": `var(--c-${SECTIONS[i]?.color ?? "amber"})` }) as CSSProperties;
-
 /**
- * The top bar: brand, section links (each lit in its own colour), the Durban
- * clock, the theme toggle, and on phones a menu that unfolds beneath it. A
- * rainbow hairline along its edge fills as you scroll.
+ * The top bar: brand, the Durban clock pill with the theme toggle, and (on
+ * phones) the crumple button. Section navigation lives in the Flow Tab Bar at
+ * the bottom. A rainbow hairline along the bar's edge fills as you scroll.
  */
-export function Nav({ active, onGo, reduced, onCrumple }: NavProps) {
-  const [open, setOpen] = useState(false);
+export function Nav({ onGo, reduced, onCrumple }: NavProps) {
   const progress = useRef<HTMLSpanElement>(null);
-  const wrap = useRef<HTMLElement>(null);
 
   useEffect(
     () =>
@@ -34,52 +27,12 @@ export function Nav({ active, onGo, reduced, onCrumple }: NavProps) {
     [],
   );
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    const onDown = (e: PointerEvent) => {
-      if (wrap.current && e.target instanceof Node && !wrap.current.contains(e.target)) setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("pointerdown", onDown);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("pointerdown", onDown);
-    };
-  }, [open]);
-
-  const go = (i: number) => {
-    setOpen(false);
-    onGo(i);
-  };
-
   return (
-    <header ref={wrap} className={styles.wrap} data-open={open}>
-      <nav className={styles.bar} aria-label="Primary">
-        <button type="button" className={styles.brand} onClick={() => go(0)} aria-label="Siyabonga Kuhlase — back to top">
+    <header className={styles.wrap}>
+      <div className={styles.bar}>
+        <button type="button" className={styles.brand} onClick={() => onGo(0)} aria-label="Siyabonga Kuhlase — back to top">
           SK<i />
         </button>
-
-        <ul className={styles.links}>
-          {SECTIONS.map((s, i) =>
-            i === 0 ? null : (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  className={styles.link}
-                  style={tint(i)}
-                  data-active={i === active}
-                  aria-current={i === active ? "true" : undefined}
-                  onClick={() => go(i)}
-                >
-                  {s.label}
-                </button>
-              </li>
-            ),
-          )}
-        </ul>
 
         <div className={styles.tools}>
           <div className={styles.pill}>
@@ -88,51 +41,16 @@ export function Nav({ active, onGo, reduced, onCrumple }: NavProps) {
             </div>
             <ThemeToggle />
           </div>
-          <button
-            type="button"
-            className={styles.burger}
-            aria-expanded={open}
-            aria-controls="nav-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((o) => !o)}
-          >
-            <span />
-            <span />
-          </button>
+          {onCrumple && (
+            <button type="button" className={styles.crumple} onClick={onCrumple} aria-label="Crumple the page" title="Crumple the page">
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.3">
+                <path d="M2 11 5.5 4 8 10 10.5 3 14 12" strokeLinejoin="round" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
         </div>
 
         <span ref={progress} className={styles.progress} aria-hidden="true" />
-      </nav>
-
-      <div id="nav-menu" className={styles.menu} data-open={open} inert={!open}>
-        <ul>
-          {SECTIONS.map((s, i) => (
-            <li key={s.id} style={{ ...tint(i), "--n": i } as CSSProperties}>
-              <button type="button" className={styles.item} data-active={i === active} onClick={() => go(i)}>
-                <span className={styles.num}>{String(i + 1).padStart(2, "0")}</span>
-                <span className={styles.name}>{s.label}</span>
-                <span className={styles.what}>{s.title}</span>
-              </button>
-            </li>
-          ))}
-          {onCrumple && (
-            <li style={{ "--lc": "var(--c-rose)", "--n": SECTIONS.length } as CSSProperties}>
-              <button
-                type="button"
-                className={`${styles.item} ${styles.extra}`}
-                onClick={() => {
-                  setOpen(false);
-                  // let the menu fold away first so it isn't part of what gets crumpled
-                  window.setTimeout(onCrumple, 260);
-                }}
-              >
-                <span className={styles.num}>✦</span>
-                <span className={styles.name}>Crumple the page</span>
-                <span className={styles.what}>fold it up, watch it settle</span>
-              </button>
-            </li>
-          )}
-        </ul>
       </div>
     </header>
   );

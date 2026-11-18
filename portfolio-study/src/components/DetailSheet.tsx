@@ -148,7 +148,7 @@ export function DetailSheet({ project, index, total, grain, onClose }: DetailShe
 
         <div className={styles.foot}>
           <a className={styles.visit} href={project.url} target="_blank" rel="noopener noreferrer">
-            Visit live site ↗
+            Visit live site <span className={styles.arrow}>↗</span>
           </a>
         </div>
       </div>

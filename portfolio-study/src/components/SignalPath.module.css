@@ -1,0 +1,560 @@
+/* ---- Signal path: one request traced from the screen to the camera ------------------------ */
+
+.wrap {
+  margin-top: clamp(40px, 8vh, 88px);
+}
+
+.head {
+  max-width: 640px;
+  margin-bottom: clamp(28px, 5vh, 48px);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-teal);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+
+.title {
+  margin-top: 12px;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.55rem, 3.2vw, 2.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 52ch;
+  margin-top: 12px;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--ink-dim);
+}
+
+/* readout on the left, the trace on the right; phones and tablets get the trace alone */
+.body {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+/* ---- the probe readout ------------------------------------------------------------- */
+
+.probe {
+  --hc: var(--c-rose);
+  position: sticky;
+  top: 32vh;
+  padding: 16px 18px 18px;
+  border: 1px solid rgb(var(--edge) / 0.13);
+  background: color-mix(in srgb, var(--field-1) 72%, transparent);
+  font-family: var(--font-mono);
+}
+
+/* registration corners, in the colour of the hop the request last reached */
+.probe::before,
+.probe::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 0 solid var(--hc);
+  transition: border-color var(--rail-time) var(--ease-out);
+}
+.probe::before {
+  top: -1px;
+  left: -1px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+.probe::after {
+  right: -1px;
+  bottom: -1px;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.probeHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.probeHead b {
+  font-weight: 600;
+  color: var(--hc);
+}
+
+.probeName {
+  margin-top: 16px;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.probeTech {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.probeLink {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px dashed rgb(var(--edge) / 0.16);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--hc);
+}
+
+.meter {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  margin-top: 14px;
+}
+
+.meter i {
+  height: 6px;
+  background: rgb(var(--edge) / 0.1);
+  transition:
+    background-color var(--rail-time) var(--ease-out),
+    box-shadow var(--rail-time) var(--ease-out);
+}
+
+.meter i[data-on="true"] {
+  background: var(--hc);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--hc) 45%, transparent);
+}
+
+/* ---- the board: trace underneath, hops on top, the packet above both ------------------ */
+
+.board {
+  --col: 44px; /* width of the trace column */
+  --step: 28px; /* each hop sits a step further in: the request descends */
+  --padY: 9px; /* pad centre, from the top of its hop */
+  --pc: var(--c-rose);
+  position: relative;
+  min-width: 0;
+}
+
+.trace,
+.flight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.trace {
+  z-index: 0;
+}
+
+.flight {
+  z-index: 2;
+}
+
+.base {
+  fill: none;
+  stroke: rgb(var(--edge) / 0.17);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.lit,
+.litGlow {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: butt;
+}
+
+.lit {
+  stroke-width: 2;
+}
+
+.litGlow {
+  stroke-width: 8;
+  opacity: 0.2;
+}
+
+:global(:root[data-theme="light"]) .litGlow {
+  opacity: 0.12;
+}
+
+.origin {
+  fill: var(--field-1);
+  stroke: var(--c-rose);
+  stroke-width: 1.5;
+}
+
+.ground path {
+  fill: none;
+  stroke: rgb(var(--edge) / 0.24);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke var(--rail-time) var(--ease-out);
+}
+
+.ground[data-on="true"] path {
+  stroke: var(--c-teal);
+}
+
+/* ---- hops ------------------------------------------------------------------------- */
+
+.hops {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hop {
+  --hc: var(--c-teal);
+  position: relative;
+  padding: 0 0 46px calc(var(--col) + var(--i) * var(--step) + 14px);
+}
+
+.hop:last-child {
+  padding-bottom: 60px; /* room for the earth symbol */
+}
+
+/* a PCB pad with a via through it; it lights in its hop's colour when the request arrives */
+.pad {
+  position: absolute;
+  top: calc(var(--padY) - 7px);
+  left: calc(var(--i) * var(--step) + var(--col) / 2 - 7px);
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgb(var(--edge) / 0.32);
+  border-radius: 3px;
+  background: var(--field-1);
+  transition:
+    border-color var(--rail-time) var(--ease-out),
+    background-color var(--rail-time) var(--ease-out),
+    box-shadow calc(0.5s * var(--z, 1)) var(--ease-out);
+}
+
+.pad::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: rgb(var(--edge) / 0.24);
+  transition: background-color var(--rail-time) var(--ease-out);
+}
+
+.pad::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1px solid var(--hc);
+  border-radius: 4px;
+  opacity: 0;
+}
+
+.hop[data-on="true"] .pad {
+  border-color: var(--hc);
+  background: color-mix(in srgb, var(--hc) 28%, var(--field-1));
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--hc) 13%, transparent),
+    0 0 18px color-mix(in srgb, var(--hc) 50%, transparent);
+}
+
+.hop[data-on="true"] .pad::before {
+  background: var(--hc);
+}
+
+/* one ring goes out as the request lands */
+.hop[data-on="true"] .pad::after {
+  animation: land calc(0.9s * var(--z, 1)) var(--ease-out) both;
+}
+
+@keyframes land {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: calc(var(--padY) * 2);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.hop[data-on="true"] .kicker {
+  color: var(--ink-dim);
+}
+
+.idx {
+  font-weight: 600;
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+.hop[data-on="true"] .idx {
+  color: var(--hc);
+}
+
+.name {
+  margin: 6px 0 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink-dim);
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+.hop[data-on="true"] .name {
+  color: var(--ink);
+}
+
+.tech {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  transition: color var(--rail-time) var(--ease-out);
+}
+
+.hop[data-on="true"] .tech {
+  color: var(--ink-dim);
+}
+
+.logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--hc); /* generic icons take the hop's colour; brand marks keep their own */
+  filter: grayscale(1);
+  opacity: 0.45;
+  transition:
+    filter calc(0.4s * var(--z, 1)) var(--ease-out),
+    opacity calc(0.4s * var(--z, 1)) var(--ease-out);
+}
+
+.hop[data-on="true"] .logos {
+  filter: none;
+  opacity: 1;
+}
+
+/* The observation is always in the DOM. Until the request arrives it sits behind a clip, over
+   ruled placeholder lines; then it wipes in from the left. */
+.note {
+  position: relative;
+  max-width: 58ch;
+  margin-top: 10px;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* dashed rules, one per line of text still to come */
+.note::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 calc(1.6em - 0.42em),
+    rgb(var(--edge) / 0.2) calc(1.6em - 0.42em) calc(1.6em - 0.42em + 1px),
+    transparent calc(1.6em - 0.42em + 1px) 1.6em
+  );
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 9px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 9px);
+  transition: opacity calc(0.5s * var(--z, 1)) var(--ease-out);
+}
+
+.noteText {
+  display: block;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path calc(0.8s * var(--z, 1)) var(--ease-out) calc(0.12s * var(--z, 1));
+}
+
+.hop[data-on="true"] .note::before {
+  opacity: 0;
+}
+
+.hop[data-on="true"] .noteText {
+  clip-path: inset(0 -2% 0 0);
+}
+
+.link {
+  position: relative;
+  display: inline-block;
+  margin-top: 16px;
+  padding: 3px 8px;
+  border: 1px solid rgb(var(--edge) / 0.14);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition:
+    color var(--rail-time) var(--ease-out),
+    border-color var(--rail-time) var(--ease-out);
+}
+
+/* a net label: tied back to the trace with a dashed lead */
+.link::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: calc(var(--col) / 2 + 14px);
+  border-top: 1px dashed currentColor;
+  opacity: 0.7;
+}
+
+.hop[data-on="true"] .link {
+  color: var(--hc);
+  border-color: color-mix(in srgb, var(--hc) 45%, transparent);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- the packet ------------------------------------------------------------------- */
+
+.packetHalo {
+  fill: var(--pc);
+  opacity: 0.6;
+}
+
+.packetCore {
+  fill: color-mix(in srgb, var(--pc) 40%, #ffffff);
+}
+
+.wake {
+  fill: var(--pc);
+}
+
+:global(:root[data-theme="light"]) .packetCore {
+  fill: var(--field-2);
+  stroke: var(--pc);
+  stroke-width: 2px;
+}
+
+:global(:root[data-theme="light"]) .packetHalo {
+  opacity: 0.38;
+}
+
+/* waiting at the port: the halo breathes until the request is sent */
+.packet[data-state="idle"] .packetHalo {
+  animation: armed calc(1.8s * var(--z, 1)) ease-in-out infinite;
+}
+
+@keyframes armed {
+  50% {
+    opacity: 0.12;
+  }
+}
+
+/* ---- breakpoints ------------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .probe {
+    display: none;
+  }
+  .board {
+    --step: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .board {
+    --col: 28px;
+    --step: 0px;
+  }
+  .hop {
+    padding-left: calc(var(--col) + 12px);
+    padding-bottom: 36px;
+  }
+  .hop:last-child {
+    padding-bottom: 58px;
+  }
+  .link::before {
+    width: calc(var(--col) / 2 + 12px);
+  }
+  .note {
+    font-size: 0.94rem;
+  }
+  .kicker,
+  .tech,
+  .link {
+    font-size: 0.72rem;
+  }
+}
+
+/* ---- reduced motion: the end state, still ----------------------------------------- */
+
+:global([data-reduced="true"]) .flight {
+  display: none;
+}
+
+:global([data-reduced="true"]) .pad,
+:global([data-reduced="true"]) .pad::before,
+:global([data-reduced="true"]) .note::before,
+:global([data-reduced="true"]) .noteText,
+:global([data-reduced="true"]) .logos,
+:global([data-reduced="true"]) .name,
+:global([data-reduced="true"]) .idx,
+:global([data-reduced="true"]) .tech,
+:global([data-reduced="true"]) .link,
+:global([data-reduced="true"]) .meter i,
+:global([data-reduced="true"]) .ground path {
+  transition: none;
+}
+
+:global([data-reduced="true"]) .pad::after,
+:global([data-reduced="true"]) .packetHalo {
+  animation: none;
+}

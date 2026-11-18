@@ -170,3 +170,21 @@ html.theme-pour * {
     scroll-behavior: auto;
   }
 }
+
+/* Touch should feel instant: no double-tap-zoom wait, no grey flash; every control
+   also gets a pressed state below so a tap visibly lands before anything else happens. */
+a,
+button,
+[role="button"],
+input,
+textarea,
+select,
+label {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):active,
+a:active {
+  transition-duration: 60ms;
+}

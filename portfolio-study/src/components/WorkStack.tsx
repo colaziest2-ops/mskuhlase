@@ -511,9 +511,36 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
       pull(pi);
       return;
     }
-    // Touch: a tap anywhere on the front card (except its own buttons and links) opens it.
-    if ((coarse || narrowRef.current) && !(e?.target instanceof Element && e.target.closest("a, button"))) openFront();
+    // A tap or click on the front card that misses its buttons: the card shrugs, says so,
+    // and points at the button that does the thing — guided, never a dead click.
+    if (!(e?.target instanceof Element && e.target.closest("a, button"))) missed(pi, e);
   };
+
+  /* ---- guidance: a touch ripple, the "missed me" nudge, and arrows on the next step ---- */
+
+  const [tap, setTap] = useState<{ pi: number; x: number; y: number; k: number; miss: boolean } | null>(null);
+  const tapTimer = useRef(0);
+  /** 0: point at Open · 1: they've opened one, now point at Visit */
+  const [guide, setGuide] = useState(0);
+
+  const tapAt = (pi: number, clientX: number, clientY: number, miss: boolean) => {
+    const paper = rigs[pi]?.paper;
+    if (!paper) return;
+    const r = paper.getBoundingClientRect();
+    setTap((t) => ({ pi, x: clientX - r.left, y: clientY - r.top, k: (t?.k ?? 0) + 1, miss }));
+    window.clearTimeout(tapTimer.current);
+    tapTimer.current = window.setTimeout(() => setTap(null), miss ? 1700 : 700);
+  };
+
+  const missed = (pi: number, e?: ReactMouseEvent) => {
+    if (!e) return;
+    tapAt(pi, e.clientX, e.clientY, true);
+  };
+
+  useEffect(() => () => window.clearTimeout(tapTimer.current), []);
+  useEffect(() => {
+    if (expanded !== null || sheet !== null) setGuide(1);
+  }, [expanded, sheet]);
 
   const front = order[0] ?? 0;
   const frontProject = PROJECTS[front];
@@ -549,7 +576,11 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
               data-front={isFront}
               data-expanded={isExp}
               data-dimmed={expanded !== null && !isExp}
-              onPointerDown={(e) => onPointerDown(e, pi)}
+              onPointerDown={(e) => {
+                // a small ripple where the finger (or click) lands: you always see the touch register
+                if (isFront && expandedRef.current === null && e.button === 0) tapAt(pi, e.clientX, e.clientY, false);
+                onPointerDown(e, pi);
+              }}
               onPointerMove={(e) => {
                 // the holographic sheen follows the pointer across the front card
                 if (!isFront) return;
@@ -598,8 +629,23 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                 }}
                 className={styles.paper}
                 data-paper=""
+                data-miss={tap?.pi === pi && tap.miss ? (tap.k % 2 ? "a" : "b") : undefined}
               >
                 <span className={styles.sheen} aria-hidden="true" />
+                {tap?.pi === pi && (
+                  <span
+                    key={tap.k}
+                    className={styles.ripple}
+                    data-miss={tap.miss}
+                    style={{ "--mx": `${tap.x}px`, "--my": `${tap.y}px` } as CSSProperties}
+                    aria-hidden="true"
+                  />
+                )}
+                {tap?.pi === pi && tap.miss && (
+                  <span key={`m${tap.k}`} className={styles.missed} role="status">
+                    Missed me! Tap <b>Open</b> to read more
+                  </span>
+                )}
                 {isFront ? (
                   <div className={styles.tab}>
                     <span className={styles.idx}>{n}</span>
@@ -640,10 +686,10 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                     <div className={styles.foot}>
                       <span className={styles.domain}>{p.domain}</span>
                       <span className={styles.actions}>
-                        <button type="button" onClick={openFront}>
+                        <button type="button" onClick={openFront} data-guide={isFront && guide === 0} data-nudge={tap?.pi === pi && tap.miss}>
                           Open <kbd>E</kbd>
                         </button>
-                        <a href={p.url} target="_blank" rel="noopener noreferrer">
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" data-guide={isFront && guide === 1}>
                           Visit ↗
                         </a>
                       </span>
@@ -691,8 +737,8 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
         </span>
         <span>
           {narrow || coarse
-            ? "tap a tab to pull it forward · tap the card to open it"
-            : "click a tab to pull it forward · drag the top card to peel · double-click or E to open"}
+            ? "① tap a tab to bring it forward · ② tap Open · ③ Visit the live site"
+            : "① click a tab to bring it forward · ② Open (or E) · ③ Visit — drag the top card to peel"}
         </span>
       </p>
 

@@ -28,7 +28,10 @@
   width: min(100%, 560px);
   max-height: min(88vh, 720px);
   max-height: min(88svh, 720px);
-  background: linear-gradient(168deg, var(--paper) 0%, var(--paper-aged) 100%);
+  background:
+    radial-gradient(120% 60% at 0% 0%, color-mix(in srgb, var(--ac) 16%, transparent), transparent 55%),
+    radial-gradient(90% 50% at 100% 100%, rgb(186 168 255 / 0.18), transparent 60%),
+    linear-gradient(160deg, rgb(255 255 255 / 0.98), rgb(243 240 250 / 0.96));
   color: #1b1916;
   border-radius: 24px 24px 0 0;
   box-shadow: 0 -24px 70px rgb(0 0 0 / 0.5);
@@ -40,14 +43,14 @@
   transform: none;
 }
 
-/* the same paper grain the cards have */
+/* the same faint frosting the cards have */
 .panel::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: var(--grain);
   mix-blend-mode: multiply;
-  opacity: 0.5;
+  opacity: 0.16;
   pointer-events: none;
 }
 
@@ -234,4 +237,31 @@
 :global([data-reduced="true"]) .panel,
 :global([data-reduced="true"]) .backdrop {
   transition: none;
+}
+
+/* step ③: the arrow keeps nudging out toward the live site */
+.arrow {
+  display: inline-block;
+  margin-left: 4px;
+  animation: visitNudge calc(1.3s * var(--z, 1)) ease-in-out infinite;
+}
+
+@keyframes visitNudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 3px -3px;
+  }
+}
+
+.visit:active,
+.close:active {
+  transform: scale(0.95);
+  transition-duration: 60ms;
+}
+
+:global([data-reduced="true"]) .arrow {
+  animation: none;
 }

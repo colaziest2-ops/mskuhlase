@@ -1,0 +1,164 @@
+/* Geist 500, self-hosted, for the tab labels only (SIL OFL 1.1, see /fonts/Geist-OFL.txt) */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The stage is drawn at 380 x 84 and scaled as a whole (--s), so the shader, the
+   hit areas and the icons always line up — on a 360px phone or a 27" screen. */
+.wrap {
+  --s: 1;
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 82;
+  width: calc(380px * var(--s));
+  height: calc(84px * var(--s));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 380px;
+  height: 84px;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+}
+
+/* the real page, frosted, under the shader's glass */
+.blur {
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  width: 368px;
+  height: 64px;
+  border-radius: 32px;
+  background: rgb(10 9 8 / 0.25);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 380px;
+  height: 84px;
+}
+
+/* no WebGL2: a plain glass bar and a CSS bead driven by the same numbers */
+.wrap[data-gl="off"] .canvas {
+  display: none;
+}
+.wrap[data-gl="off"] .blur {
+  background: rgb(14 13 12 / 0.86);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    0 8px 24px rgb(0 0 0 / 0.35);
+}
+.cssBead {
+  display: none;
+}
+.wrap[data-gl="off"] .cssBead {
+  display: block;
+  position: absolute;
+  left: calc(var(--bx) - var(--hw));
+  top: calc(var(--by) - var(--hh));
+  width: calc(var(--hw) * 2);
+  height: calc(var(--hh) * 2);
+  border-radius: 999px;
+  background: rgb(255 255 255 / calc(0.14 - var(--depth) * 0.1));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  opacity: calc(1 - var(--depth) * 0.6);
+}
+
+.tabs {
+  position: absolute;
+  left: 16px;
+  top: 10px;
+  display: flex;
+  width: 348px;
+  height: 64px;
+  pointer-events: auto;
+}
+
+.tabs li {
+  --a: 0;
+  --e: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.tab {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 28px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: color-mix(in srgb, var(--tc) calc(var(--a) * 100%), rgb(232 228 220 / 0.6));
+}
+
+.tab:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.75);
+  outline-offset: -5px;
+}
+
+/* icon lifts and grows as the bead surfaces under it; its stroke is erased and redrawn on the move */
+.icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: var(--e);
+  transform: translateY(calc(var(--a) * -8px)) scale(calc(1 + var(--a) * 0.14));
+  filter: drop-shadow(0 0 calc(var(--a) * 6px) color-mix(in srgb, var(--tc) 70%, transparent));
+}
+
+.tab:hover .icon {
+  color: rgb(255 255 255 / 0.9);
+}
+
+/* the label fades in from a blur under the lifted icon */
+.label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9px;
+  overflow: hidden;
+  font-family: "Geist", var(--font-label);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--tc) 35%, #fff);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+  opacity: var(--a);
+  filter: blur(calc((1 - var(--a)) * 6px));
+  transform: translateY(calc((1 - var(--a)) * 5px));
+}
+
+/* press feedback: instant on touch, same family as the hover lift */
+.tab:active .icon {
+  transform: translateY(calc(var(--a) * -8px)) scale(calc(0.9 + var(--a) * 0.14));
+  transition: transform 60ms;
+}

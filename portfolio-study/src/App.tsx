@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cursor } from "./components/Cursor";
+import { FlowTabBar } from "./components/FlowTabBar";
 import { Nav } from "./components/Nav";
 import { Orbs } from "./components/Orbs";
 import { Rail } from "./components/Rail";
@@ -117,8 +118,9 @@ export function App() {
       <Stage active={active} onActive={onActive} apiRef={apiRef} reduced={reduced} />
       <canvas ref={canvas} className={styles.creases} aria-hidden="true" />
 
-      <Nav active={active} onGo={goTo} reduced={reduced} onCrumple={doCrumple} />
-      <Rail active={active} onGo={goTo} reduced={reduced} />
+      <Nav onGo={goTo} reduced={reduced} onCrumple={doCrumple} />
+      <Rail active={active} />
+      <FlowTabBar active={active} onGo={goTo} reduced={reduced} />
       <Cursor reduced={reduced} />
 
       <button

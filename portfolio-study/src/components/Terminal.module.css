@@ -201,3 +201,7 @@
   background: var(--c-lime);
   opacity: 0.6;
 }
+
+.snd:active {
+  transform: scale(0.95);
+}
