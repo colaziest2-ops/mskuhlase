@@ -446,7 +446,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                   style={{ width: "100%", aspectRatio: "375 / 667" }}
                 />
               </div>
-              <figcaption>{coarse ? "depth-mapped · the light drifts" : "depth-mapped · lit by your cursor"}</figcaption>
+              <figcaption>{coarse ? "touch the photo to move the lighting" : "hover your mouse to move the lighting"}</figcaption>
             </Reveal>
           </div>
         </section>

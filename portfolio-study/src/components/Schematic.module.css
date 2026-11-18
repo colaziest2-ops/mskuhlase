@@ -1,4 +1,4 @@
-.diagram {
+﻿.diagram {
   position: relative;
   height: 450px; /* three strata × 150px */
   margin-bottom: 70px; /* room for the last note to open downward */
@@ -63,7 +63,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.9em;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.66rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -108,7 +108,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.82rem;
   white-space: nowrap;
   color: var(--ink-dim);
@@ -161,7 +161,7 @@
   border: 1px solid rgb(var(--edge) / 0.12);
   border-radius: 3px;
   box-shadow: 0 14px 30px rgb(0 0 0 / 0.5);
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.74rem;
   line-height: 1.55;
   color: var(--ink);

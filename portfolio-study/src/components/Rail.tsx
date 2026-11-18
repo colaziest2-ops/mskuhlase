@@ -12,6 +12,15 @@ interface RailProps {
 
 const DECAY_S = 1.2;
 
+/** lucide icons (ISC), stroke-drawn; keyed by section id. The readout names the section on hover. */
+const ICONS: Readonly<Record<string, readonly string[]>> = {
+  home: ["M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"],
+  work: ["M3 7h18v13H3z", "M8 7V4h8v3", "M3 13h18"],
+  stack: ["m12 3 9 5-9 5-9-5z", "m3 12.5 9 5 9-5", "m3 17 9 5 9-5"],
+  play: ["M6 3.5v17L20 12z"],
+  contact: ["M3 5h18v14H3z", "m3 6 9 7 9-7"],
+};
+
 /**
  * The instrument rail. Hovering a marker lifts a line and previews the
  * section in the readout; the active marker carries "residual heat" that
@@ -50,7 +59,13 @@ export function Rail({ active, onGo, reduced }: RailProps) {
 
   return (
     <nav className={styles.rail} aria-label="Sections">
-      <p className={styles.readout} aria-hidden="true">
+      {/* keyed on the section so the distortion replays each time the readout changes */}
+      <p
+        key={shown}
+        className={styles.readout}
+        style={{ "--mc": `var(--c-${section?.color ?? "amber"})` } as CSSProperties}
+        aria-hidden="true"
+      >
         <span>{String(shown + 1).padStart(2, "0")}</span>
         {section?.title}
       </p>
@@ -72,7 +87,11 @@ export function Rail({ active, onGo, reduced }: RailProps) {
               onFocus={() => setHover(i)}
               onBlur={() => setHover((h) => (h === i ? null : h))}
             >
-              <span className={styles.label}>{s.label}</span>
+              <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
+                {(ICONS[s.id] ?? ICONS.home)?.map((d) => (
+                  <path key={d} d={d} />
+                ))}
+              </svg>
             </button>
           </li>
         ))}

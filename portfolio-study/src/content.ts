@@ -1,4 +1,4 @@
-/**
+﻿/**
  * All copy lives here. Project facts and stack badges come from what each live
  * site actually ships; anything that only you know is marked [FILL].
  */
@@ -71,7 +71,7 @@ export interface Section {
 }
 
 export const SECTIONS: readonly Section[] = [
-  { id: "home", label: "Home", title: "Siyabonga Kuhlase — arrival", color: "amber" },
+  { id: "home", label: "Home", title: "Siyabonga Kuhlase", color: "amber" },
   { id: "work", label: "Work", title: "Seven platforms, all live", color: "rose" },
   { id: "stack", label: "Stack", title: "Interface to server room", color: "teal" },
   { id: "play", label: "Play", title: "Talk to the shell", color: "lime" },

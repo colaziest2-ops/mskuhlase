@@ -1,4 +1,4 @@
-.root {
+﻿.root {
   position: fixed;
   inset: 0;
   z-index: 130;
@@ -84,7 +84,7 @@
 }
 
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -139,7 +139,7 @@
 }
 
 .sector {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -165,7 +165,7 @@
 .note span {
   display: block;
   margin-bottom: 3px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.7rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -201,12 +201,7 @@
   margin-top: 20px;
 }
 .tags li {
-  padding: 5px 10px;
-  border: 1px dashed color-mix(in srgb, var(--ac) 60%, transparent);
-  border-radius: 3px;
-  font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: #4a443b;
 }
 
 /* ---- footer ------------------------------------------------------------------------- */
@@ -227,7 +222,7 @@
   border-radius: 999px;
   background: var(--ac);
   color: #fff;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.12em;

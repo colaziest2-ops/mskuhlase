@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* desk field — slightly warmer than pure black */
   --field-0: #0a0908;
   --field-1: #12100e;
@@ -8,6 +8,8 @@
   /* type */
   --font-display: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-label: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
   --ink: #e8e4dc;
   --ink-dim: #9a958c;
   --ink-faint: #5c584f;

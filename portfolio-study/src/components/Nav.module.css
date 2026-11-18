@@ -1,4 +1,4 @@
-.wrap {
+﻿.wrap {
   position: fixed;
   top: max(12px, env(safe-area-inset-top));
   left: 0;
@@ -247,7 +247,7 @@
 
   .num {
     grid-area: n;
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-size: 0.7rem;
     color: var(--lc);
   }

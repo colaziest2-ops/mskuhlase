@@ -1,4 +1,4 @@
-.viewport {
+﻿.viewport {
   position: fixed;
   inset: 0;
   overflow-x: hidden;
@@ -38,7 +38,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -146,7 +146,7 @@
   border: 1px solid color-mix(in srgb, var(--c-lime) 38%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--c-lime) 9%, transparent);
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -226,7 +226,7 @@
 
 .role {
   margin-top: clamp(18px, 3vh, 28px);
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: clamp(0.78rem, 1.5vw, 0.95rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -306,11 +306,11 @@
 
 .portrait figcaption {
   margin-top: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-dim);
 }
 
 @media (max-width: 900px) {
@@ -458,7 +458,7 @@
   padding: 3px 8px;
   border: 1px solid rgb(var(--edge) / 0.18);
   border-radius: 2px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.64rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -504,7 +504,7 @@
 .stamp {
   min-height: 1.4em;
   margin-top: 10px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.74rem;
   letter-spacing: 0.06em;
   color: var(--c-lime);
@@ -515,7 +515,7 @@
   flex-wrap: wrap;
   gap: 8px 28px;
   margin-top: 26px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -546,7 +546,7 @@
 }
 
 .formHead {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.64rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -566,7 +566,7 @@
 }
 
 .field > span {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.64rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -617,7 +617,7 @@
   border: 0;
   border-radius: 999px;
   color: #fff;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.76rem;
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -641,7 +641,7 @@
 
 .formStatus {
   min-height: 1.4em;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: 0.74rem;
   letter-spacing: 0.06em;
   color: var(--c-lime);

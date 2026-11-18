@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { PROJECTS } from "../content";
+import { TechTag } from "./TechTags";
 import { DetailSheet } from "./DetailSheet";
 import { CARD, SpringBag } from "../lib/physics";
 import { PARAMS } from "../lib/params";
@@ -568,7 +569,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                 <p className={styles.stripLabel}>stack</p>
                 <ul className={styles.stripTags}>
                   {p.stack.map((s) => (
-                    <li key={s}>{s}</li>
+                    <TechTag key={s} name={s} />
                   ))}
                 </ul>
                 <p className={styles.live}>
@@ -620,7 +621,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                     <p className={styles.tagline}>{p.tagline}</p>
                     <ul className={styles.tags}>
                       {p.stack.map((s) => (
-                        <li key={s}>{s}</li>
+                        <TechTag key={s} name={s} />
                       ))}
                     </ul>
                     <div className={styles.foot}>
@@ -656,7 +657,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                     </ul>
                     <ul className={styles.tags}>
                       {p.stack.map((s) => (
-                        <li key={s}>{s}</li>
+                        <TechTag key={s} name={s} />
                       ))}
                     </ul>
                     <a className={styles.visit} href={p.url} target="_blank" rel="noopener noreferrer">

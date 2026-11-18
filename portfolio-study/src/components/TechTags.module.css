@@ -1,0 +1,44 @@
+/* a logo on a small dark tile: every brand colour reads on it, on the paper cards in either theme */
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  background: #211e1a;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  color: #e9e4d8;
+}
+
+.item[data-named="true"] {
+  padding: 0 11px 0 9px;
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* the dark tile is the same in both themes, so undo the per-theme tone shifts from Logo.module.css */
+.item svg {
+  color: var(--lg, currentColor) !important;
+}
+.item svg[data-tone="dark"] {
+  color: #f2efe8 !important;
+}
+
+.text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

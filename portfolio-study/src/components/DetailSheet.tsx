@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import type { Project } from "../content";
+import { TechTag } from "./TechTags";
 import styles from "./DetailSheet.module.css";
 
 interface DetailSheetProps {
@@ -140,7 +141,7 @@ export function DetailSheet({ project, index, total, grain, onClose }: DetailShe
           </ul>
           <ul className={styles.tags}>
             {project.stack.map((s) => (
-              <li key={s}>{s}</li>
+              <TechTag key={s} name={s} />
             ))}
           </ul>
         </div>

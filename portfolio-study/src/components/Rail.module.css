@@ -1,4 +1,4 @@
-.rail {
+﻿.rail {
   position: fixed;
   left: 0;
   right: 0;
@@ -9,7 +9,7 @@
   justify-content: space-between;
   gap: 24px;
   padding: 0 var(--gutter) max(10px, env(safe-area-inset-bottom));
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   pointer-events: none;
 }
 
@@ -29,15 +29,95 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  padding: 8px 10px; /* room for the glow, which overflow:hidden would otherwise clip */
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-dim);
+  color: var(--ink);
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--mc, var(--heat)) 75%, transparent),
+    0 0 18px color-mix(in srgb, var(--mc, var(--heat)) 45%, transparent);
+  transform-origin: left center;
+  animation:
+    warp calc(0.7s * var(--z, 1)) var(--ease-out) both,
+    glow calc(3.6s * var(--z, 1)) ease-in-out calc(0.7s * var(--z, 1)) infinite;
 }
 
 .readout span {
   margin-right: 1.1em;
-  color: var(--heat);
+  color: var(--mc, var(--heat));
+}
+
+/* arrives distorted: skewed, blurred, with the colour channels split apart, then snaps into focus */
+@keyframes warp {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) skewX(-22deg) scaleX(1.12);
+    filter: blur(3px);
+    text-shadow:
+      -6px 0 0 rgb(255 60 90 / 0.8),
+      6px 0 0 rgb(60 200 255 / 0.8),
+      0 0 24px var(--mc, var(--heat));
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(5px) skewX(14deg) scaleX(0.96);
+    filter: blur(1.5px);
+    text-shadow:
+      4px 0 0 rgb(255 60 90 / 0.7),
+      -4px 0 0 rgb(60 200 255 / 0.7),
+      0 0 22px var(--mc, var(--heat));
+  }
+  50% {
+    transform: translateX(-3px) skewX(-7deg);
+    filter: blur(0.6px);
+    text-shadow:
+      -2px 0 0 rgb(255 60 90 / 0.5),
+      2px 0 0 rgb(60 200 255 / 0.5),
+      0 0 18px var(--mc, var(--heat));
+  }
+  75% {
+    transform: translateX(1px) skewX(3deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* at rest it breathes, with the odd tiny flicker */
+@keyframes glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 6px color-mix(in srgb, var(--mc, var(--heat)) 75%, transparent),
+      0 0 18px color-mix(in srgb, var(--mc, var(--heat)) 45%, transparent);
+  }
+  50% {
+    text-shadow:
+      0 0 9px color-mix(in srgb, var(--mc, var(--heat)) 95%, transparent),
+      0 0 30px color-mix(in srgb, var(--mc, var(--heat)) 65%, transparent);
+  }
+  92% {
+    transform: none;
+  }
+  94% {
+    transform: translateX(1.5px) skewX(-4deg);
+    text-shadow:
+      -2px 0 0 rgb(255 60 90 / 0.5),
+      2px 0 0 rgb(60 200 255 / 0.5),
+      0 0 14px var(--mc, var(--heat));
+  }
+  96% {
+    transform: none;
+  }
+}
+
+:global([data-reduced="true"]) .readout {
+  animation: none;
 }
 
 .marks {
@@ -102,12 +182,17 @@
   color: var(--mc, var(--heat));
 }
 
-.label {
+.icon {
   position: relative;
   z-index: 1;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 @media (max-width: 760px) {
