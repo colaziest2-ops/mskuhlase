@@ -65,7 +65,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 3px 3px 3px 18px;
+  padding: 1px 2px 1px 18px;
   background: linear-gradient(180deg, rgb(var(--edge) / 0.09), rgb(var(--edge) / 0.03));
   border: 1px solid rgb(var(--edge) / 0.14);
   border-radius: 999px;

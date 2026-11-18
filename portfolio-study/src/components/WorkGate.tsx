@@ -1,7 +1,7 @@
 ﻿import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { PROJECTS } from "../content";
-import { WorkStack } from "./WorkStack";
+import { WarpCards } from "./WarpCards";
 import styles from "./WorkGate.module.css";
 
 const OPEN_MS = 520;
@@ -9,8 +9,8 @@ const OPEN_MS = 520;
 /**
  * The Work section opens like a desktop: a closed "projects" window with the seven
  * platforms as icons and one clear button. Pressing it opens the window (it swells and
- * dissolves, the icons are pulled into the middle), and the interactive card stack
- * is dealt out where it was. After that it stays open.
+ * dissolves, the icons are pulled into the middle), and the warp-card track fans
+ * out where it was. After that it stays open.
  */
 export function WorkGate({ active, reduced }: { readonly active: boolean; readonly reduced: boolean }) {
   const [phase, setPhase] = useState<"closed" | "opening" | "open">(reduced ? "open" : "closed");
@@ -36,7 +36,7 @@ export function WorkGate({ active, reduced }: { readonly active: boolean; readon
     return () => window.removeEventListener("study:expand", onExpand);
   }, [active, phase, open]);
 
-  if (phase === "open") return <WorkStack active={active} reduced={reduced} />;
+  if (phase === "open") return <WarpCards active={active} reduced={reduced} />;
 
   return (
     <div className={styles.gate} data-phase={phase}>
@@ -71,7 +71,7 @@ export function WorkGate({ active, reduced }: { readonly active: boolean; readon
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </button>
-          <p className={styles.hint}>Seven live platforms. Pull them forward, peel them, open them.</p>
+          <p className={styles.hint}>Seven live platforms. Swipe through them, open them, visit them.</p>
         </div>
       </div>
     </div>

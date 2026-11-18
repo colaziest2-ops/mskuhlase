@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode, RefObject } from "react";
 import { FOOTER, INTRO_PARTS, PERSON, PROJECTS, SECTIONS, SKILLS, type ColorName } from "../content";
 import { createScroller } from "../lib/physics";
@@ -7,6 +7,7 @@ import { rngFor } from "../lib/rng";
 import { publishScroll, subscribeScroll, useInView } from "../lib/scroll";
 import { sastHM } from "../lib/time";
 import { Hl } from "./Hl";
+import { KeycapName } from "./KeycapName";
 import { Logo } from "./Logo";
 import { ReLuma } from "./ReLuma";
 import { Reveal } from "./Reveal";
@@ -38,11 +39,6 @@ const TICKER: readonly TickerItem[] = SKILLS.flatMap((l) =>
 
 const sec = (i: number) => ({ "--sec": `var(--c-${SECTIONS[i]?.color ?? "amber"})` }) as CSSProperties;
 
-const mix = (a: ColorName, b: ColorName, f: number) =>
-  `color-mix(in srgb, var(--c-${a}) ${Math.round((1 - f) * 100)}%, var(--c-${b}))`;
-/** The surname runs amber → rose → violet, letter by letter. */
-const surnameTint = (f: number) => (f < 0.5 ? mix("amber", "rose", f * 2) : mix("rose", "violet", (f - 0.5) * 2));
-
 /**
  * The bio, split into words so a soft beam of light can run through it on a loop.
  * Highlighted phrases travel as one unit; whitespace stays plain text (`i: -1`).
@@ -62,42 +58,6 @@ const INTRO_SWEEP: readonly { k: string; t: string; i: number; c?: ColorName }[]
   });
   return out;
 })();
-
-/** Name letters resolve on a slight mechanical delay — stepped, a little uneven, never smooth. */
-function Resolve({
-  text,
-  label,
-  start,
-  tint,
-  offset = 0,
-}: {
-  text: string;
-  label: string;
-  start: number;
-  tint?: (f: number) => string;
-  /** where this word starts in the light sweep that runs through the whole name */
-  offset?: number;
-}) {
-  const glyphs = useMemo(() => {
-    const r = rngFor(PARAMS.seed, `arrival:${label}`);
-    const chars = Array.from(text);
-    return chars.map((ch, i) => ({
-      ch,
-      delay: Math.round(start + i * 58 + r() * 110),
-      color: tint ? tint(chars.length > 1 ? i / (chars.length - 1) : 0) : undefined,
-    }));
-  }, [text, label, start, tint]);
-
-  return (
-    <span aria-hidden="true">
-      {glyphs.map((g, i) => (
-        <span key={i} className={styles.glyph} style={{ "--d": `${g.delay}ms`, "--gi": offset + i, color: g.color } as CSSProperties}>
-          {g.ch === " " ? " " : g.ch}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 async function copyText(text: string): Promise<void> {
   try {
@@ -431,18 +391,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                 <i /> {PERSON.availability}
               </p>
               <h1 id="name" className={styles.name} aria-label={PERSON.name}>
-                <span className={styles.nameLine}>
-                  <Resolve text={PERSON.first} label="first" start={120} />
-                </span>
-                <span className={styles.nameLine}>
-                  <Resolve
-                    text={PERSON.last}
-                    label="last"
-                    start={120 + PERSON.first.length * 58 + 140}
-                    tint={surnameTint}
-                    offset={PERSON.first.length + 1}
-                  />
-                </span>
+                <KeycapName reduced={reduced} />
               </h1>
               <p className={styles.role}>
                 <span className={styles.roleA}>Software Engineer</span> <span className={styles.roleAmp}>·</span>{" "}
@@ -533,11 +482,8 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                 />
               </h2>
               <Reveal as="p" variant="blur" delay={300} className={styles.lede}>
-                Real businesses, real traffic. <Hl c="rose">Pull a card forward</Hl>,{" "}
-                <span className={styles.peelOnly}>
-                  <Hl c="amber">peel it sideways</Hl> to see what's under it,{" "}
-                </span>
-                or <Hl c="sky">open it</Hl> for the working notes.
+                Real businesses, real traffic. <Hl c="rose">Swipe or arrow through</Hl> the cards,{" "}
+                <Hl c="amber">open one</Hl> for the working notes, then <Hl c="sky">visit</Hl> the live site.
               </Reveal>
             </div>
             <WorkGate active={active === 1} reduced={reduced} />

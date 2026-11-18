@@ -180,54 +180,11 @@
   }
 }
 
+/* the name is drawn as keycap spheres (KeycapName); they size themselves off this box */
 .name {
-  font-size: clamp(3rem, 9.4vw, 8.2rem);
-  font-weight: 400;
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  /* the type casts its own shadow, away from wherever the light (your cursor) is */
-  text-shadow:
-    calc(var(--lx) * -0.045em) calc(var(--ly) * -0.045em + 0.05em) 0.16em rgb(0 0 0 / var(--name-shadow-a)),
-    0 0 0.7em rgb(var(--heat-rgb) / 0.06);
-}
-
-.nameLine {
-  display: block;
-}
-
-.glyph {
-  --gi: 0;
-  display: inline-block;
-  opacity: 0;
-  /* resolve once, then a beam of light runs through the name, letter by letter, forever */
-  animation:
-    resolve calc(0.46s * var(--z, 1)) steps(4, end) both,
-    glint calc(6.5s * var(--z, 1)) linear infinite;
-  animation-delay:
-    calc(var(--d) * var(--z, 1)),
-    calc((2.8s + var(--gi) * 0.07s) * var(--z, 1));
-}
-
-@keyframes resolve {
-  0% {
-    opacity: 0;
-    filter: blur(7px);
-    transform: translateY(0.05em);
-  }
-  60% {
-    opacity: 0.7;
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: none;
-  }
-}
-
-:global([data-reduced="true"]) .glyph {
-  animation: none;
-  opacity: 1;
+  container-type: inline-size;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .role {
@@ -669,13 +626,6 @@
   color: var(--ink-faint);
 }
 
-/* peeling needs room and a pointer; phones just tap */
-@media (max-width: 760px) {
-  .peelOnly {
-    display: none;
-  }
-}
-
 /* phone type floor + tap targets; sits last so the earlier per-element sizes can't win */
 @media (max-width: 760px) {
   .addrHint.addrHint,
@@ -781,18 +731,7 @@
   color: var(--c-rose);
 }
 
-/* ---- the light sweep: letters of the name, then words of the bio --------------- */
-
-@keyframes glint {
-  0%,
-  13%,
-  100% {
-    filter: none;
-  }
-  5% {
-    filter: brightness(1.55) drop-shadow(0 0 0.1em rgb(255 236 205 / 0.6));
-  }
-}
+/* ---- the light sweep: keys of the name (KeycapName), then words of the bio ------ */
 
 .w,
 .wh {
@@ -833,10 +772,6 @@
   }
 }
 
-:global([data-reduced="true"]) .glyph {
-  animation: none;
-  opacity: 1;
-}
 :global([data-reduced="true"]) .w,
 :global([data-reduced="true"]) .wh {
   animation: none;

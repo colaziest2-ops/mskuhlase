@@ -1,0 +1,724 @@
+.shell {
+  --cardW: 360px;
+  --cardH: 440px;
+  --trackH: calc(var(--cardH) + 56px);
+  width: 100%;
+  min-width: 0;
+}
+
+.region {
+  position: relative;
+  border-radius: 18px;
+  outline: none;
+}
+.region:focus-visible {
+  box-shadow: 0 0 0 2px var(--heat-soft);
+}
+
+/* ---- the track: clipped sideways, never scrolls the page sideways ----------------- */
+
+.viewport {
+  position: relative;
+  height: var(--trackH);
+  overflow: hidden;
+  /* the curled neighbours fade out at the edges of the lens instead of being cut off */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+@supports (overflow: clip) {
+  .viewport {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+}
+
+/* the drag surface; vertical page scroll stays native, horizontal drags are ours */
+.stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1100px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;
+}
+.stage[data-dragging="true"] {
+  cursor: grabbing;
+}
+.stage[data-dragging="true"] .card {
+  cursor: grabbing;
+}
+
+/* ---- a card: placed by JS from its offset; CSS only sets the resting origin ------- */
+
+.card {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  width: var(--cardW);
+  height: var(--cardH);
+  margin-left: calc(var(--cardW) / -2);
+  border-radius: 18px;
+  will-change: transform, filter;
+  cursor: pointer;
+}
+.card[data-centre="true"] {
+  cursor: grab;
+}
+
+/* ---- the paper: frosted pearl glass, tinted by the project's own colour ------------ */
+
+.paper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--ac) 16%, transparent), transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgb(186 168 255 / 0.18), transparent 60%),
+    radial-gradient(70% 60% at 100% 0%, rgb(140 220 255 / 0.12), transparent 60%),
+    linear-gradient(160deg, #fff, #f3f0fa); /* opaque: the curled neighbours must not show through */
+  color: #1b1916;
+  box-shadow:
+    0 2px 0 var(--paper-edge),
+    0 22px 50px rgb(0 0 0 / 0.34);
+  overflow: hidden;
+}
+
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--grain);
+  mix-blend-mode: multiply;
+  opacity: 0.16;
+}
+.paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.9),
+    inset 0 0 0 2px rgb(120 108 170 / 0.1),
+    inset 0 -26px 40px -30px rgb(130 110 210 / 0.22);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 20px 20px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgb(27 25 22 / 0.12);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6f685b;
+}
+
+.idx {
+  flex: none;
+  color: var(--ac);
+  font-weight: 600;
+}
+
+.cat {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.livechip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  background: color-mix(in srgb, #3f9a4a 14%, transparent);
+  border: 1px solid color-mix(in srgb, #3f9a4a 40%, transparent);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #2f7a39;
+}
+.livechip i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3f9a4a;
+  box-shadow: 0 0 8px #3f9a4a;
+}
+
+.sector {
+  margin-top: 16px;
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a7366;
+}
+
+.title {
+  margin: 6px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 2.6vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: #15130f;
+}
+
+.tagline {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #38342d;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+.tags li {
+  font-size: 0.75rem;
+}
+
+.foot {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.domain {
+  display: block;
+  margin-bottom: 20px; /* room for the guide arrow above the buttons */
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6f685b;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* glass pills; Visit is the primary one */
+.actions button,
+.actions a {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  background: rgb(255 255 255 / 0.62);
+  border: 1px solid rgb(27 25 22 / 0.16);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 3px rgb(30 20 60 / 0.08);
+  cursor: pointer;
+  font-family: var(--font-label);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #1b1916;
+  transition:
+    background var(--rail-time) var(--ease-out),
+    transform calc(0.18s * var(--z, 1)) var(--ease-spring),
+    box-shadow var(--rail-time) var(--ease-out);
+}
+.actions a {
+  background: #1b1916;
+  border-color: #1b1916;
+  color: #fbf8f2;
+}
+.actions button:hover {
+  background: rgb(255 255 255 / 0.95);
+}
+.actions a:hover {
+  background: #000;
+}
+.actions button:active,
+.actions a:active {
+  transform: scale(0.94);
+  transition-duration: 60ms;
+}
+
+kbd {
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+/* ---- sheen: light catching the glass of the centred card ------------------------ */
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--sx, 50%) var(--sy, 25%), rgb(255 255 255 / 0.85), transparent 42%),
+    linear-gradient(
+      115deg,
+      transparent 18%,
+      rgb(255 110 190 / 0.4) 34%,
+      rgb(110 190 255 / 0.45) 50%,
+      rgb(150 255 190 / 0.4) 66%,
+      transparent 82%
+    );
+  background-size: 100% 100%, 220% 100%;
+  background-position: 0 0, calc(var(--sx, 50%) * -1 + 60%) 0;
+  transition: opacity calc(0.35s * var(--z, 1)) var(--ease-out);
+}
+.card[data-centre="true"] .sheen {
+  opacity: 0.45;
+}
+.card[data-centre="true"]:hover .sheen,
+.card[data-centre="true"]:focus-within .sheen {
+  opacity: 0.95;
+}
+
+/* ---- prev / next: glass buttons at either side ------------------------------------ */
+
+.arrow {
+  position: absolute;
+  top: calc(var(--trackH) / 2 - 22px);
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: color-mix(in srgb, var(--field-1) 55%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgb(var(--edge) / 0.22);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    0 8px 22px rgb(0 0 0 / 0.28);
+  cursor: pointer;
+  color: var(--ink);
+  transition:
+    transform calc(0.18s * var(--z, 1)) var(--ease-spring),
+    opacity var(--rail-time) var(--ease-out),
+    background var(--rail-time) var(--ease-out);
+}
+.arrow[data-dir="prev"] {
+  left: 6px;
+}
+.arrow[data-dir="next"] {
+  right: 6px;
+}
+.arrow:hover {
+  background: color-mix(in srgb, var(--field-2) 80%, transparent);
+}
+.arrow:active {
+  transform: scale(0.88);
+  transition-duration: 60ms;
+}
+.arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+.arrow:disabled:active {
+  transform: none;
+}
+
+/* until the first interaction, the arrows nudge outward: "there's more this way" */
+.arrow[data-idle="true"]:not(:disabled) svg {
+  animation: nudgeNext calc(1.4s * var(--z, 1)) ease-in-out infinite;
+}
+.arrow[data-dir="prev"][data-idle="true"]:not(:disabled) svg {
+  animation-name: nudgePrev;
+}
+@keyframes nudgeNext {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 4px 0;
+  }
+}
+@keyframes nudgePrev {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -4px 0;
+  }
+}
+
+/* ---- dots + index ------------------------------------------------------------------ */
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 18px;
+  margin-top: 6px;
+}
+
+.dots {
+  display: flex;
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dot i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(var(--edge) / 0.3);
+  transition:
+    width calc(0.3s * var(--z, 1)) var(--ease-out),
+    background calc(0.3s * var(--z, 1)) var(--ease-out),
+    transform calc(0.18s * var(--z, 1)) var(--ease-spring);
+}
+.dot[data-on="true"] i {
+  width: 22px;
+  background: var(--ac);
+}
+.dot:hover i {
+  background: rgb(var(--edge) / 0.55);
+}
+.dot[data-on="true"]:hover i {
+  background: var(--ac);
+}
+.dot:active i {
+  transform: scale(0.7);
+  transition-duration: 60ms;
+}
+.dot:focus-visible {
+  outline: 2px solid var(--heat-soft);
+  outline-offset: -6px;
+  border-radius: 10px;
+}
+
+.index {
+  font-family: var(--font-label);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.index b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.hint {
+  margin-top: 10px;
+  font-family: var(--font-label);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- guidance: arrows on the next step ------------------------------------------- */
+
+.actions [data-guide="true"] {
+  animation: guideRing calc(2.2s * var(--z, 1)) var(--ease-out) infinite;
+}
+
+.actions [data-guide="true"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  width: 9px;
+  height: 9px;
+  margin-left: -5px;
+  border-right: 2px solid var(--ac, #c4651a);
+  border-bottom: 2px solid var(--ac, #c4651a);
+  transform: rotate(45deg);
+  animation: guideBob calc(1.1s * var(--z, 1)) ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes guideRing {
+  0% {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 0 color-mix(in srgb, var(--ac, #c4651a) 45%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 9px color-mix(in srgb, var(--ac, #c4651a) 0%, transparent);
+  }
+}
+
+@keyframes guideBob {
+  0%,
+  100% {
+    translate: 0 -3px;
+  }
+  50% {
+    translate: 0 3px;
+  }
+}
+
+/* after a miss, the button that does the thing gives a little hop */
+.actions [data-nudge="true"] {
+  animation: nudgeHop calc(0.6s * var(--z, 1)) var(--ease-spring) 2;
+}
+
+@keyframes nudgeHop {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-5px) scale(1.08);
+  }
+}
+
+/* ---- touch ripple + "missed me" ------------------------------------------------- */
+
+.ripple {
+  position: absolute;
+  left: var(--mx);
+  top: var(--my);
+  z-index: 4;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid color-mix(in srgb, var(--ac, #c4651a) 80%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: tapRing calc(0.6s * var(--z, 1)) var(--ease-out) forwards;
+}
+.ripple[data-miss="true"] {
+  border-color: #d12f68;
+  animation-duration: calc(0.8s * var(--z, 1));
+}
+
+@keyframes tapRing {
+  from {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(5.5);
+  }
+}
+
+/* the card shrugs: a quick sideways wobble (composes with the track's transform on the card) */
+.paper[data-miss="a"] {
+  animation: shrugA calc(0.55s * var(--z, 1)) var(--ease-out);
+}
+.paper[data-miss="b"] {
+  animation: shrugB calc(0.55s * var(--z, 1)) var(--ease-out);
+}
+
+@keyframes shrugA {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  20% {
+    translate: -7px 0;
+    rotate: -1.2deg;
+  }
+  45% {
+    translate: 5px 0;
+    rotate: 0.8deg;
+  }
+  70% {
+    translate: -2px 0;
+    rotate: -0.3deg;
+  }
+}
+@keyframes shrugB {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  20% {
+    translate: -7px 0;
+    rotate: -1.2deg;
+  }
+  45% {
+    translate: 5px 0;
+    rotate: 0.8deg;
+  }
+  70% {
+    translate: -2px 0;
+    rotate: -0.3deg;
+  }
+}
+
+.missed {
+  position: absolute;
+  left: 20px;
+  bottom: 80px;
+  z-index: 5;
+  padding: 9px 13px;
+  background: #1b1916;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgb(20 10 40 / 0.28);
+  font-family: var(--font-label);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  color: #fbf8f2;
+  pointer-events: none;
+  transform-origin: 20% 100%;
+  animation: bubble calc(1.7s * var(--z, 1)) var(--ease-spring) forwards;
+}
+.missed b {
+  color: #ffb37a;
+  font-weight: 600;
+}
+/* its tail points down at the Open button (the left half of the action row) */
+.missed::after {
+  content: "";
+  position: absolute;
+  left: calc((var(--cardW) - 48px) / 4 - 5px);
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+@keyframes bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.8);
+  }
+  14%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ---- phones ------------------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .shell {
+    --cardW: min(78vw, 330px);
+    --cardH: 420px;
+    --trackH: calc(var(--cardH) + 40px);
+  }
+  /* the track runs edge to edge, so the curled neighbours peek in from the screen sides */
+  .viewport {
+    margin-inline: calc(-1 * var(--gutter));
+  }
+  .card {
+    top: 20px;
+  }
+  .stage {
+    perspective: 900px;
+  }
+  /* the arrows move down beside the dots, clear of the centred card */
+  .arrow {
+    top: calc(var(--trackH) + 6px);
+  }
+  .arrow[data-dir="prev"] {
+    left: 0;
+  }
+  .arrow[data-dir="next"] {
+    right: 0;
+  }
+  .bar {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .index {
+    max-width: 100%;
+  }
+  .hint {
+    text-align: center;
+  }
+  .title {
+    font-size: 2rem;
+  }
+}
+
+/* no keyboard on a touch screen */
+@media (hover: none), (pointer: coarse) {
+  kbd {
+    display: none;
+  }
+}
+
+/* ---- reduced motion: the track snaps; no nudges, no wobbles ---------------------- */
+
+:global([data-reduced="true"]) .actions [data-guide="true"],
+:global([data-reduced="true"]) .actions [data-guide="true"]::after,
+:global([data-reduced="true"]) .actions [data-nudge="true"],
+:global([data-reduced="true"]) .paper[data-miss],
+:global([data-reduced="true"]) .arrow svg {
+  animation: none;
+}
+:global([data-reduced="true"]) .card {
+  will-change: auto;
+}

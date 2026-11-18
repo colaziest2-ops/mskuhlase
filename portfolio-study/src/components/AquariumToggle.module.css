@@ -1,0 +1,59 @@
+/* The pill's column: its width sizes the whole toggle (the engine fits the pill plus its 3% glass margin into it). */
+.wrap {
+  flex: none;
+  width: 96px;
+}
+
+.tank {
+  position: relative;
+  max-width: 100%;
+}
+
+.tank canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* The switch: an invisible button over the pill; the engine sizes it to the pill */
+.hit {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hit:active {
+  cursor: grabbing;
+}
+.hit:focus {
+  outline: none;
+}
+.hit:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cursor {
+  display: none;
+}
+
+/* phones: a little smaller so the nav still fits the brand, the clock and the crumple button */
+@media (max-width: 760px) {
+  .wrap {
+    width: 88px;
+  }
+}

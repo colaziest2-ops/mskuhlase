@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { Clock } from "./Clock";
-import { ThemeToggle } from "./ThemeToggle";
+import { AquariumToggle } from "./AquariumToggle";
 import styles from "./Nav.module.css";
 
 interface NavProps {
@@ -39,7 +39,7 @@ export function Nav({ onGo, reduced, onCrumple }: NavProps) {
             <div className={styles.clock}>
               <Clock reduced={reduced} />
             </div>
-            <ThemeToggle />
+            <AquariumToggle />
           </div>
           {onCrumple && (
             <button type="button" className={styles.crumple} onClick={onCrumple} aria-label="Crumple the page" title="Crumple the page">
