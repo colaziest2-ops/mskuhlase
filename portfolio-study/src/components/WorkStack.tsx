@@ -550,6 +550,13 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
               data-expanded={isExp}
               data-dimmed={expanded !== null && !isExp}
               onPointerDown={(e) => onPointerDown(e, pi)}
+              onPointerMove={(e) => {
+                // the holographic sheen follows the pointer across the front card
+                if (!isFront) return;
+                const r = e.currentTarget.getBoundingClientRect();
+                e.currentTarget.style.setProperty("--sx", `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+                e.currentTarget.style.setProperty("--sy", `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
+              }}
               onPointerUp={(e) => endDrag(e, pi)}
               onPointerCancel={(e) => endDrag(e, pi)}
               onClick={(e) => onCardClick(pi, e)}
@@ -592,6 +599,7 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
                 className={styles.paper}
                 data-paper=""
               >
+                <span className={styles.sheen} aria-hidden="true" />
                 {isFront ? (
                   <div className={styles.tab}>
                     <span className={styles.idx}>{n}</span>
@@ -616,7 +624,12 @@ export function WorkStack({ active, reduced }: { active: boolean; reduced: boole
 
                 <div className={styles.body} inert={!isFront}>
                   <div className={styles.compact} data-hidden={isExp}>
-                    <p className={styles.sector}>{p.sector}</p>
+                    <p className={styles.sector}>
+                      {p.sector}
+                      <span className={styles.livechip}>
+                        <i /> Live
+                      </span>
+                    </p>
                     <h3 className={styles.title}>{p.name}</h3>
                     <p className={styles.tagline}>{p.tagline}</p>
                     <ul className={styles.tags}>

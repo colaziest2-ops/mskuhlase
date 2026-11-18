@@ -1,35 +1,42 @@
-/* Sits inside the nav bar. */
+﻿/* A small floating pill: the label over serif numerals. The seconds glow and tick. */
 .clock {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-  font-family: var(--font-mono);
-  line-height: 1.2;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
   pointer-events: none;
 }
 
 .zone {
-  font-size: 0.56rem;
-  letter-spacing: 0.2em;
+  font-family: var(--font-label);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
   color: var(--ink-faint);
 }
 
 .time {
-  font-size: 0.86rem;
-  letter-spacing: 0.06em;
-  color: var(--ink-dim);
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-serif);
+  font-size: 1.28rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  font-variant-numeric: lining-nums tabular-nums;
+  text-shadow: 0 1px 0 rgb(var(--edge) / 0.18);
 }
 
 .time i {
   font-style: normal;
   color: var(--ink-faint);
+  padding: 0 0.03em;
 }
 
 .time b {
-  font-weight: 500;
+  font-weight: 400;
   color: var(--heat);
+  text-shadow: 0 0 12px rgb(var(--heat-rgb) / 0.55);
 }
 
 .tick {
@@ -49,5 +56,18 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+/* phones: the label and seconds step aside so the pill stays slim */
+@media (max-width: 760px) {
+  .zone {
+    display: none;
+  }
+  .time {
+    font-size: 1.1rem;
+  }
+  .secs {
+    display: none;
   }
 }

@@ -22,13 +22,13 @@ export const PERSON: Person = {
   name: "Siyabonga Kuhlase",
   first: "Siyabonga",
   last: "Kuhlase",
-  role: "Software Engineer & Technical Operations",
+  role: "Software Engineer · Full-Stack & Networking · AI Solutions",
   location: "Durban, South Africa", // [FILL] confirm
   availability: "Available for select freelance projects",
   email: "mskuhlase1011@icloud.com",
   resumeUrl: "", // [FILL]
   github: "", // [FILL]
-  linkedin: "", // [FILL]
+  linkedin: "https://www.linkedin.com/in/siyabonga-kuhlase", // [FILL] placeholder — replace with the real profile URL
 };
 
 export type ColorName = "amber" | "teal" | "sky" | "violet" | "rose" | "lime";
@@ -41,24 +41,23 @@ export interface IntroPart {
 
 export const INTRO_PARTS: readonly IntroPart[] = [
   { t: "I build " },
-  { t: "web apps", c: "sky" },
-  { t: " and I " },
-  { t: "keep systems running", c: "amber" },
-  { t: " — two things that don't usually sit in the same job description, but here we are. Day to day that's " },
-  { t: "Next.js", c: "sky" },
+  { t: "practical software", c: "sky" },
   { t: " and " },
-  { t: "React", c: "sky" },
-  { t: " for clients who need a real interface, and " },
-  { t: "SQL Server", c: "violet" },
-  { t: " and server-node work for " },
+  { t: "keep complex systems running", c: "amber" },
+  { t: ". Most of my work sits at the intersection of " },
+  { t: "full-stack web applications", c: "sky" },
+  { t: " and the infrastructure underneath them — " },
   { t: "video management systems", c: "teal" },
-  { t: " running across " },
-  { t: "mine sites", c: "rose" },
-  { t: ". Different problems, same instinct: " },
-  { t: "understand the system before you touch it", c: "lime" },
+  { t: ", " },
+  { t: "networking", c: "violet" },
+  { t: ", and " },
+  { t: "multi-site deployments", c: "rose" },
+  { t: " that need to stay reliable. Lately I've been layering " },
+  { t: "AI solutions", c: "lime" },
+  { t: " into these environments to surface useful signals faster and cut manual work. The goal is the same in every project: make things more efficient and contribute to a " },
+  { t: "safer, better-run South Africa", c: "rose" },
   { t: "." },
 ];
-
 export const INTRO = INTRO_PARTS.map((p) => p.t).join("");
 
 export interface Section {

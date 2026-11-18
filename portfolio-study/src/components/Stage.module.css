@@ -85,9 +85,9 @@
 .h2 {
   max-width: 16ch;
   font-size: clamp(2.2rem, 5.6vw, 4.2rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
@@ -182,9 +182,9 @@
 
 .name {
   font-size: clamp(3rem, 9.4vw, 8.2rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.92;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
   /* the type casts its own shadow, away from wherever the light (your cursor) is */
   text-shadow:
     calc(var(--lx) * -0.045em) calc(var(--ly) * -0.045em + 0.05em) 0.16em rgb(0 0 0 / var(--name-shadow-a)),
@@ -680,5 +680,93 @@
   .send,
   .address {
     min-height: 44px;
+  }
+}
+
+.roleC {
+  color: var(--c-violet);
+}
+
+/* ---- LinkedIn button ---------------------------------------------------------- */
+
+.ctaRow {
+  margin-top: clamp(20px, 3.4vh, 30px);
+}
+
+.linkedin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+  padding: 8px 20px 8px 8px;
+  background: color-mix(in srgb, #0a66c2 12%, var(--field-1));
+  border: 1px solid color-mix(in srgb, #0a66c2 45%, transparent);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 0 8px 28px color-mix(in srgb, #0a66c2 18%, transparent);
+  transition:
+    transform var(--rail-time) var(--ease-spring),
+    box-shadow var(--rail-time) var(--ease-out),
+    border-color var(--rail-time) var(--ease-out);
+}
+
+.linkedin:hover,
+.linkedin:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, #0a66c2 80%, transparent);
+  box-shadow: 0 12px 36px color-mix(in srgb, #0a66c2 38%, transparent);
+  outline: none;
+}
+
+.linkedin:active {
+  transform: scale(0.97);
+}
+
+.liMark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+}
+
+/* the official mark in its own blue, always on white, so it reads in both themes */
+.liMark svg {
+  color: #0a66c2 !important;
+}
+
+.linkedin b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.linkedin small {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+
+.liArrow {
+  margin-left: 4px;
+  font-size: 1.05rem;
+  color: color-mix(in srgb, #0a66c2 70%, var(--ink));
+  transition: transform var(--rail-time) var(--ease-spring);
+}
+
+.linkedin:hover .liArrow {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 900px) {
+  .ctaRow {
+    margin-bottom: 40px; /* the portrait drifts up under the button as you scroll */
   }
 }

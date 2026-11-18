@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { sastParts, untilNextSecond, type ClockParts } from "../lib/time";
 import styles from "./Clock.module.css";
 
@@ -23,11 +23,13 @@ export function Clock({ reduced }: { reduced: boolean }) {
         {t.h}
         <i>:</i>
         {t.m}
-        <i>:</i>
-        {/* keyed on the second so the flicker animation restarts every tick */}
-        <b key={t.s} className={reduced ? undefined : styles.tick}>
-          {t.s}
-        </b>
+        <span className={styles.secs}>
+          <i>:</i>
+          {/* keyed on the second so the flicker animation restarts every tick */}
+          <b key={t.s} className={reduced ? undefined : styles.tick}>
+            {t.s}
+          </b>
+        </span>
       </span>
     </div>
   );

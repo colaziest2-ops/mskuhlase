@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode, RefObject } from "react";
 import { FOOTER, INTRO_PARTS, PERSON, PROJECTS, SECTIONS, SKILLS, type ColorName } from "../content";
 import { createScroller } from "../lib/physics";
@@ -7,13 +7,14 @@ import { rngFor } from "../lib/rng";
 import { publishScroll, subscribeScroll, useInView } from "../lib/scroll";
 import { sastHM } from "../lib/time";
 import { Hl } from "./Hl";
+import { Logo } from "./Logo";
 import { ReLuma } from "./ReLuma";
 import { Reveal } from "./Reveal";
 import { Schematic } from "./Schematic";
 import { Terminal } from "./Terminal";
 import { Ticker, type TickerItem } from "./Ticker";
 import { Words } from "./Words";
-import { WorkStack } from "./WorkStack";
+import { WorkGate } from "./WorkGate";
 import styles from "./Stage.module.css";
 
 export interface StageApi {
@@ -414,8 +415,9 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                 </span>
               </h1>
               <p className={styles.role}>
-                <span className={styles.roleA}>Software Engineer</span> <span className={styles.roleAmp}>&amp;</span>{" "}
-                <span className={styles.roleB}>Technical Operations</span>
+                <span className={styles.roleA}>Software Engineer</span> <span className={styles.roleAmp}>·</span>{" "}
+                <span className={styles.roleB}>Full-Stack &amp; Networking</span> <span className={styles.roleAmp}>·</span>{" "}
+                <span className={styles.roleC}>AI Solutions</span>
               </p>
               <Reveal as="p" variant="blur" delay={650} className={styles.intro}>
                 {INTRO_PARTS.map((p, i) =>
@@ -428,6 +430,22 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                   ),
                 )}
               </Reveal>
+              {PERSON.linkedin && (
+                <Reveal variant="rise" delay={900} className={styles.ctaRow}>
+                  <a className={styles.linkedin} href={PERSON.linkedin} target="_blank" rel="noopener noreferrer">
+                    <span className={styles.liMark}>
+                      <Logo id="linkedin" size={20} decorative />
+                    </span>
+                    <span>
+                      <b>Connect on LinkedIn</b>
+                      <small>Let's talk shop</small>
+                    </span>
+                    <span className={styles.liArrow} aria-hidden="true">
+                      ↗
+                    </span>
+                  </a>
+                </Reveal>
+              )}
             </div>
 
             <Reveal as="figure" variant="pop" delay={450} className={styles.portrait}>
@@ -487,7 +505,7 @@ export function Stage({ active, onActive, apiRef, reduced }: StageProps) {
                 or <Hl c="sky">open it</Hl> for the working notes.
               </Reveal>
             </div>
-            <WorkStack active={active === 1} reduced={reduced} />
+            <WorkGate active={active === 1} reduced={reduced} />
           </div>
         </section>
 

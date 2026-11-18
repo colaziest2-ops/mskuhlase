@@ -1,4 +1,4 @@
-*,
+﻿*,
 *::before,
 *::after {
   box-sizing: border-box;
@@ -76,6 +76,14 @@ h3,
 p,
 ul {
   margin: 0;
+}
+
+/* headings get a serif with character; body stays a clean sans */
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
 }
 
 ul {

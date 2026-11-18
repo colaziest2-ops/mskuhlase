@@ -82,10 +82,12 @@ export function Nav({ active, onGo, reduced, onCrumple }: NavProps) {
         </ul>
 
         <div className={styles.tools}>
-          <div className={styles.clock}>
-            <Clock reduced={reduced} />
+          <div className={styles.pill}>
+            <div className={styles.clock}>
+              <Clock reduced={reduced} />
+            </div>
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
           <button
             type="button"
             className={styles.burger}

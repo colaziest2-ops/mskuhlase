@@ -491,3 +491,67 @@ kbd {
     padding: 0 16px;
   }
 }
+
+/* ---- live badge + holographic sheen ------------------------------------------- */
+
+.livechip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 10px;
+  padding: 2px 8px;
+  vertical-align: middle;
+  background: color-mix(in srgb, #3f9a4a 14%, transparent);
+  border: 1px solid color-mix(in srgb, #3f9a4a 40%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-label);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #2f7a39;
+}
+
+.livechip i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3f9a4a;
+  box-shadow: 0 0 8px #3f9a4a;
+}
+
+/* light catching frosted glass: a bright spot under the pointer and a pastel refraction band */
+.sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--sx, 50%) var(--sy, 25%), rgb(255 255 255 / 0.85), transparent 42%),
+    linear-gradient(
+      115deg,
+      transparent 18%,
+      rgb(255 110 190 / 0.4) 34%,
+      rgb(110 190 255 / 0.45) 50%,
+      rgb(150 255 190 / 0.4) 66%,
+      transparent 82%
+    );
+  background-size: 100% 100%, 220% 100%;
+  background-position: 0 0, calc(var(--sx, 50%) * -1 + 60%) 0;
+  transition: opacity calc(0.35s * var(--z, 1)) var(--ease-out);
+}
+
+.card[data-front="true"]:hover .sheen,
+.card[data-front="true"]:focus-within .sheen {
+  opacity: 0.95;
+}
+
+/* touch has no hover: a faint resting sheen so the card still reads as glass */
+@media (hover: none), (pointer: coarse) {
+  .card[data-front="true"] .sheen {
+    opacity: 0.5;
+  }
+}
